@@ -1,4 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Portfolio.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// ====================================
+// CONFIGURAÇÃO DO BANCO DE DADOS
+// ====================================
+// Registra o DbContext e configura a conexão com PostgreSQL
+// A connection string vem do appsettings.json
+builder.Services.AddDbContext<PortfolioDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
