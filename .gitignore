@@ -1,0 +1,56 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+
+# Rider
+.idea/
+*.sln.iml
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+
+# Test Results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+
+# Blazor
+**/wwwroot/dist/
+
+# Database
+*.db
+*.sqlite
+
+# Secrets & Config
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+secrets.json
+.env
+.env.local
+
+# OS
+Thumbs.db
+.DS_Store
+*~
+
+# Logs
+logs/
+*.log
