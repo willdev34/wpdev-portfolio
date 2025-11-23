@@ -1,5 +1,14 @@
+// ====================================
+// Título: Program.cs - API Entry Point
+// Descrição: Ponto de entrada da API, configura serviços e middleware
+// Autor: Will
+// Empresa: WpDev
+// Data: 23/11/2024
+// ====================================
+
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Infrastructure.Data;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +20,48 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PortfolioDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ====================================
+// CONFIGURAÇÃO DO AUTOMAPPER
+// ====================================
+// Registra todos os Profiles da camada Application
+// Isso permite converter automaticamente Entity ↔ DTO
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile<Portfolio.Application.Mappings.ProjectMappingProfile>();
+});
+
+// ====================================
+// REGISTRO DOS REPOSITORIES
+// ====================================
+// Registra o ProjectRepository para injeção de dependência
+// Sempre que alguém pedir IProjectRepository, o ASP.NET injeta ProjectRepository
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IProjectRepository, 
+                           Portfolio.Infrastructure.Repositories.ProjectRepository>();
+
+// ====================================
+// CONFIGURAÇÃO DO MEDIATR (CQRS)
+// ====================================
+// Registra todos os Handlers (Commands e Queries) da camada Application
+// O MediatR vai procurar automaticamente todos os IRequestHandler
+builder.Services.AddMediatR(cfg => 
+    cfg.RegisterServicesFromAssembly(typeof(Portfolio.Application.Queries.Projects.GetAllProjects.GetAllProjectsQuery).Assembly));
+
+// ====================================
+// CONFIGURAÇÃO DO FLUENTVALIDATION
+// ====================================
+// Registra todos os Validators da camada Application
+// As validações serão executadas automaticamente antes dos Handlers
+builder.Services.AddValidatorsFromAssembly(typeof(Portfolio.Application.Commands.Projects.CreateProject.CreateProjectCommandValidator).Assembly);
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// ====================================
+// CONFIGURAÇÃO DOS CONTROLLERS
+// ====================================
+// Habilita o uso de Controllers (API REST tradicional)
+builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -26,6 +75,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// ====================================
+// MAPEAMENTO DOS CONTROLLERS
+// ====================================
+// Registra todos os Controllers da API
+app.MapControllers();
 
 var summaries = new[]
 {

@@ -42,7 +42,6 @@ public class PortfolioDbContext : DbContext
             entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
             entity.Property(e => e.DemoUrl).HasMaxLength(500);
             entity.Property(e => e.RepositoryUrl).HasMaxLength(500);
-            entity.Property(e => e.FlavorText).HasMaxLength(300);
             
             // Converter lista para JSON
             entity.Property(e => e.Technologies)

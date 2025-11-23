@@ -1,21 +1,22 @@
 // ====================================
-// Título: Project.cs (REFATORADO)
-// Descrição: Entidade de domínio que representa um projeto do portfólio
+// Título: UpdateProjectDto.cs (REFATORADO)
+// Descrição: DTO para atualização de projetos existentes
 // Autor: Will
 // Empresa: WpDev
 // Data: 23/11/2024
 // ====================================
 
-namespace Portfolio.Domain.Entities;
+namespace Portfolio.Application.DTOs.Projects;
 
 /// <summary>
-/// Entidade Project - Representa um projeto do portfólio
-/// Design editorial minimalista (sem atributos de carta de jogo)
+/// DTO para atualização de um Project existente
+/// Contém Id (para identificar qual projeto atualizar)
+/// Usado no endpoint PUT /api/projects/{id}
 /// </summary>
-public class Project
+public class UpdateProjectDto
 {
     // ====================================
-    // IDENTIFICAÇÃO
+    // IDENTIFICAÇÃO (obrigatório para update)
     // ====================================
     public Guid Id { get; set; }
     
@@ -39,23 +40,10 @@ public class Project
     public List<string> Technologies { get; set; } = new();
     public int Year { get; set; }
     public bool IsFeatured { get; set; }
-    public ProjectStatus Status { get; set; }
+    public int Status { get; set; }
     
     // ====================================
-    // AUDITORIA
+    // CONTROLE DE ATIVAÇÃO
     // ====================================
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public bool IsActive { get; set; } = true;
-}
-
-/// <summary>
-/// Status do projeto no ciclo de desenvolvimento
-/// </summary>
-public enum ProjectStatus
-{
-    Planning = 0,      // Planejamento
-    InProgress = 1,    // Em desenvolvimento
-    Completed = 2,     // Concluído
-    Archived = 3       // Arquivado
+    public bool IsActive { get; set; }
 }
