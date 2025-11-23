@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.Commands.Projects.CreateProject;
 using Portfolio.Application.DTOs.Projects;
 using Portfolio.Application.Queries.Projects.GetAllProjects;
+using Portfolio.Application.Queries.Projects.GetProjectById;
+using Portfolio.Application.Commands.Projects.UpdateProject;
+using Portfolio.Application.Commands.Projects.DeleteProject;
 
 namespace Portfolio.Api.Controllers;
 
@@ -69,8 +72,20 @@ public class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProjectDto>> GetById(Guid id)
     {
-        // TODO: Implementar GetProjectByIdQuery na próxima etapa
-        return NotFound(new { message = "Endpoint ainda não implementado" });
+        // Cria a query
+        var query = new GetProjectByIdQuery(id);
+        
+        // Envia para o MediatR processar
+        var project = await _mediator.Send(query);
+        
+        // Se não encontrou, retorna 404
+        if (project == null)
+        {
+            return NotFound(new { message = $"Projeto com ID {id} não encontrado" });
+        }
+        
+        // Retorna HTTP 200 OK com o projeto
+        return Ok(project);
     }
 
     // ====================================
@@ -134,8 +149,21 @@ public class ProjectsController : ControllerBase
             return BadRequest(new { message = "O ID da URL não corresponde ao ID do body" });
         }
 
-        // TODO: Implementar UpdateProjectCommand na próxima etapa
-        return NoContent();
+        try
+        {
+            // Cria o command
+            var command = new UpdateProjectCommand(updateDto);
+            
+            // Envia para o MediatR processar
+            await _mediator.Send(command);
+            
+            // Retorna HTTP 204 No Content (sucesso, sem corpo)
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
 
     // ====================================
@@ -153,7 +181,20 @@ public class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        // TODO: Implementar DeleteProjectCommand na próxima etapa
-        return NoContent();
+        try
+        {
+            // Cria o command
+            var command = new DeleteProjectCommand(id);
+            
+            // Envia para o MediatR processar
+            await _mediator.Send(command);
+            
+            // Retorna HTTP 204 No Content (sucesso)
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
 }
