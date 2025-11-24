@@ -28,6 +28,7 @@ builder.Services.AddDbContext<PortfolioDbContext>(options =>
 builder.Services.AddAutoMapper(config =>
 {
     config.AddProfile<Portfolio.Application.Mappings.ProjectMappingProfile>();
+    config.AddProfile<Portfolio.Application.Mappings.BlogPostMappingProfile>();
 });
 
 // ====================================
@@ -37,6 +38,10 @@ builder.Services.AddAutoMapper(config =>
 // Sempre que alguém pedir IProjectRepository, o ASP.NET injeta ProjectRepository
 builder.Services.AddScoped<Portfolio.Application.Interfaces.IProjectRepository, 
                            Portfolio.Infrastructure.Repositories.ProjectRepository>();
+
+// Registra o BlogPostRepository para injeção de dependência
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IBlogPostRepository, 
+                           Portfolio.Infrastructure.Repositories.BlogPostRepository>();                           
 
 // ====================================
 // CONFIGURAÇÃO DO MEDIATR (CQRS)
