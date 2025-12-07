@@ -40,6 +40,7 @@ builder.Services.AddAutoMapper(config =>
     config.AddProfile<Portfolio.Application.Mappings.BlogPostMappingProfile>();
     config.AddProfile<Portfolio.Application.Mappings.TimelineEventMappingProfile>();
     config.AddProfile<Portfolio.Application.Mappings.GalleryImageMappingProfile>();
+    config.AddProfile<Portfolio.Application.Mappings.ContactMessageMappingProfile>();
 });
 
 // ====================================
@@ -59,7 +60,10 @@ builder.Services.AddScoped<Portfolio.Application.Interfaces.ITimelineEventReposi
                            Portfolio.Infrastructure.Repositories.TimelineEventRepository>();   
 
 builder.Services.AddScoped<Portfolio.Application.Interfaces.IGalleryImageRepository, 
-                           Portfolio.Infrastructure.Repositories.GalleryImageRepository>();                      
+                           Portfolio.Infrastructure.Repositories.GalleryImageRepository>();
+
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IContactMessageRepository, 
+                           Portfolio.Infrastructure.Repositories.ContactMessageRepository>();                                   
 
 // ====================================
 // CONFIGURAÇÃO DO MEDIATR (CQRS)
