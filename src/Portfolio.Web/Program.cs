@@ -33,6 +33,11 @@ builder.Services.AddScoped(sp => new HttpClient
 // ====================================
 // Registra o ProjectService para injeção de dependência
 builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<BlogPostService>();
+builder.Services.AddScoped<TimelineService>();
+builder.Services.AddScoped<GalleryService>();
+builder.Services.AddScoped<ContactService>();
+builder.Services.AddScoped<NowService>();
 
 // TODO: Adicionar outros serviços conforme formos criando
 // builder.Services.AddScoped<BlogPostService>();
