@@ -1,28 +1,87 @@
-﻿@page "/"
+﻿@* ====================================
+   Título: Home.razor
+   Descrição: Página inicial com hero editorial
+   Autor: Will
+   Empresa: WpDev
+   Data: 09/12/2024
+   ==================================== *@
+
+@page "/"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.Projects
 @inject ProjectService ProjectService
 
-<PageTitle>WPDev Portfolio - Home</PageTitle>
+<PageTitle>WPDev - Portfólio</PageTitle>
 
-<h1>🚀 Teste de Conexão com a API</h1>
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content fade-in">
+            <h1 class="hero-title">
+                Desenvolvendo<br />
+                <span class="text-primary">Soluções Digitais</span><br />
+                com Excelência
+            </h1>
+            <p class="hero-subtitle">
+                Portfólio de projetos com foco em arquitetura limpa,<br />
+                design moderno e experiência excepcional.
+            </p>
+            <div class="hero-cta">
+                <a href="/projects" class="btn btn-primary">Ver Projetos</a>
+            </div>
+        </div>
+    </div>
+</section>
 
-@if (isLoading)
-{
-    <p><em>Carregando projetos...</em></p>
-}
-else if (projects.Any())
-{
-    <h2>✅ Sucesso! Projetos carregados da API:</h2>
-    <ul>
-        @foreach (var project in projects)
+<!-- PROJETOS EM DESTAQUE -->
+<section class="section featured-projects">
+    <div class="container">
+        <div class="section-header">
+            <h2>Projetos em Destaque</h2>
+            <p class="section-subtitle">Trabalhos recentes e cases de sucesso</p>
+        </div>
+
+        @if (isLoading)
         {
-            <li><strong>@project.Title</strong> - @project.Year</li>
+            <div class="loading-state">
+                <p>Carregando projetos...</p>
+            </div>
         }
-    </ul>
-}
-else
-{
-    <p>❌ Nenhum projeto encontrado ou erro na conexão.</p>
-}
+        else if (projects.Any())
+        {
+            <div class="projects-grid">
+                @foreach (var project in projects.Take(3))
+                {
+                    <div class="project-card fade-in">
+                        <div class="project-thumbnail">
+                            <img src="@project.ImageUrl" alt="@project.Title" />
+                        </div>
+                        <div class="project-info">
+                            <h3 class="project-title">@project.Title</h3>
+                            <p class="project-description">@project.ShortDescription</p>
+                            <div class="project-tech">
+                                @foreach (var tech in project.Technologies.Take(3))
+                                {
+                                    <span class="tech-tag">@tech</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="section-cta">
+                <a href="/projects" class="btn btn-primary">Ver Todos os Projetos</a>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p>Nenhum projeto cadastrado ainda.</p>
+            </div>
+        }
+    </div>
+</section>
 
 @code {
     private List<ProjectCardDto> projects = new();
@@ -30,8 +89,169 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
         isLoading = true;
-        projects = await ProjectService.GetAllAsync();
+        projects = await ProjectService.GetFeaturedAsync();
         isLoading = false;
     }
 }
+
+<style>
+    /* ====================================
+       HOME PAGE STYLES
+       ==================================== */
+
+    /* HERO SECTION */
+    .hero-section {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        padding: var(--spacing-xxl) 0;
+        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
+    }
+
+    .hero-content {
+        max-width: 900px;
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 6vw, 5.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: var(--spacing-md);
+        letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.125rem, 2vw, 1.375rem);
+        color: var(--color-dark);
+        opacity: 0.8;
+        margin-bottom: var(--spacing-lg);
+        line-height: 1.7;
+    }
+
+    .hero-cta {
+        margin-top: var(--spacing-lg);
+    }
+
+    /* FEATURED PROJECTS */
+    .featured-projects {
+        padding: var(--spacing-xxl) 0;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .section-subtitle {
+        font-size: 1.125rem;
+        color: var(--color-dark);
+        opacity: 0.7;
+        margin-top: var(--spacing-sm);
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .project-card {
+        background: var(--color-white);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: var(--transition-smooth);
+        cursor: pointer;
+    }
+
+    .project-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(13, 28, 36, 0.12);
+    }
+
+    .project-thumbnail {
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background: var(--color-light);
+    }
+
+    .project-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition-smooth);
+    }
+
+    .project-card:hover .project-thumbnail img {
+        transform: scale(1.05);
+    }
+
+    .project-info {
+        padding: var(--spacing-md);
+    }
+
+    .project-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-dark);
+    }
+
+    .project-description {
+        font-size: 1rem;
+        color: var(--color-dark);
+        opacity: 0.8;
+        margin-bottom: var(--spacing-md);
+        line-height: 1.6;
+    }
+
+    .project-tech {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tech-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: var(--color-light);
+        color: var(--color-primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 20px;
+    }
+
+    .section-cta {
+        text-align: center;
+        margin-top: var(--spacing-xl);
+    }
+
+    /* LOADING & EMPTY STATES */
+    .loading-state,
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-xl);
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .hero-section {
+            min-height: 70vh;
+            padding: var(--spacing-xl) 0;
+        }
+
+        .projects-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+    }
+</style>

@@ -1,16 +1,192 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+﻿@* ====================================
+   Título: MainLayout.razor
+   Descrição: Layout principal do portfólio WPDev
+   Autor: Will
+   Empresa: WpDev
+   Data: 09/12/2024
+   ==================================== *@
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+@inherits LayoutComponentBase
+
+<div class="wpdev-layout">
+    <!-- HEADER / NAVEGAÇÃO -->
+    <header class="wpdev-header">
+        <div class="container">
+            <nav class="wpdev-nav">
+                <div class="nav-brand">
+                    <a href="/" class="brand-link">
+                        <span class="brand-wp">WP</span><span class="brand-dev">Dev</span>
+                    </a>
+                </div>
+                
+                <ul class="nav-menu">
+                    <li><a href="/" class="nav-link link-underline">Home</a></li>
+                    <li><a href="/projects" class="nav-link link-underline">Projetos</a></li>
+                    <li><a href="/blog" class="nav-link link-underline">Blog</a></li>
+                    <li><a href="/timeline" class="nav-link link-underline">Timeline</a></li>
+                    <li><a href="/now" class="nav-link link-underline">Now</a></li>
+                    <li><a href="/contact" class="nav-link link-underline">Contato</a></li>
+                </ul>
+            </nav>
         </div>
+    </header>
 
-        <article class="content px-4">
-            @Body
-        </article>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="wpdev-main">
+        @Body
     </main>
+
+    <!-- FOOTER -->
+    <footer class="wpdev-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p class="footer-brand">
+                        <span class="brand-wp">WP</span><span class="brand-dev">Dev</span>
+                    </p>
+                    <p class="footer-tagline">Desenvolvendo soluções com excelência</p>
+                </div>
+                
+                <div class="footer-right">
+                    <p>&copy; @DateTime.Now.Year WPDev. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
+
+<style>
+    /* ====================================
+       WPDEV LAYOUT STYLES
+       ==================================== */
+    
+    .wpdev-layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    .wpdev-header {
+        background-color: var(--color-white);
+        padding: 2rem 0;
+        border-bottom: 1px solid rgba(13, 28, 36, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .wpdev-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* BRAND */
+    .nav-brand .brand-link {
+        font-family: var(--font-heading);
+        font-size: 1.75rem;
+        font-weight: 800;
+        text-decoration: none;
+        letter-spacing: -0.02em;
+    }
+
+    .brand-wp {
+        color: var(--color-primary);
+    }
+
+    .brand-dev {
+        color: var(--color-dark);
+    }
+
+    /* NAVIGATION MENU */
+    .nav-menu {
+        display: flex;
+        gap: 3rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-link {
+        font-family: var(--font-body);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--color-dark);
+        text-decoration: none;
+        transition: var(--transition-smooth);
+    }
+
+    .nav-link:hover {
+        color: var(--color-primary);
+    }
+
+    /* MAIN CONTENT */
+    .wpdev-main {
+        flex: 1;
+    }
+
+    /* FOOTER */
+    .wpdev-footer {
+        background-color: var(--color-dark);
+        color: var(--color-light);
+        padding: 4rem 0 2rem;
+        margin-top: var(--spacing-xxl);
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .footer-brand {
+        font-family: var(--font-heading);
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .footer-brand .brand-wp {
+        color: var(--color-primary);
+    }
+
+    .footer-brand .brand-dev {
+        color: var(--color-light);
+    }
+
+    .footer-tagline {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    .footer-right p {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .wpdev-nav {
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .nav-menu {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
