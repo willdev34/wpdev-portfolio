@@ -1,7 +1,37 @@
 ﻿@page "/"
+@inject ProjectService ProjectService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>WPDev Portfolio - Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>🚀 Teste de Conexão com a API</h1>
 
-Welcome to your new app.
+@if (isLoading)
+{
+    <p><em>Carregando projetos...</em></p>
+}
+else if (projects.Any())
+{
+    <h2>✅ Sucesso! Projetos carregados da API:</h2>
+    <ul>
+        @foreach (var project in projects)
+        {
+            <li><strong>@project.Title</strong> - @project.Year</li>
+        }
+    </ul>
+}
+else
+{
+    <p>❌ Nenhum projeto encontrado ou erro na conexão.</p>
+}
+
+@code {
+    private List<ProjectCardDto> projects = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        projects = await ProjectService.GetAllAsync();
+        isLoading = false;
+    }
+}

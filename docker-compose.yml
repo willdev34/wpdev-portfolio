@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: portfolio_dev
       POSTGRES_USER: wpdev
-      POSTGRES_PASSWORD: Dev@2024!
+      POSTGRES_PASSWORD: Dev2024
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"

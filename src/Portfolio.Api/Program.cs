@@ -93,10 +93,33 @@ builder.Services.AddValidatorsFromAssembly(typeof(Portfolio.Application.Commands
 // Habilita o uso de Controllers (API REST tradicional)
 builder.Services.AddControllers();
 
+// ====================================
+// CONFIGURAÇÃO DO CORS
+// ====================================
+// Permite que o Blazor (localhost:5237) acesse a API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazor", policy =>
+    {
+        policy.WithOrigins("http://localhost:5237", "https://localhost:7257")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// ====================================
+// APLICAR MIGRATIONS AUTOMATICAMENTE
+// ====================================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -106,6 +129,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// ====================================
+// USA O CORS
+// ====================================
+app.UseCors("AllowBlazor");
 
 // ====================================
 // MAPEAMENTO DOS CONTROLLERS
