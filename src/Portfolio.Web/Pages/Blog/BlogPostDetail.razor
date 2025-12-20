@@ -1,0 +1,345 @@
+@* ====================================
+   Título: BlogPostDetail.razor
+   Descrição: Página de detalhes de um post do blog
+   Autor: Will
+   Empresa: WpDev
+   Data: 20/12/2024
+   ==================================== *@
+
+@page "/blog/{Id:guid}"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.BlogPosts
+@inject BlogPostService BlogPostService
+@inject NavigationManager Navigation
+
+<PageTitle>@(post?.Title ?? "Post") - WPDev</PageTitle>
+
+@if (isLoading)
+{
+    <div class="loading-container">
+        <p>Carregando post...</p>
+    </div>
+}
+else if (post == null)
+{
+    <div class="not-found-container">
+        <h1>Post não encontrado</h1>
+        <p>O artigo que você procura não existe ou foi removido.</p>
+        <a href="/blog" class="btn btn-primary">← Voltar para o Blog</a>
+    </div>
+}
+else
+{
+    <!-- POST HERO -->
+    <section class="post-hero">
+        <div class="hero-image">
+            <img src="@post.ThumbnailUrl" alt="@post.Title" />
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="container-narrow">
+                <div class="hero-text fade-in">
+                    <!-- Meta Info -->
+                    <div class="post-meta">
+                        <time class="post-date">@post.PublishedAt.ToString("dd MMM yyyy")</time>
+                        <span class="meta-separator">•</span>
+                        <span class="post-reading">@post.ReadTimeMinutes min de leitura</span>
+                    </div>
+                    
+                    <h1 class="post-hero-title">@post.Title</h1>
+                    
+                    <!-- Tags -->
+                    @if (post.Tags.Any())
+                    {
+                        <div class="post-tags">
+                            @foreach (var tag in post.Tags)
+                            {
+                                <span class="tag-badge">#@tag</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- POST CONTENT -->
+    <section class="section post-content">
+        <div class="container-narrow">
+            <article class="article-body fade-in">
+                <!-- Excerpt -->
+                <div class="article-excerpt">
+                    <p>@post.Excerpt</p>
+                </div>
+
+                <!-- Content -->
+                <div class="article-text">
+                    @* Aqui você pode usar um componente de Markdown ou HTML *@
+                    <p>@post.Content</p>
+                </div>
+
+                <!-- Article Footer -->
+                <div class="article-footer">
+                    <div class="footer-tags">
+                        <span class="footer-label">Tags:</span>
+                        @foreach (var tag in post.Tags)
+                        {
+                            <span class="footer-tag">#@tag</span>
+                        }
+                    </div>
+                </div>
+            </article>
+
+            <!-- Back to Blog -->
+            <div class="back-link">
+                <a href="/blog" class="link-underline">← Voltar para o Blog</a>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private BlogPostDto? post;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPost();
+    }
+
+    private async Task LoadPost()
+    {
+        isLoading = true;
+        post = await BlogPostService.GetByIdAsync(Id);
+        isLoading = false;
+    }
+}
+
+<style>
+    /* ====================================
+       BLOG POST DETAIL STYLES
+       ==================================== */
+
+    /* HERO SECTION */
+    .post-hero {
+        position: relative;
+        min-height: 60vh;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .hero-image {
+        position: absolute;
+        inset: 0;
+    }
+
+    .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, 
+            transparent 0%, 
+            rgba(13, 28, 36, 0.6) 50%,
+            rgba(13, 28, 36, 0.95) 100%
+        );
+    }
+
+    .hero-content {
+        position: relative;
+        width: 100%;
+        padding: var(--spacing-xl) 0;
+    }
+
+    .hero-text {
+        max-width: 800px;
+    }
+
+    /* POST META */
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+        font-size: 0.9375rem;
+        color: var(--color-white);
+        opacity: 0.9;
+        text-transform: capitalize;
+    }
+
+    .meta-separator {
+        opacity: 0.5;
+    }
+
+    .post-hero-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        color: var(--color-white);
+        margin-bottom: var(--spacing-md);
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+    }
+
+    /* TAGS IN HERO */
+    .post-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tag-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: var(--color-white);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* POST CONTENT */
+    .post-content {
+        padding: var(--spacing-xxl) 0;
+    }
+
+    .article-body {
+        background: var(--color-white);
+        border-radius: 24px;
+        padding: var(--spacing-xl);
+        box-shadow: 0 8px 32px rgba(13, 28, 36, 0.08);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    /* EXCERPT */
+    .article-excerpt {
+        padding-bottom: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+        border-bottom: 2px solid var(--color-light);
+    }
+
+    .article-excerpt p {
+        font-size: 1.375rem;
+        line-height: 1.8;
+        color: var(--color-dark);
+        font-weight: 500;
+        margin: 0;
+    }
+
+    /* ARTICLE TEXT */
+    .article-text {
+        font-size: 1.125rem;
+        line-height: 1.9;
+        color: var(--color-dark);
+    }
+
+    .article-text p {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .article-text h2 {
+        font-size: 2rem;
+        margin-top: var(--spacing-xl);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .article-text h3 {
+        font-size: 1.5rem;
+        margin-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    /* ARTICLE FOOTER */
+    .article-footer {
+        margin-top: var(--spacing-xl);
+        padding-top: var(--spacing-lg);
+        border-top: 2px solid var(--color-light);
+    }
+
+    .footer-tags {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+
+    .footer-label {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    .footer-tag {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        background: var(--color-light);
+        color: var(--color-primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 16px;
+    }
+
+    /* BACK LINK */
+    .back-link {
+        text-align: center;
+        padding: var(--spacing-lg) 0;
+    }
+
+    .back-link a {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--color-dark);
+    }
+
+    /* LOADING & NOT FOUND */
+    .loading-container,
+    .not-found-container {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-xxl);
+        text-align: center;
+    }
+
+    .not-found-container h1 {
+        font-size: 3rem;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .not-found-container p {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-lg);
+        opacity: 0.8;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .post-hero {
+            min-height: 50vh;
+        }
+
+        .article-body {
+            padding: var(--spacing-lg);
+        }
+
+        .article-excerpt p {
+            font-size: 1.125rem;
+        }
+
+        .article-text {
+            font-size: 1rem;
+        }
+    }
+</style>

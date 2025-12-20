@@ -1,0 +1,408 @@
+@* ====================================
+   Título: ProjectDetail.razor
+   Descrição: Página de detalhes de um projeto
+   Autor: Will
+   Empresa: WpDev
+   Data: 20/12/2024
+   ==================================== *@
+
+@page "/projects/{Id:guid}"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.Projects
+@inject ProjectService ProjectService
+@inject NavigationManager Navigation
+
+<PageTitle>@(project?.Title ?? "Projeto") - WPDev</PageTitle>
+
+@if (isLoading)
+{
+    <div class="loading-container">
+        <p>Carregando projeto...</p>
+    </div>
+}
+else if (project == null)
+{
+    <div class="not-found-container">
+        <h1>Projeto não encontrado</h1>
+        <p>O projeto que você procura não existe ou foi removido.</p>
+        <a href="/projects" class="btn btn-primary">← Voltar para Projetos</a>
+    </div>
+}
+else
+{
+    <!-- PROJECT HERO -->
+    <section class="project-hero">
+        <div class="hero-image">
+            <img src="@project.ImageUrl" alt="@project.Title" />
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="container">
+                <div class="hero-text fade-in">
+                    <h1 class="project-hero-title">@project.Title</h1>
+                    <p class="project-hero-description">@project.ShortDescription</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECT DETAILS -->
+    <section class="section project-details">
+        <div class="container-narrow">
+            <div class="details-grid">
+                <!-- Main Content -->
+                <div class="details-main">
+                    <!-- Full Description -->
+                    <div class="detail-section fade-in">
+                        <h2 class="section-title">Sobre o Projeto</h2>
+                        <div class="section-content">
+                            <p>@project.Description</p>
+                        </div>
+                    </div>
+
+                    <!-- Technologies -->
+                    @if (project.Technologies.Any())
+                    {
+                        <div class="detail-section fade-in">
+                            <h2 class="section-title">Tecnologias Utilizadas</h2>
+                            <div class="tech-grid">
+                                @foreach (var tech in project.Technologies)
+                                {
+                                    <div class="tech-item">
+                                        <span class="tech-icon">→</span>
+                                        <span class="tech-name">@tech</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Sidebar -->
+                <div class="details-sidebar">
+                    <!-- Project Info Card -->
+                    <div class="info-card fade-in">
+                        <h3 class="info-title">Informações</h3>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Ano</span>
+                            <span class="info-value">@project.Year</span>
+                        </div>
+
+                        @if (project.IsFeatured)
+                        {
+                            <div class="info-item">
+                                <span class="featured-badge">✨ Projeto em Destaque</span>
+                            </div>
+                        }
+
+                        <!-- Links -->
+                        <div class="project-links">
+                            @if (!string.IsNullOrEmpty(project.DemoUrl))
+                            {
+                                <a href="@project.DemoUrl" target="_blank" class="btn btn-primary btn-block">
+                                    Ver Demo →
+                                </a>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(project.RepositoryUrl))
+                            {
+                                <a href="@project.RepositoryUrl" target="_blank" class="btn btn-secondary btn-block">
+                                    Ver Código
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Back Button -->
+                    <div class="back-link">
+                        <a href="/projects" class="link-underline">← Voltar para Projetos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private ProjectDto? project;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProject();
+    }
+
+    private async Task LoadProject()
+    {
+        isLoading = true;
+        project = await ProjectService.GetByIdAsync(Id);
+        isLoading = false;
+    }
+}
+
+<style>
+    /* ====================================
+       PROJECT DETAIL STYLES
+       ==================================== */
+
+    /* HERO SECTION */
+    .project-hero {
+        position: relative;
+        height: 70vh;
+        min-height: 500px;
+        overflow: hidden;
+    }
+
+    .hero-image {
+        position: absolute;
+        inset: 0;
+    }
+
+    .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, 
+            transparent 0%, 
+            rgba(13, 28, 36, 0.4) 50%,
+            rgba(13, 28, 36, 0.9) 100%
+        );
+    }
+
+    .hero-content {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        padding-bottom: var(--spacing-xl);
+    }
+
+    .hero-text {
+        max-width: 800px;
+    }
+
+    .project-hero-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        color: var(--color-white);
+        margin-bottom: var(--spacing-md);
+        letter-spacing: -0.02em;
+    }
+
+    .project-hero-description {
+        font-size: clamp(1.125rem, 2vw, 1.375rem);
+        color: var(--color-white);
+        opacity: 0.95;
+        line-height: 1.7;
+    }
+
+    /* PROJECT DETAILS */
+    .project-details {
+        padding: var(--spacing-xxl) 0;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: var(--spacing-xl);
+    }
+
+    /* DETAIL SECTIONS */
+    .detail-section {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: var(--spacing-md);
+        color: var(--color-dark);
+    }
+
+    .section-content {
+        font-size: 1.125rem;
+        line-height: 1.9;
+        color: var(--color-dark);
+    }
+
+    .section-content p {
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* TECH GRID */
+    .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .tech-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--color-light);
+        border-radius: 12px;
+        transition: var(--transition-smooth);
+    }
+
+    .tech-item:hover {
+        background: var(--color-primary);
+        color: var(--color-white);
+    }
+
+    .tech-icon {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .tech-item:hover .tech-icon {
+        color: var(--color-white);
+    }
+
+    .tech-name {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    /* SIDEBAR */
+    .info-card {
+        background: var(--color-white);
+        border-radius: 20px;
+        padding: var(--spacing-lg);
+        box-shadow: 0 8px 24px rgba(13, 28, 36, 0.08);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .info-title {
+        font-size: 1.375rem;
+        font-weight: 700;
+        margin-bottom: var(--spacing-md);
+        color: var(--color-dark);
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--color-light);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .featured-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #6C9EA3 0%, #8FB5BA 100%);
+        color: var(--color-white);
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 20px;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* PROJECT LINKS */
+    .project-links {
+        margin-top: var(--spacing-md);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .btn-block {
+        width: 100%;
+        text-align: center;
+    }
+
+    .btn-secondary {
+        background: var(--color-light);
+        color: var(--color-dark);
+    }
+
+    .btn-secondary:hover {
+        background: var(--color-dark);
+        color: var(--color-white);
+    }
+
+    .back-link {
+        text-align: center;
+    }
+
+    .back-link a {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--color-dark);
+    }
+
+    /* LOADING & NOT FOUND */
+    .loading-container,
+    .not-found-container {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-xxl);
+        text-align: center;
+    }
+
+    .not-found-container h1 {
+        font-size: 3rem;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .not-found-container p {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-lg);
+        opacity: 0.8;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 1024px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .project-hero {
+            height: 50vh;
+            min-height: 400px;
+        }
+
+        .hero-content {
+            padding-bottom: var(--spacing-lg);
+        }
+
+        .tech-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
