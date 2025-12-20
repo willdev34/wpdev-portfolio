@@ -1,0 +1,361 @@
+@* ====================================
+   Título: Timeline.razor
+   Descrição: Página de timeline profissional
+   Autor: Will
+   Empresa: WpDev
+   Data: 20/12/2024
+   ==================================== *@
+
+@page "/timeline"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.Timeline
+@inject TimelineService TimelineService
+
+<PageTitle>Timeline - WPDev</PageTitle>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <div class="container">
+        <div class="header-content fade-in">
+            <h1 class="page-title">
+                Timeline<br />
+                <span class="text-primary">Profissional</span>
+            </h1>
+            <p class="page-subtitle">
+                Minha jornada profissional em desenvolvimento,<br />
+                marcos importantes e evolução de carreira.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="section timeline-section">
+    <div class="container-narrow">
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                <p>Carregando timeline...</p>
+            </div>
+        }
+        else if (events.Any())
+        {
+            <!-- Timeline Container -->
+            <div class="timeline-container">
+                @foreach (var evt in events.OrderByDescending(e => e.StartDate))
+                {
+                    <div class="timeline-item fade-in">
+                        <!-- Timeline Marker -->
+                        <div class="timeline-marker">
+                            <div class="marker-dot @(evt.IsCurrent ? "marker-current" : "")"></div>
+                        </div>
+
+                        <!-- Timeline Content -->
+                        <div class="timeline-content">
+                            <!-- Date Badge -->
+                            <div class="timeline-date">
+                                <span class="date-start">@evt.StartDate.ToString("MMM yyyy")</span>
+                                @if (evt.IsCurrent)
+                                {
+                                    <span class="date-separator">→</span>
+                                    <span class="date-current">Atual</span>
+                                }
+                                else if (evt.EndDate.HasValue)
+                                {
+                                    <span class="date-separator">→</span>
+                                    <span class="date-end">@evt.EndDate.Value.ToString("MMM yyyy")</span>
+                                }
+                            </div>
+
+                            <!-- Card -->
+                            <div class="timeline-card">
+                                @if (!string.IsNullOrEmpty(evt.IconUrl))
+                                {
+                                    <div class="card-icon">
+                                        <img src="@evt.IconUrl" alt="@evt.Company" />
+                                    </div>
+                                }
+
+                                <div class="card-content">
+                                    <h3 class="card-title">@evt.Title</h3>
+                                    <p class="card-company">@evt.Company</p>
+                                    <p class="card-description">@evt.Description</p>
+
+                                    @if (evt.IsCurrent)
+                                    {
+                                        <span class="current-badge">✨ Posição Atual</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <h3>Timeline em construção</h3>
+                <p>Em breve a timeline profissional estará disponível.</p>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<TimelineEventDto> events = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTimeline();
+    }
+
+    private async Task LoadTimeline()
+    {
+        isLoading = true;
+        events = await TimelineService.GetAllAsync();
+        isLoading = false;
+    }
+}
+
+<style>
+    /* ====================================
+       TIMELINE PAGE STYLES
+       ==================================== */
+
+    /* PAGE HEADER */
+    .page-header {
+        padding: var(--spacing-xxl) 0 var(--spacing-xl);
+        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
+    }
+
+    .header-content {
+        max-width: 800px;
+    }
+
+    .page-title {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: var(--spacing-md);
+        letter-spacing: -0.03em;
+    }
+
+    .page-subtitle {
+        font-size: clamp(1.125rem, 2vw, 1.25rem);
+        color: var(--color-dark);
+        opacity: 0.8;
+        line-height: 1.7;
+    }
+
+    /* TIMELINE SECTION */
+    .timeline-section {
+        padding: var(--spacing-xl) 0 var(--spacing-xxl);
+    }
+
+    .timeline-container {
+        position: relative;
+        padding-left: 3rem;
+    }
+
+    /* Timeline Line */
+    .timeline-container::before {
+        content: '';
+        position: absolute;
+        left: 0.75rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, 
+            var(--color-primary) 0%, 
+            var(--color-accent) 50%, 
+            rgba(108, 158, 163, 0.2) 100%
+        );
+    }
+
+    /* TIMELINE ITEM */
+    .timeline-item {
+        position: relative;
+        padding-bottom: var(--spacing-xl);
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    /* Timeline Marker */
+    .timeline-marker {
+        position: absolute;
+        left: -2.375rem;
+        top: 0.5rem;
+        z-index: 2;
+    }
+
+    .marker-dot {
+        width: 1rem;
+        height: 1rem;
+        background: var(--color-white);
+        border: 3px solid var(--color-primary);
+        border-radius: 50%;
+        transition: var(--transition-smooth);
+    }
+
+    .marker-dot.marker-current {
+        width: 1.5rem;
+        height: 1.5rem;
+        background: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(108, 158, 163, 0.2);
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 4px rgba(108, 158, 163, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 0 8px rgba(108, 158, 163, 0.1);
+        }
+    }
+
+    /* Timeline Content */
+    .timeline-content {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .timeline-date {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: var(--spacing-sm);
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        text-transform: capitalize;
+    }
+
+    .date-separator {
+        opacity: 0.5;
+    }
+
+    .date-current {
+        background: var(--color-primary);
+        color: var(--color-white);
+        padding: 0.125rem 0.625rem;
+        border-radius: 12px;
+        font-size: 0.8125rem;
+    }
+
+    /* Timeline Card */
+    .timeline-card {
+        background: var(--color-white);
+        border-radius: 16px;
+        padding: var(--spacing-md);
+        box-shadow: 0 4px 12px rgba(13, 28, 36, 0.08);
+        transition: var(--transition-smooth);
+        display: flex;
+        gap: var(--spacing-md);
+    }
+
+    .timeline-card:hover {
+        transform: translateX(8px);
+        box-shadow: 0 12px 24px rgba(13, 28, 36, 0.12);
+    }
+
+    .card-icon {
+        flex-shrink: 0;
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--color-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0.5rem;
+    }
+
+    .card-content {
+        flex: 1;
+    }
+
+    .card-title {
+        font-size: 1.375rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--color-dark);
+    }
+
+    .card-company {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .card-description {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--color-dark);
+        opacity: 0.8;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .current-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        background: linear-gradient(135deg, #6C9EA3 0%, #8FB5BA 100%);
+        color: var(--color-white);
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 20px;
+    }
+
+    /* STATES */
+    .loading-state,
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-xxl) var(--spacing-md);
+    }
+
+    .empty-state h3 {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state p {
+        font-size: 1.125rem;
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: var(--spacing-xl) 0 var(--spacing-lg);
+        }
+
+        .timeline-container {
+            padding-left: 2rem;
+        }
+
+        .timeline-marker {
+            left: -1.875rem;
+        }
+
+        .timeline-card {
+            flex-direction: column;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+        }
+    }
+</style>

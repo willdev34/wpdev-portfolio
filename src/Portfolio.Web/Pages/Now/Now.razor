@@ -1,0 +1,346 @@
+@* ====================================
+   Título: Now.razor
+   Descrição: Página "O que estou fazendo agora"
+   Autor: Will
+   Empresa: WpDev
+   Data: 20/12/2024
+   ==================================== *@
+
+@page "/now"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.Now
+@inject NowService NowService
+
+<PageTitle>Now - WPDev</PageTitle>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <div class="container">
+        <div class="header-content fade-in">
+            <h1 class="page-title">
+                What I'm Doing<br />
+                <span class="text-primary">Now</span>
+            </h1>
+            <p class="page-subtitle">
+                Uma visão transparente do meu foco atual,<br />
+                aprendizados e objetivos profissionais.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- NOW CONTENT -->
+<section class="section now-section">
+    <div class="container-narrow">
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                <p>Carregando informações...</p>
+            </div>
+        }
+        else if (nowSection != null)
+        {
+            <!-- Last Updated -->
+            <div class="last-updated">
+                <span>📅 Última atualização: @nowSection.LastUpdated.ToString("dd MMMM yyyy")</span>
+            </div>
+
+            <!-- Current Focus -->
+            <div class="now-card fade-in">
+                <div class="card-header">
+                    <h2 class="card-title">🎯 Foco Atual</h2>
+                </div>
+                <div class="card-content">
+                    <p class="focus-text">@nowSection.CurrentFocus</p>
+                </div>
+            </div>
+
+            <!-- Currently Learning -->
+            @if (nowSection.CurrentlyLearning.Any())
+            {
+                <div class="now-card fade-in">
+                    <div class="card-header">
+                        <h2 class="card-title">📚 Aprendendo Agora</h2>
+                    </div>
+                    <div class="card-content">
+                        <ul class="learning-list">
+                            @foreach (var learning in nowSection.CurrentlyLearning)
+                            {
+                                <li>@learning</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+            <!-- Current Goals -->
+            @if (nowSection.CurrentGoals.Any())
+            {
+                <div class="now-card fade-in">
+                    <div class="card-header">
+                        <h2 class="card-title">🎯 Objetivos Atuais</h2>
+                    </div>
+                    <div class="card-content">
+                        <ul class="goals-list">
+                            @foreach (var goal in nowSection.CurrentGoals)
+                            {
+                                <li>@goal</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+            <!-- Current Location -->
+            @if (!string.IsNullOrEmpty(nowSection.CurrentLocation))
+            {
+                <div class="now-card fade-in">
+                    <div class="card-header">
+                        <h2 class="card-title">📍 Localização</h2>
+                    </div>
+                    <div class="card-content">
+                        <p class="location-text">@nowSection.CurrentLocation</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Inspired By -->
+            <div class="inspired-by">
+                <p>
+                    Inspirado pelo movimento <a href="https://nownownow.com" target="_blank" class="link-underline">nownownow.com</a>
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <h3>Página em construção</h3>
+                <p>Em breve esta seção estará disponível.</p>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private NowSectionDto? nowSection;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNow();
+    }
+
+    private async Task LoadNow()
+    {
+        isLoading = true;
+        nowSection = await NowService.GetCurrentAsync();
+        isLoading = false;
+    }
+}
+
+<style>
+    /* ====================================
+       NOW PAGE STYLES
+       ==================================== */
+
+    /* PAGE HEADER */
+    .page-header {
+        padding: var(--spacing-xxl) 0 var(--spacing-xl);
+        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
+    }
+
+    .header-content {
+        max-width: 800px;
+    }
+
+    .page-title {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: var(--spacing-md);
+        letter-spacing: -0.03em;
+    }
+
+    .page-subtitle {
+        font-size: clamp(1.125rem, 2vw, 1.25rem);
+        color: var(--color-dark);
+        opacity: 0.8;
+        line-height: 1.7;
+    }
+
+    /* NOW SECTION */
+    .now-section {
+        padding: var(--spacing-xl) 0 var(--spacing-xxl);
+    }
+
+    .last-updated {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--color-white);
+        border-radius: 24px;
+        box-shadow: 0 4px 12px rgba(13, 28, 36, 0.06);
+    }
+
+    .last-updated span {
+        font-size: 0.9375rem;
+        color: var(--color-dark);
+        opacity: 0.7;
+        font-weight: 500;
+    }
+
+    /* NOW CARDS */
+    .now-card {
+        background: var(--color-white);
+        border-radius: 20px;
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+        box-shadow: 0 8px 24px rgba(13, 28, 36, 0.08);
+        transition: var(--transition-smooth);
+    }
+
+    .now-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(13, 28, 36, 0.12);
+    }
+
+    .card-header {
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 2px solid var(--color-light);
+    }
+
+    .card-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--color-dark);
+        margin: 0;
+    }
+
+    .card-content {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: var(--color-dark);
+    }
+
+    /* Focus Text */
+    .focus-text {
+        font-size: 1.25rem;
+        line-height: 1.9;
+        color: var(--color-dark);
+        margin: 0;
+    }
+
+    /* Learning List */
+    .learning-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .learning-list li {
+        padding: var(--spacing-sm) 0;
+        padding-left: 2rem;
+        position: relative;
+    }
+
+    .learning-list li::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--color-primary);
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    /* Goals List */
+    .goals-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .goals-list li {
+        padding: var(--spacing-sm);
+        padding-left: 2.5rem;
+        position: relative;
+        background: var(--color-light);
+        border-radius: 12px;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .goals-list li::before {
+        content: '✓';
+        position: absolute;
+        left: 0.875rem;
+        color: var(--color-primary);
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    /* Location Text */
+    .location-text {
+        font-size: 1.25rem;
+        color: var(--color-primary);
+        font-weight: 600;
+        margin: 0;
+    }
+
+    /* Inspired By */
+    .inspired-by {
+        text-align: center;
+        margin-top: var(--spacing-xl);
+        padding-top: var(--spacing-lg);
+        border-top: 1px solid rgba(13, 28, 36, 0.1);
+    }
+
+    .inspired-by p {
+        font-size: 0.9375rem;
+        color: var(--color-dark);
+        opacity: 0.6;
+        margin: 0;
+    }
+
+    .inspired-by a {
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    /* STATES */
+    .loading-state,
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-xxl) var(--spacing-md);
+    }
+
+    .empty-state h3 {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state p {
+        font-size: 1.125rem;
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: var(--spacing-xl) 0 var(--spacing-lg);
+        }
+
+        .now-card {
+            padding: var(--spacing-md);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+        }
+
+        .focus-text,
+        .location-text {
+            font-size: 1.125rem;
+        }
+    }
+</style>
