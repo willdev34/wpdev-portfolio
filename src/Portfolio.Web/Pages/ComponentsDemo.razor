@@ -1,0 +1,145 @@
+@page "/components-demo"
+@using Portfolio.Web.Components.Shared
+
+<PageTitle>Componentes - WPDev Portfolio</PageTitle>
+
+<div class="demo-page">
+    
+    <header class="demo-header">
+        <h1>Card Component - Demonstração</h1>
+        <p>Visualização de todas as variantes e possibilidades do Card reutilizável</p>
+    </header>
+
+    <section class="demo-section">
+        <h2 class="demo-section__title">1. Card Padrão</h2>
+        <p class="demo-section__description">Layout vertical com imagem</p>
+        
+        <div class="demo-grid">
+            
+            <Card 
+                ImageUrl="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800"
+                ImageAlt="Código em tela de computador"
+                Title="Sistema de Gerenciamento Completo"
+                Description="Plataforma web moderna desenvolvida com .NET 8 e Blazor WebAssembly. Inclui autenticação JWT, CRUD completo e dashboard administrativo."
+                Badge="Novo">
+                
+                <HeaderContent>
+                    <div class="card-tags">
+                        <span class="tag tag--primary">C#</span>
+                        <span class="tag tag--secondary">Blazor</span>
+                        <span class="tag tag--accent">PostgreSQL</span>
+                    </div>
+                </HeaderContent>
+                
+                <FooterContent>
+                    <a href="#" class="card-link">Ver projeto completo</a>
+                </FooterContent>
+            </Card>
+
+            <Card 
+                Title="API REST em .NET Core"
+                Description="API robusta seguindo Clean Architecture com CQRS e validação com FluentValidation.">
+                
+                <HeaderContent>
+                    <span class="card-meta">Publicado em 15/12/2024</span>
+                </HeaderContent>
+                
+                <FooterContent>
+                    <a href="#" class="card-link">Documentação</a>
+                </FooterContent>
+            </Card>
+
+            <Card 
+                ImageUrl="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800"
+                ImageAlt="Desenvolvimento de software"
+                Title="Dashboard Analítico"
+                Description="Interface interativa para visualização de dados em tempo real."
+                Badge="Destaque">
+                
+                <HeaderContent>
+                    <div class="card-tags">
+                        <span class="tag tag--primary">React</span>
+                        <span class="tag tag--secondary">TypeScript</span>
+                    </div>
+                </HeaderContent>
+            </Card>
+        </div>
+    </section>
+
+    <section class="demo-section">
+        <h2 class="demo-section__title">2. Card Horizontal</h2>
+        <p class="demo-section__description">Layout lado a lado</p>
+        
+        <div class="demo-stack">
+            
+            <Card 
+                Variant="horizontal"
+                ImageUrl="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800"
+                ImageAlt="Workspace de desenvolvedor"
+                Title="Como implementei Clean Architecture"
+                Description="Tutorial completo mostrando a estrutura de pastas e separação de camadas.">
+                
+                <HeaderContent>
+                    <div class="card-header-flex">
+                        <span class="tag tag--accent">Tutorial</span>
+                        <span class="card-meta">20 min de leitura</span>
+                    </div>
+                </HeaderContent>
+                
+                <FooterContent>
+                    <div class="card-footer-flex">
+                        <span class="card-meta">12 de Dezembro, 2024</span>
+                        <a href="#" class="card-link">Ler artigo</a>
+                    </div>
+                </FooterContent>
+            </Card>
+
+            <Card 
+                Variant="horizontal"
+                Title="Migrando de Entity Framework 8 para 9"
+                Description="Guia prático sobre a migração e novas features.">
+                
+                <HeaderContent>
+                    <div class="card-header-flex">
+                        <span class="tag tag--primary">Guia</span>
+                        <span class="card-meta">8 min de leitura</span>
+                    </div>
+                </HeaderContent>
+                
+                <FooterContent>
+                    <span class="card-meta">18 de Dezembro, 2024</span>
+                </FooterContent>
+            </Card>
+        </div>
+    </section>
+
+    <section class="demo-section">
+        <h2 class="demo-section__title">3. Card Minimal</h2>
+        <p class="demo-section__description">Versão minimalista</p>
+        
+        <div class="demo-grid demo-grid--3col">
+            
+            <Card 
+                Variant="minimal"
+                Title="15+ Projetos"
+                Description="Portfólio diversificado com aplicações web."
+                Class="text-center">
+            </Card>
+
+            <Card 
+                Variant="minimal"
+                Title="5 Anos"
+                Description="Experiência em desenvolvimento full-stack."
+                Class="text-center">
+            </Card>
+
+            <Card 
+                Variant="minimal"
+                Title="100% Remoto"
+                Description="Trabalho com equipes distribuídas."
+                Class="text-center">
+            </Card>
+        </div>
+    </section>
+
+</div>

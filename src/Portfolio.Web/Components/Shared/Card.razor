@@ -1,0 +1,227 @@
+@*
+    ============================================================================
+    Título: Card Component - Componente de Cartão Reutilizável
+    Descrição: Componente genérico e versátil para exibir conteúdo em formato
+               de cartão. Suporta múltiplas variações (padrão, horizontal, mínimo)
+               e pode ser customizado via parâmetros e CSS classes.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*@
+
+<div class="card @VariantClass @Class" @onclick="HandleClick">
+    
+    @* 
+        SEÇÃO DE IMAGEM
+        Renderiza condicionalmente apenas se ImageUrl for fornecida
+        Usa lazy loading nativo para performance
+    *@
+    @if (!string.IsNullOrEmpty(ImageUrl))
+    {
+        <div class="card__image">
+            @* 
+                Imagem responsiva com lazy loading
+                - loading="lazy": carrega apenas quando próxima ao viewport (economiza banda)
+                - alt: texto alternativo para acessibilidade e SEO
+            *@
+            <img src="@ImageUrl" alt="@ImageAlt" loading="lazy" />
+            
+            @* 
+                Badge opcional sobre a imagem
+                Exemplos de uso: "Novo", "Destaque", "Em breve"
+            *@
+            @if (!string.IsNullOrEmpty(Badge))
+            {
+                <span class="card__badge">@Badge</span>
+            }
+        </div>
+    }
+
+    @* 
+        SEÇÃO DE CONTEÚDO
+        Container principal com título, descrição e conteúdo customizado
+    *@
+    <div class="card__content">
+        
+        @* 
+            HEADER - Metadados opcionais
+            Use RenderFragment para injetar tags, datas, categorias, etc
+            Exemplo: <HeaderContent><span class="tag">C#</span></HeaderContent>
+        *@
+        @if (HeaderContent != null)
+        {
+            <div class="card__header">
+                @HeaderContent
+            </div>
+        }
+
+        @* 
+            TÍTULO
+            Elemento principal do card, sempre deve estar presente
+            Usa font-family Poppins (definida em --font-title)
+        *@
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <h3 class="card__title">@Title</h3>
+        }
+
+        @* 
+            DESCRIÇÃO
+            Texto resumido, limitado a 3 linhas via CSS (-webkit-line-clamp)
+            Ideal para previews de conteúdo
+        *@
+        @if (!string.IsNullOrEmpty(Description))
+        {
+            <p class="card__description">@Description</p>
+        }
+
+        @* 
+            BODY - Conteúdo customizado adicional
+            Use quando Description não é suficiente
+            Exemplo: lista de tecnologias, estatísticas, etc
+        *@
+        @if (BodyContent != null)
+        {
+            <div class="card__body">
+                @BodyContent
+            </div>
+        }
+
+        @* 
+            FOOTER - Rodapé com ações
+            Ideal para botões, links ou informações adicionais
+            Exemplo: "Leia mais →", "Ver projeto", data de publicação
+        *@
+        @if (FooterContent != null)
+        {
+            <div class="card__footer">
+                @FooterContent
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    // ========================================================================
+    // PARÂMETROS DO COMPONENTE
+    // Todos os [Parameter] podem ser passados pelo componente pai
+    // Exemplo de uso: <Card Title="Meu Projeto" ImageUrl="/images/projeto.jpg" />
+    // ========================================================================
+
+    /// <summary>
+    /// URL da imagem de capa do card
+    /// Se não fornecida, o card será renderizado apenas com conteúdo textual
+    /// </summary>
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// Texto alternativo da imagem (obrigatório para acessibilidade)
+    /// Descreve o conteúdo da imagem para leitores de tela
+    /// </summary>
+    [Parameter]
+    public string ImageAlt { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Título principal exibido no card
+    /// Geralmente o nome do projeto, post ou item
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Descrição ou resumo do conteúdo
+    /// Será limitada a 3 linhas via CSS para manter consistência visual
+    /// </summary>
+    [Parameter]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Badge opcional que aparece sobre a imagem (canto superior direito)
+    /// Exemplos: "Novo", "Destaque", "Hot", "Beta"
+    /// </summary>
+    [Parameter]
+    public string? Badge { get; set; }
+
+    /// <summary>
+    /// Variante visual do card que altera o layout
+    /// Opções disponíveis:
+    /// - "default": layout vertical padrão (imagem em cima, conteúdo embaixo)
+    /// - "horizontal": layout lado a lado (imagem à esquerda, conteúdo à direita)
+    /// - "minimal": versão minimalista sem imagem e com menos padding
+    /// </summary>
+    [Parameter]
+    public string Variant { get; set; } = "default";
+
+    /// <summary>
+    /// Classes CSS adicionais para customização específica
+    /// Útil para adicionar estilos únicos sem modificar o componente
+    /// Exemplo: Class="featured-card" ou Class="highlight"
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// RenderFragment para conteúdo customizado no header
+    /// Permite injetar qualquer HTML/Razor (tags, datas, categorias, etc)
+    /// Exemplo: <HeaderContent><span class="date">20/12/2024</span></HeaderContent>
+    /// </summary>
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    /// <summary>
+    /// RenderFragment para conteúdo customizado no corpo
+    /// Use quando precisar de conteúdo mais complexo que apenas Description
+    /// Exemplo: listas, badges de tecnologias, estatísticas
+    /// </summary>
+    [Parameter]
+    public RenderFragment? BodyContent { get; set; }
+
+    /// <summary>
+    /// RenderFragment para conteúdo customizado no rodapé
+    /// Ideal para botões, links de ação ou metadados adicionais
+    /// Exemplo: <FooterContent><a href="/detalhes">Ver mais →</a></FooterContent>
+    /// </summary>
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+
+    /// <summary>
+    /// Callback executado quando o card inteiro é clicado
+    /// EventCallback permite comunicação com componente pai
+    /// Exemplo: OnClick="() => NavigationManager.NavigateTo($"/projeto/{id}")"
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    // ========================================================================
+    // PROPRIEDADES COMPUTADAS
+    // Calculadas automaticamente baseadas nos parâmetros
+    // ========================================================================
+
+    /// <summary>
+    /// Gera a classe CSS correspondente à variante selecionada
+    /// Segue padrão BEM (Block Element Modifier): card--{variant}
+    /// Exemplos: "card--default", "card--horizontal", "card--minimal"
+    /// </summary>
+    private string VariantClass => $"card--{Variant}";
+
+    // ========================================================================
+    // MÉTODOS
+    // ========================================================================
+
+    /// <summary>
+    /// Manipulador de evento de clique no card
+    /// Verifica se existe um callback registrado antes de invocar
+    /// Previne erros caso OnClick não tenha sido fornecido
+    /// </summary>
+    private async Task HandleClick()
+    {
+        // HasDelegate verifica se o EventCallback foi atribuído pelo pai
+        if (OnClick.HasDelegate)
+        {
+            // InvokeAsync executa o callback de forma assíncrona
+            await OnClick.InvokeAsync();
+        }
+    }
+}

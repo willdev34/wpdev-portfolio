@@ -1,0 +1,133 @@
+.demo-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 24px;
+}
+
+.demo-header {
+    margin-bottom: 64px;
+    text-align: center;
+}
+
+.demo-header h1 {
+    font-family: var(--font-title);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin: 0 0 16px 0;
+}
+
+.demo-header p {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.demo-section {
+    margin-bottom: 80px;
+}
+
+.demo-section__title {
+    font-family: var(--font-title);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    margin: 0 0 8px 0;
+}
+
+.demo-section__description {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0 0 32px 0;
+}
+
+.demo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+}
+
+.demo-grid--3col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.demo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 2px;
+}
+
+.tag--primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.tag--secondary {
+    background: var(--color-dark);
+    color: white;
+}
+
+.tag--accent {
+    background: rgba(108, 158, 163, 0.15);
+    color: var(--color-primary);
+}
+
+.card-meta {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.card-link {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.card-header-flex {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.card-footer-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .demo-page {
+        padding: 40px 20px;
+    }
+    
+    .demo-header h1 {
+        font-size: 2rem;
+    }
+    
+    .demo-grid,
+    .demo-grid--3col {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}
