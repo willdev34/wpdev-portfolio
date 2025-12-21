@@ -131,3 +131,22 @@
         gap: 24px;
     }
 }
+
+/* ============================================================================
+   SKELETON DEMO - Estilos para seção de demonstração de skeletons
+   ============================================================================ */
+
+.skeleton-demo-item {
+    /* Container de cada exemplo de skeleton */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skeleton-demo-title {
+    /* Título de cada exemplo */
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    margin: 0;
+}

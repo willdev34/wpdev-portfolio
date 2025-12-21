@@ -142,4 +142,47 @@
         </div>
     </section>
 
+    <section class="demo-section">
+        <h2 class="demo-section__title">5. Loading Skeletons</h2>
+        <p class="demo-section__description">Placeholders animados durante carregamento</p>
+        
+        <div class="demo-grid">
+            
+            <div class="skeleton-demo-item">
+                <h3 class="skeleton-demo-title">Card Skeleton</h3>
+                <LoadingSkeleton Variant="card" />
+            </div>
+
+            <div class="skeleton-demo-item">
+                <h3 class="skeleton-demo-title">Text Skeleton (5 linhas)</h3>
+                <div style="background: white; padding: 20px; border-radius: 4px;">
+                    <LoadingSkeleton Variant="text" Lines="5" />
+                </div>
+            </div>
+
+            <div class="skeleton-demo-item">
+                <h3 class="skeleton-demo-title">Circle Skeleton</h3>
+                <div style="background: white; padding: 20px; border-radius: 4px;">
+                    <LoadingSkeleton Variant="circle" Width="80px" Height="80px" />
+                </div>
+            </div>
+
+            <div class="skeleton-demo-item">
+                <h3 class="skeleton-demo-title">Rectangle Skeleton</h3>
+                <div style="background: white; padding: 20px; border-radius: 4px;">
+                    <LoadingSkeleton Variant="rectangle" Height="150px" />
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section" style="margin-top: 40px;">
+            <h3 class="skeleton-demo-title">Grid de Card Skeletons (simulando carregamento de projetos)</h3>
+            <div class="demo-grid">
+                <LoadingSkeleton Variant="card" />
+                <LoadingSkeleton Variant="card" />
+                <LoadingSkeleton Variant="card" />
+            </div>
+        </div>
+    </section>
+
 </div>

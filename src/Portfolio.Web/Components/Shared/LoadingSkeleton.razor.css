@@ -1,0 +1,249 @@
+/*
+    ============================================================================
+    Título: Loading Skeleton Styles
+    Descrição: Estilos para componente de skeleton com animação shimmer.
+               Cria efeito de "brilho deslizante" que indica carregamento.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*/
+
+/* ============================================================================
+   ANIMAÇÃO SHIMMER
+   Define a animação de "brilho deslizante" aplicada aos skeletons
+   ============================================================================ */
+
+@keyframes shimmer {
+    /*
+        Animação de gradiente que se move da esquerda para direita
+        Cria efeito visual de "carregando" ou "processando"
+    */
+    0% {
+        background-position: -468px 0; /* Início: gradiente à esquerda (fora da tela) */
+    }
+    100% {
+        background-position: 468px 0; /* Fim: gradiente à direita (fora da tela) */
+    }
+}
+
+
+/* ============================================================================
+   BASE SKELETON
+   Estilos compartilhados por todos os tipos de skeleton
+   ============================================================================ */
+
+.skeleton {
+    /*
+        BACKGROUND ANIMADO
+        Cria o efeito shimmer com gradiente linear que se move
+        - #f0f0f0: cor base (cinza claro)
+        - #e0e0e0: cor do "brilho" (cinza um pouco mais escuro)
+        - background-size maior que 100% permite o movimento
+    */
+    background: linear-gradient(
+        90deg,                    /* Direção: da esquerda para direita */
+        #f0f0f0 0%,              /* Cor base no início */
+        #e0e0e0 50%,             /* Cor de brilho no meio */
+        #f0f0f0 100%             /* Volta para cor base no fim */
+    );
+    background-size: 468px 100%; /* Tamanho maior que o elemento para permitir movimento */
+    
+    /*
+        ANIMAÇÃO
+        Aplica a animação shimmer definida acima
+        - shimmer: nome da animação
+        - 1.2s: duração (1.2 segundos por ciclo)
+        - ease-in-out: aceleração suave no início e fim
+        - infinite: repete infinitamente
+    */
+    animation: shimmer 1.2s ease-in-out infinite;
+    
+    /* FORMA */
+    border-radius: 4px; /* Cantos levemente arredondados */
+    
+    /* DIMENSÕES PADRÃO */
+    width: 100%; /* Ocupa toda largura disponível por padrão */
+}
+
+
+/* ============================================================================
+   SKELETON CARD
+   Simula estrutura completa de um card (imagem + conteúdo)
+   ============================================================================ */
+
+.skeleton-card {
+    /* Layout */
+    display: flex;
+    flex-direction: column; /* Empilha imagem e conteúdo verticalmente */
+    
+    /* Visual */
+    background: var(--color-bg-light); /* Fundo claro #F4F7F7 */
+    border-radius: 4px;
+    overflow: hidden; /* Esconde overflow para respeitar border-radius */
+    
+    /* Dimensões */
+    height: 100%; /* Ocupa altura total do container */
+}
+
+.skeleton-card__image {
+    /*
+        PROPORÇÃO 16:9 usando padding-bottom trick
+        Mesmo método usado no Card.razor para manter consistência
+    */
+    width: 100%;
+    padding-bottom: 56.25%; /* 9 ÷ 16 = 0.5625 = 56.25% */
+    
+    /* Visual */
+    background: linear-gradient(90deg, #e0e0e0 0%, #d0d0d0 50%, #e0e0e0 100%);
+    background-size: 468px 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.skeleton-card__content {
+    /* Layout */
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espaçamento entre linhas (mesmo do Card real) */
+    flex: 1; /* Ocupa espaço restante */
+    
+    /* Espaçamento */
+    padding: 24px; /* Mesmo padding do Card real */
+}
+
+
+/* ============================================================================
+   SKELETON LINES
+   Linhas genéricas usadas para simular texto
+   ============================================================================ */
+
+.skeleton-line {
+    /*
+        Linha padrão: largura total, altura de 1 linha de texto
+        Usado para simular parágrafos e descrições
+    */
+    height: 16px; /* Altura aproximada de uma linha de texto */
+    width: 100%;  /* Largura total */
+    border-radius: 2px; /* Cantos muito sutis */
+    
+    /* Visual animado (herda do .skeleton pai) */
+    background: linear-gradient(90deg, #e0e0e0 0%, #d0d0d0 50%, #e0e0e0 100%);
+    background-size: 468px 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+/* 
+   VARIANTES DE LINHA
+   Diferentes tamanhos para simular hierarquia de texto
+*/
+
+/* Linha pequena: para metadados, datas, tags */
+.skeleton-line--small {
+    width: 40%; /* 40% da largura disponível */
+    height: 14px; /* Mais baixa que linha padrão */
+}
+
+/* Linha de título: mais grossa para simular h2/h3 */
+.skeleton-line--title {
+    width: 70%; /* 70% da largura */
+    height: 24px; /* Mais alta, simula fonte de título */
+}
+
+/* Linha curta: para última linha de parágrafo */
+.skeleton-line--short {
+    width: 80%; /* 80% da largura (não chega até o fim) */
+}
+
+
+/* ============================================================================
+   SKELETON TEXT
+   Container para múltiplas linhas de texto
+   ============================================================================ */
+
+.skeleton-text {
+    /* Layout vertical com espaçamento */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Espaçamento entre linhas */
+}
+
+
+/* ============================================================================
+   SKELETON CIRCLE
+   Elemento circular para avatares ou ícones
+   ============================================================================ */
+
+.skeleton-circle {
+    /* Dimensões padrão (pode ser sobrescrito via parâmetro Height/Width) */
+    width: 48px;
+    height: 48px;
+    
+    /* Forma circular */
+    border-radius: 50%; /* 50% = círculo perfeito */
+    
+    /* Visual animado */
+    background: linear-gradient(90deg, #e0e0e0 0%, #d0d0d0 50%, #e0e0e0 100%);
+    background-size: 468px 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+
+/* ============================================================================
+   SKELETON RECTANGLE
+   Retângulo genérico para imagens, thumbnails, banners
+   ============================================================================ */
+
+.skeleton-rectangle {
+    /* Dimensões padrão */
+    width: 100%;
+    height: 200px; /* Altura padrão (pode ser sobrescrita) */
+    
+    /* Visual */
+    border-radius: 4px;
+    
+    /* Animação */
+    background: linear-gradient(90deg, #e0e0e0 0%, #d0d0d0 50%, #e0e0e0 100%);
+    background-size: 468px 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+
+/* ============================================================================
+   SKELETON DEFAULT
+   Variante padrão quando nenhuma específica é escolhida
+   ============================================================================ */
+
+.skeleton-default {
+    /* Dimensões mínimas */
+    width: 100%;
+    min-height: 20px; /* Altura mínima para ser visível */
+    
+    /* Visual */
+    border-radius: 4px;
+    
+    /* Animação (herda do pai .skeleton) */
+}
+
+
+/* ============================================================================
+   RESPONSIVE - Mobile
+   Ajustes para telas menores
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    
+    /* Reduz padding do card skeleton em mobile */
+    .skeleton-card__content {
+        padding: 20px; /* 24px → 20px */
+        gap: 10px;     /* 12px → 10px */
+    }
+    
+    /* Ajusta altura das linhas em mobile */
+    .skeleton-line {
+        height: 14px; /* 16px → 14px */
+    }
+    
+    .skeleton-line--title {
+        height: 20px; /* 24px → 20px */
+    }
+}

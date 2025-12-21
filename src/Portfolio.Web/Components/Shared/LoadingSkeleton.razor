@@ -1,0 +1,179 @@
+@*
+    ============================================================================
+    Título: Loading Skeleton Component
+    Descrição: Componente de placeholder animado exibido durante carregamento
+               de dados. Simula a estrutura do conteúdo final com animação
+               de "shimmer" para feedback visual ao usuário.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*@
+
+<div class="skeleton @VariantClass @Class" style="@StyleAttribute">
+    
+    @* 
+        CONTEÚDO CONDICIONAL
+        Renderiza diferentes estruturas baseado na variante selecionada
+    *@
+    
+    @if (Variant == "card")
+    {
+        @* 
+            SKELETON CARD - Simula um card completo
+            Estrutura: imagem + header + título + descrição + footer
+        *@
+        <div class="skeleton-card">
+            @* Placeholder da imagem (retângulo com proporção 16:9) *@
+            <div class="skeleton-card__image"></div>
+            
+            <div class="skeleton-card__content">
+                @* Placeholder do header (linha pequena) *@
+                <div class="skeleton-line skeleton-line--small"></div>
+                
+                @* Placeholder do título (linha média mais grossa) *@
+                <div class="skeleton-line skeleton-line--title"></div>
+                
+                @* Placeholder da descrição (3 linhas finas) *@
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line skeleton-line--short"></div>
+                
+                @* Placeholder do footer (linha pequena) *@
+                <div class="skeleton-line skeleton-line--small" style="margin-top: auto;"></div>
+            </div>
+        </div>
+    }
+    else if (Variant == "text")
+    {
+        @* 
+            SKELETON TEXT - Simula linhas de texto
+            Quantidade de linhas controlada pelo parâmetro Lines
+        *@
+        <div class="skeleton-text">
+            @for (int i = 0; i < Lines; i++)
+            {
+                @* Última linha é mais curta (80%) para parecer mais natural *@
+                <div class="skeleton-line @(i == Lines - 1 ? "skeleton-line--short" : "")"></div>
+            }
+        </div>
+    }
+    else if (Variant == "circle")
+    {
+        @* 
+            SKELETON CIRCLE - Simula avatar ou ícone circular
+            Tamanho controlado pelos parâmetros Width/Height
+        *@
+        <div class="skeleton-circle"></div>
+    }
+    else if (Variant == "rectangle")
+    {
+        @* 
+            SKELETON RECTANGLE - Retângulo genérico
+            Dimensões personalizáveis via Width/Height
+            Uso: imagens, thumbnails, banners
+        *@
+        <div class="skeleton-rectangle"></div>
+    }
+    else
+    {
+        @* 
+            SKELETON PADRÃO - Retângulo básico
+            Fallback quando nenhuma variante específica é escolhida
+        *@
+        <div class="skeleton-default"></div>
+    }
+</div>
+
+@code {
+    // ========================================================================
+    // PARÂMETROS DO COMPONENTE
+    // Controlam aparência e comportamento do skeleton
+    // ========================================================================
+
+    /// <summary>
+    /// Variante visual do skeleton
+    /// Opções disponíveis:
+    /// - "card": simula estrutura completa de um card (padrão para grids)
+    /// - "text": simula múltiplas linhas de texto
+    /// - "circle": simula avatar ou ícone circular
+    /// - "rectangle": retângulo genérico para imagens/thumbnails
+    /// - "default": retângulo básico sem estrutura específica
+    /// </summary>
+    [Parameter]
+    public string Variant { get; set; } = "default";
+
+    /// <summary>
+    /// Largura do skeleton
+    /// Aceita valores CSS: "100%", "200px", "50vw", etc
+    /// Se não especificada, usa 100% (ocupa todo o container)
+    /// </summary>
+    [Parameter]
+    public string? Width { get; set; }
+
+    /// <summary>
+    /// Altura do skeleton
+    /// Aceita valores CSS: "200px", "50vh", "auto", etc
+    /// Se não especificada, usa altura automática baseada no conteúdo
+    /// </summary>
+    [Parameter]
+    public string? Height { get; set; }
+
+    /// <summary>
+    /// Número de linhas para a variante "text"
+    /// Controla quantas linhas de placeholder serão renderizadas
+    /// Padrão: 3 linhas
+    /// </summary>
+    [Parameter]
+    public int Lines { get; set; } = 3;
+
+    /// <summary>
+    /// Classes CSS adicionais para customização
+    /// Permite adicionar estilos específicos sem modificar o componente
+    /// Exemplo: Class="my-custom-skeleton" ou Class="large-skeleton"
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    // ========================================================================
+    // PROPRIEDADES COMPUTADAS
+    // Calculadas dinamicamente baseadas nos parâmetros
+    // ========================================================================
+
+    /// <summary>
+    /// Gera classe CSS baseada na variante selecionada
+    /// Segue padrão BEM: skeleton--{variant}
+    /// Exemplos: "skeleton--card", "skeleton--text", "skeleton--circle"
+    /// </summary>
+    private string VariantClass => $"skeleton--{Variant}";
+
+    /// <summary>
+    /// Gera atributo style inline com width e height personalizados
+    /// Apenas adiciona se os parâmetros Width ou Height foram fornecidos
+    /// Exemplo: style="width: 200px; height: 100px;"
+    /// </summary>
+    private string StyleAttribute
+    {
+        get
+        {
+            // Lista para acumular estilos
+            var styles = new List<string>();
+
+            // Adiciona width se especificado
+            if (!string.IsNullOrEmpty(Width))
+            {
+                styles.Add($"width: {Width}");
+            }
+
+            // Adiciona height se especificado
+            if (!string.IsNullOrEmpty(Height))
+            {
+                styles.Add($"height: {Height}");
+            }
+
+            // Retorna estilos separados por ponto-e-vírgula
+            // Se nenhum estilo foi adicionado, retorna string vazia
+            return string.Join("; ", styles);
+        }
+    }
+}
