@@ -1,0 +1,328 @@
+/*
+    ============================================================================
+    Título: Pagination Component Styles
+    Descrição: Estilos para componente de paginação com navegação anterior/
+               próximo, números de página e informações de registros.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*/
+
+/* ============================================================================
+   PAGINATION CONTAINER
+   Container principal com layout flex
+   ============================================================================ */
+
+.pagination {
+    /* LAYOUT */
+    display: flex;
+    flex-direction: column; /* Info em cima, controles embaixo */
+    gap: 16px;
+    align-items: center; /* Centraliza horizontalmente */
+    
+    /* ESPAÇAMENTO */
+    padding: 20px 0;
+}
+
+
+/* ============================================================================
+   PAGINATION INFO - Informação de registros
+   ============================================================================ */
+
+.pagination__info {
+    /* TIPOGRAFIA */
+    font-size: 0.875rem; /* 14px */
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+
+/* ============================================================================
+   PAGINATION CONTROLS - Container dos botões e números
+   ============================================================================ */
+
+.pagination__controls {
+    /* LAYOUT */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaçamento entre elementos */
+    flex-wrap: wrap; /* Permite quebra em telas pequenas */
+    justify-content: center;
+}
+
+
+/* ============================================================================
+   PAGINATION BUTTONS - Botões Anterior/Próximo
+   ============================================================================ */
+
+.pagination__button {
+    /* RESET */
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    
+    /* VISUAL */
+    background: var(--color-bg-light); /* Fundo claro */
+    color: var(--color-dark);
+    border: 2px solid rgba(13, 28, 36, 0.1);
+    border-radius: 6px;
+    
+    /* TIPOGRAFIA */
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    
+    /* ESPAÇAMENTO */
+    padding: 8px 16px;
+    min-width: 100px; /* Largura mínima para consistência */
+    
+    /* TRANSIÇÕES */
+    transition: all 0.2s ease;
+}
+
+/* HOVER nos botões */
+.pagination__button:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 158, 163, 0.2);
+}
+
+/* ACTIVE (clicado) */
+.pagination__button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* DISABLED */
+.pagination__button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* FOCUS (acessibilidade) */
+.pagination__button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================================
+   PAGINATION PAGES - Container dos números de página
+   ============================================================================ */
+
+.pagination__pages {
+    /* LAYOUT */
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Espaço pequeno entre números */
+}
+
+
+/* ============================================================================
+   PAGINATION PAGE - Botão de número de página
+   ============================================================================ */
+
+.pagination__page {
+    /* RESET */
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    
+    /* LAYOUT */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* DIMENSÕES */
+    width: 40px;
+    height: 40px;
+    min-width: 40px; /* Garante tamanho quadrado */
+    
+    /* VISUAL */
+    background: transparent;
+    color: var(--color-dark);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    
+    /* TIPOGRAFIA */
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    
+    /* TRANSIÇÕES */
+    transition: all 0.2s ease;
+}
+
+/* HOVER em números de página */
+.pagination__page:hover {
+    background: rgba(108, 158, 163, 0.1);
+    color: var(--color-primary);
+}
+
+/* PÁGINA ATIVA (atual) */
+.pagination__page--active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.pagination__page--active:hover {
+    background: var(--color-dark);
+    border-color: var(--color-dark);
+}
+
+/* FOCUS em números */
+.pagination__page:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================================
+   PAGINATION ELLIPSIS - Indicador de páginas ocultas (...)
+   ============================================================================ */
+
+.pagination__ellipsis {
+    /* LAYOUT */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* DIMENSÕES (mesmo tamanho dos números) */
+    width: 40px;
+    height: 40px;
+    
+    /* TIPOGRAFIA */
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    
+    /* Não é clicável */
+    pointer-events: none;
+}
+
+
+/* ============================================================================
+   VARIANTS - Variantes de tamanho
+   ============================================================================ */
+
+/* SMALL - Paginação compacta */
+.pagination--small .pagination__button {
+    padding: 6px 12px;
+    font-size: 0.75rem; /* 12px */
+    min-width: 80px;
+}
+
+.pagination--small .pagination__page,
+.pagination--small .pagination__ellipsis {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.75rem;
+}
+
+/* LARGE - Paginação grande */
+.pagination--large .pagination__button {
+    padding: 12px 20px;
+    font-size: 1rem; /* 16px */
+    min-width: 120px;
+}
+
+.pagination--large .pagination__page,
+.pagination--large .pagination__ellipsis {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    font-size: 1rem;
+}
+
+
+/* ============================================================================
+   PAGINATION CENTERED - Centraliza tudo
+   ============================================================================ */
+
+.pagination--centered {
+    align-items: center;
+    text-align: center;
+}
+
+
+/* ============================================================================
+   RESPONSIVE - Mobile
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    
+    /* Stack vertical em mobile */
+    .pagination {
+        gap: 12px;
+    }
+    
+    /* Controles ocupam largura total */
+    .pagination__controls {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Reduz espaçamento entre números */
+    .pagination__pages {
+        gap: 2px;
+    }
+    
+    /* Botões anterior/próximo menores em mobile */
+    .pagination__button {
+        min-width: 80px;
+        padding: 8px 12px;
+        font-size: 0.8125rem; /* 13px */
+    }
+    
+    /* Números de página menores */
+    .pagination__page,
+    .pagination__ellipsis {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        font-size: 0.8125rem;
+    }
+    
+    /* Esconde texto dos botões, mostra apenas setas */
+    .pagination__button--prev::before {
+        content: "←";
+        margin-right: 4px;
+    }
+    
+    .pagination__button--next::after {
+        content: "→";
+        margin-left: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    
+    /* Em telas muito pequenas, esconde texto dos botões */
+    .pagination__button {
+        min-width: 44px;
+        padding: 8px;
+    }
+    
+    .pagination__button--prev {
+        font-size: 0; /* Esconde texto */
+    }
+    
+    .pagination__button--prev::before {
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    .pagination__button--next {
+        font-size: 0; /* Esconde texto */
+    }
+    
+    .pagination__button--next::after {
+        font-size: 1rem;
+        margin: 0;
+    }
+}

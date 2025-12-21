@@ -1,0 +1,280 @@
+@*
+    ============================================================================
+    Título: Pagination Component - Componente de Paginação
+    Descrição: Controle de paginação com botões anterior/próximo e números
+               de página. Suporta customização de quantidade de páginas
+               visíveis e exibição de informações sobre registros.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*@
+
+<div class="pagination @Class">
+    
+    @* 
+        INFORMAÇÕES DE REGISTROS
+        Mostra "Exibindo X-Y de Z itens"
+        Útil para dar contexto ao usuário
+    *@
+    @if (ShowInfo && TotalItems > 0)
+    {
+        <div class="pagination__info">
+            <span>
+                Exibindo @FirstItemIndex-@LastItemIndex de @TotalItems 
+                @(TotalItems == 1 ? "item" : "itens")
+            </span>
+        </div>
+    }
+    
+    @* 
+        CONTROLES DE NAVEGAÇÃO
+        Botões e números de página
+    *@
+    <div class="pagination__controls">
+        
+        @* 
+            BOTÃO ANTERIOR
+            Desabilitado quando está na primeira página
+        *@
+        <button 
+            type="button"
+            class="pagination__button pagination__button--prev"
+            disabled="@(CurrentPage <= 1)"
+            @onclick="GoToPreviousPage"
+            aria-label="Página anterior">
+            ← Anterior
+        </button>
+        
+        @* 
+            NÚMEROS DE PÁGINA
+            Mostra páginas baseado em MaxVisiblePages
+            Adiciona "..." quando há muitas páginas
+        *@
+        <div class="pagination__pages">
+            @foreach (var pageNumber in GetVisiblePages())
+            {
+                @if (pageNumber == -1)
+                {
+                    @* Ellipsis (...) para indicar páginas ocultas *@
+                    <span class="pagination__ellipsis">...</span>
+                }
+                else
+                {
+                    @* Botão de número de página *@
+                    <button 
+                        type="button"
+                        class="pagination__page @(pageNumber == CurrentPage ? "pagination__page--active" : "")"
+                        @onclick="() => GoToPage(pageNumber)"
+                        aria-label="Ir para página @pageNumber"
+                        aria-current="@(pageNumber == CurrentPage ? "page" : null)">
+                        @pageNumber
+                    </button>
+                }
+            }
+        </div>
+        
+        @* 
+            BOTÃO PRÓXIMO
+            Desabilitado quando está na última página
+        *@
+        <button 
+            type="button"
+            class="pagination__button pagination__button--next"
+            disabled="@(CurrentPage >= TotalPages)"
+            @onclick="GoToNextPage"
+            aria-label="Próxima página">
+            Próximo →
+        </button>
+    </div>
+</div>
+
+@code {
+    // ========================================================================
+    // PARÂMETROS DO COMPONENTE
+    // ========================================================================
+
+    /// <summary>
+    /// Página atual (1-indexed)
+    /// Binding bidirecional: @bind-CurrentPage="currentPage"
+    /// </summary>
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
+
+    /// <summary>
+    /// Callback quando página atual muda
+    /// Necessário para two-way binding
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> CurrentPageChanged { get; set; }
+
+    /// <summary>
+    /// Total de páginas disponíveis
+    /// Calculado como: Math.Ceiling(TotalItems / ItemsPerPage)
+    /// </summary>
+    [Parameter]
+    public int TotalPages { get; set; } = 1;
+
+    /// <summary>
+    /// Total de itens no dataset completo
+    /// Usado para calcular TotalPages e mostrar info
+    /// </summary>
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+
+    /// <summary>
+    /// Quantidade de itens por página
+    /// Usado para calcular FirstItemIndex e LastItemIndex
+    /// </summary>
+    [Parameter]
+    public int ItemsPerPage { get; set; } = 10;
+
+    /// <summary>
+    /// Máximo de números de página visíveis ao mesmo tempo
+    /// Exemplo: 5 mostra [1] [2] [3] [4] [5] ... [20]
+    /// </summary>
+    [Parameter]
+    public int MaxVisiblePages { get; set; } = 5;
+
+    /// <summary>
+    /// Mostra informação de registros ("Exibindo X-Y de Z itens")
+    /// Padrão: true
+    /// </summary>
+    [Parameter]
+    public bool ShowInfo { get; set; } = true;
+
+    /// <summary>
+    /// Classes CSS adicionais
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Callback executado quando página muda
+    /// Recebe o novo número da página
+    /// Exemplo: OnPageChange="async page => await LoadProjects(page)"
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnPageChange { get; set; }
+
+    // ========================================================================
+    // PROPRIEDADES COMPUTADAS
+    // ========================================================================
+
+    /// <summary>
+    /// Índice do primeiro item da página atual
+    /// Exemplo: Página 2 com 10 itens/página = item 11
+    /// </summary>
+    private int FirstItemIndex => ((CurrentPage - 1) * ItemsPerPage) + 1;
+
+    /// <summary>
+    /// Índice do último item da página atual
+    /// Não excede TotalItems
+    /// Exemplo: Página 2 com 10 itens/página e 25 total = item 20
+    /// </summary>
+    private int LastItemIndex => Math.Min(CurrentPage * ItemsPerPage, TotalItems);
+
+    // ========================================================================
+    // MÉTODOS
+    // ========================================================================
+
+    /// <summary>
+    /// Navega para página anterior
+    /// Não faz nada se já está na primeira página
+    /// </summary>
+    private async Task GoToPreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            await GoToPage(CurrentPage - 1);
+        }
+    }
+
+    /// <summary>
+    /// Navega para próxima página
+    /// Não faz nada se já está na última página
+    /// </summary>
+    private async Task GoToNextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            await GoToPage(CurrentPage + 1);
+        }
+    }
+
+    /// <summary>
+    /// Navega para página específica
+    /// Valida se página está dentro dos limites
+    /// </summary>
+    private async Task GoToPage(int page)
+    {
+        // Valida limites
+        if (page < 1 || page > TotalPages || page == CurrentPage)
+            return;
+
+        // Atualiza página atual
+        CurrentPage = page;
+
+        // Notifica mudança (two-way binding)
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
+
+        // Dispara callback se registrado
+        if (OnPageChange.HasDelegate)
+        {
+            await OnPageChange.InvokeAsync(CurrentPage);
+        }
+    }
+
+    /// <summary>
+    /// Calcula quais números de página devem ser visíveis
+    /// Adiciona -1 para representar ellipsis (...)
+    /// Algoritmo:
+    /// - Sempre mostra primeira e última página
+    /// - Mostra páginas ao redor da página atual
+    /// - Adiciona "..." onde há páginas ocultas
+    /// </summary>
+    private List<int> GetVisiblePages()
+    {
+        var pages = new List<int>();
+
+        // Se total de páginas cabe em MaxVisiblePages, mostra todas
+        if (TotalPages <= MaxVisiblePages)
+        {
+            for (int i = 1; i <= TotalPages; i++)
+            {
+                pages.Add(i);
+            }
+            return pages;
+        }
+
+        // Sempre adiciona primeira página
+        pages.Add(1);
+
+        // Calcula range de páginas ao redor da atual
+        int startPage = Math.Max(2, CurrentPage - 1);
+        int endPage = Math.Min(TotalPages - 1, CurrentPage + 1);
+
+        // Adiciona ellipsis se há gap após primeira página
+        if (startPage > 2)
+        {
+            pages.Add(-1); // -1 representa "..."
+        }
+
+        // Adiciona páginas do range
+        for (int i = startPage; i <= endPage; i++)
+        {
+            pages.Add(i);
+        }
+
+        // Adiciona ellipsis se há gap antes da última página
+        if (endPage < TotalPages - 1)
+        {
+            pages.Add(-1); // -1 representa "..."
+        }
+
+        // Sempre adiciona última página
+        pages.Add(TotalPages);
+
+        return pages;
+    }
+}

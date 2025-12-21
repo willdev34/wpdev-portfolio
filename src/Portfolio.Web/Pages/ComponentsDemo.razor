@@ -272,11 +272,11 @@
         <div class="demo-subsection">
             <h3 class="demo-subsection__title">Filtros Básicos (clique para ativar/desativar)</h3>
             <div class="filter-chip-demo-row">
-                <FilterChip Label="React" @bind-IsActive="filterReact" />
-                <FilterChip Label="C#" @bind-IsActive="filterCSharp" />
-                <FilterChip Label="TypeScript" @bind-IsActive="filterTypeScript" />
-                <FilterChip Label="PostgreSQL" @bind-IsActive="filterPostgreSQL" />
-                <FilterChip Label="Docker" @bind-IsActive="filterDocker" />
+                <FilterChip Label="React" @bind-IsActive="@filterReact" />
+                <FilterChip Label="C#" @bind-IsActive="@filterCSharp" />
+                <FilterChip Label="TypeScript" @bind-IsActive="@filterTypeScript" />
+                <FilterChip Label="PostgreSQL" @bind-IsActive="@filterPostgreSQL" />
+                <FilterChip Label="Docker" @bind-IsActive="@filterDocker" />
             </div>
             
             @if (filterReact || filterCSharp || filterTypeScript || filterPostgreSQL || filterDocker)
@@ -350,6 +350,80 @@
         </div>
     </section>
 
+    <section class="demo-section">
+        <h2 class="demo-section__title">9. Pagination Component</h2>
+        <p class="demo-section__description">Controle de paginação para listas longas</p>
+        
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Paginação Básica</h3>
+            <Pagination 
+                @bind-CurrentPage="currentPage"
+                TotalPages="10"
+                TotalItems="95"
+                ItemsPerPage="10"
+                OnPageChange="HandlePageChange" />
+            
+            <p style="margin-top: 16px; color: var(--color-text-muted); text-align: center;">
+                Página atual: <strong>@currentPage</strong>
+            </p>
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Com Muitas Páginas (ellipsis)</h3>
+            <Pagination 
+                CurrentPage="15"
+                TotalPages="50"
+                TotalItems="500"
+                ItemsPerPage="10"
+                MaxVisiblePages="5" />
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Sem Info de Registros</h3>
+            <Pagination 
+                CurrentPage="3"
+                TotalPages="8"
+                TotalItems="75"
+                ItemsPerPage="10"
+                ShowInfo="false" />
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Tamanhos</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div>
+                    <p style="margin-bottom: 8px; font-weight: 600;">Small</p>
+                    <Pagination 
+                        Class="pagination--small"
+                        CurrentPage="2"
+                        TotalPages="5"
+                        TotalItems="50"
+                        ItemsPerPage="10" />
+                </div>
+                
+                <div>
+                    <p style="margin-bottom: 8px; font-weight: 600;">Medium (padrão)</p>
+                    <Pagination 
+                        CurrentPage="2"
+                        TotalPages="5"
+                        TotalItems="50"
+                        ItemsPerPage="10" />
+                </div>
+                
+                <div>
+                    <p style="margin-bottom: 8px; font-weight: 600;">Large</p>
+                    <Pagination 
+                        Class="pagination--large"
+                        CurrentPage="2"
+                        TotalPages="5"
+                        TotalItems="50"
+                        ItemsPerPage="10" />
+                </div>
+            </div>
+        </div>
+    </section>
+
 </div>
 
 @code {
@@ -387,4 +461,25 @@
     private bool filterTypeScript = false;
     private bool filterPostgreSQL = false;
     private bool filterDocker = false;
+
+    /*
+        ========================================================================
+        PAGINATION DEMO - Estado da paginação
+        ========================================================================
+    */
+    
+    /// <summary>
+    /// Página atual do exemplo de paginação
+    /// </summary>
+    private int currentPage = 1;
+    
+    /// <summary>
+    /// Handler executado quando página muda
+    /// </summary>
+    private void HandlePageChange(int page)
+    {
+        // Em produção, aqui carregaria os dados da nova página
+        // Por enquanto, apenas para demonstração
+        currentPage = page;
+    }
 }
