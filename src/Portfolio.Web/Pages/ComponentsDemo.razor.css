@@ -150,3 +150,36 @@
     color: var(--color-dark);
     margin: 0;
 }
+
+/* ============================================================================
+   BUTTON DEMO - Estilos para seção de demonstração de botões
+   ============================================================================ */
+
+.demo-subsection {
+    /* Subsection dentro de uma section */
+    margin-bottom: 40px;
+}
+
+.demo-subsection__title {
+    /* Título de subsection */
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    margin: 0 0 16px 0;
+}
+
+.button-demo-row {
+    /* Layout horizontal com wrap para os botões */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+}
+
+/* Mobile: botões empilham verticalmente */
+@media (max-width: 768px) {
+    .button-demo-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

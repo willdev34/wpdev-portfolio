@@ -1,0 +1,270 @@
+@*
+    ============================================================================
+    Título: Button Component - Componente de Botão Reutilizável
+    Descrição: Botão padronizado com múltiplas variantes (primary, secondary,
+               outline, ghost) e tamanhos (small, medium, large). Suporta
+               estados de loading e disabled.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*@
+
+@*
+    RENDERIZAÇÃO CONDICIONAL
+    Renderiza <button> ou <a> baseado na presença do parâmetro Href
+    - Se Href existe: renderiza link <a> estilizado como botão
+    - Se Href não existe: renderiza botão <button> normal
+*@
+
+@if (!string.IsNullOrEmpty(Href))
+{
+    @* 
+        LINK ESTILIZADO COMO BOTÃO
+        Usado para navegação entre páginas
+        Exemplo: <Button Href="/projetos">Ver Projetos</Button>
+    *@
+    <a 
+        href="@Href" 
+        class="btn @VariantClass @SizeClass @Class @DisabledClass"
+        target="@Target"
+        @attributes="AdditionalAttributes">
+        
+        @* Ícone à esquerda (opcional) *@
+        @if (!string.IsNullOrEmpty(IconLeft))
+        {
+            <span class="btn__icon btn__icon--left">@IconLeft</span>
+        }
+        
+        @* Conteúdo do botão (texto ou RenderFragment) *@
+        <span class="btn__content">@ChildContent</span>
+        
+        @* Ícone à direita (opcional) *@
+        @if (!string.IsNullOrEmpty(IconRight))
+        {
+            <span class="btn__icon btn__icon--right">@IconRight</span>
+        }
+    </a>
+}
+else
+{
+    @* 
+        BOTÃO NORMAL
+        Usado para ações (submit, onClick, etc)
+        Exemplo: <Button OnClick="HandleSubmit">Enviar</Button>
+    *@
+    <button 
+        type="@Type"
+        class="btn @VariantClass @SizeClass @Class @DisabledClass @LoadingClass"
+        disabled="@(Disabled || IsLoading)"
+        @onclick="HandleClick"
+        @attributes="AdditionalAttributes">
+        
+        @* 
+            SPINNER DE LOADING
+            Aparece quando IsLoading = true
+            Substitui o conteúdo normal do botão
+        *@
+        @if (IsLoading)
+        {
+            <span class="btn__spinner"></span>
+            @if (!string.IsNullOrEmpty(LoadingText))
+            {
+                <span class="btn__loading-text">@LoadingText</span>
+            }
+        }
+        else
+        {
+            @* Ícone à esquerda (opcional) *@
+            @if (!string.IsNullOrEmpty(IconLeft))
+            {
+                <span class="btn__icon btn__icon--left">@IconLeft</span>
+            }
+            
+            @* Conteúdo do botão *@
+            <span class="btn__content">@ChildContent</span>
+            
+            @* Ícone à direita (opcional) *@
+            @if (!string.IsNullOrEmpty(IconRight))
+            {
+                <span class="btn__icon btn__icon--right">@IconRight</span>
+            }
+        }
+    </button>
+}
+
+@code {
+    // ========================================================================
+    // PARÂMETROS DO COMPONENTE
+    // ========================================================================
+
+    /// <summary>
+    /// Conteúdo interno do botão (texto ou HTML)
+    /// Pode ser texto simples ou componentes aninhados
+    /// Exemplo: <Button>Clique aqui</Button>
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Variante visual do botão
+    /// Opções: "primary" (padrão), "secondary", "outline", "ghost", "danger"
+    /// - primary: cor primária sólida (#6C9EA3)
+    /// - secondary: cor escura sólida (#0D1C24)
+    /// - outline: apenas borda, fundo transparente
+    /// - ghost: sem borda, apenas hover
+    /// - danger: vermelho para ações destrutivas
+    /// </summary>
+    [Parameter]
+    public string Variant { get; set; } = "primary";
+
+    /// <summary>
+    /// Tamanho do botão
+    /// Opções: "small", "medium" (padrão), "large"
+    /// Controla padding e font-size
+    /// </summary>
+    [Parameter]
+    public string Size { get; set; } = "medium";
+
+    /// <summary>
+    /// Tipo do botão HTML
+    /// Opções: "button" (padrão), "submit", "reset"
+    /// Usado apenas quando não é link (Href vazio)
+    /// </summary>
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    /// <summary>
+    /// URL para navegação (transforma botão em link)
+    /// Se preenchido, renderiza <a> ao invés de <button>
+    /// Exemplo: Href="/projetos"
+    /// </summary>
+    [Parameter]
+    public string? Href { get; set; }
+
+    /// <summary>
+    /// Target do link (usado apenas quando Href está preenchido)
+    /// Opções: "_self" (padrão), "_blank", "_parent", "_top"
+    /// Exemplo: Target="_blank" abre em nova aba
+    /// </summary>
+    [Parameter]
+    public string Target { get; set; } = "_self";
+
+    /// <summary>
+    /// Ícone à esquerda do texto
+    /// Pode ser emoji, símbolo unicode ou texto
+    /// Exemplo: IconLeft="←" ou IconLeft="📁"
+    /// </summary>
+    [Parameter]
+    public string? IconLeft { get; set; }
+
+    /// <summary>
+    /// Ícone à direita do texto
+    /// Exemplo: IconRight="→" ou IconRight="✓"
+    /// </summary>
+    [Parameter]
+    public string? IconRight { get; set; }
+
+    /// <summary>
+    /// Estado de carregamento (loading)
+    /// Quando true, mostra spinner e desabilita o botão
+    /// </summary>
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+
+    /// <summary>
+    /// Texto exibido durante loading
+    /// Se vazio, mostra apenas o spinner
+    /// Exemplo: LoadingText="Carregando..."
+    /// </summary>
+    [Parameter]
+    public string? LoadingText { get; set; }
+
+    /// <summary>
+    /// Estado desabilitado
+    /// Quando true, botão fica visualmente desabilitado e não clicável
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// Botão ocupa largura total do container (100%)
+    /// Útil para formulários em mobile
+    /// </summary>
+    [Parameter]
+    public bool FullWidth { get; set; } = false;
+
+    /// <summary>
+    /// Classes CSS adicionais
+    /// Permite customização sem modificar o componente
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Callback executado ao clicar no botão
+    /// Não funciona quando Href está preenchido (link)
+    /// Exemplo: OnClick="async () => await Submit()"
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// Atributos HTML adicionais
+    /// Permite passar qualquer atributo HTML extra
+    /// Exemplo: data-*, aria-*, etc
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    // ========================================================================
+    // PROPRIEDADES COMPUTADAS
+    // Geram classes CSS dinamicamente baseadas nos parâmetros
+    // ========================================================================
+
+    /// <summary>
+    /// Classe CSS da variante
+    /// Padrão BEM: btn--{variant}
+    /// </summary>
+    private string VariantClass => $"btn--{Variant}";
+
+    /// <summary>
+    /// Classe CSS do tamanho
+    /// Padrão BEM: btn--{size}
+    /// </summary>
+    private string SizeClass => $"btn--{Size}";
+
+    /// <summary>
+    /// Classe CSS para estado disabled
+    /// Adiciona "btn--disabled" quando Disabled = true
+    /// </summary>
+    private string DisabledClass => Disabled ? "btn--disabled" : string.Empty;
+
+    /// <summary>
+    /// Classe CSS para estado loading
+    /// Adiciona "btn--loading" quando IsLoading = true
+    /// </summary>
+    private string LoadingClass => IsLoading ? "btn--loading" : string.Empty;
+
+    // ========================================================================
+    // MÉTODOS
+    // ========================================================================
+
+    /// <summary>
+    /// Manipulador de clique
+    /// Invoca o callback OnClick se fornecido
+    /// Não executa se botão estiver disabled ou loading
+    /// </summary>
+    private async Task HandleClick(MouseEventArgs e)
+    {
+        // Não executa se disabled ou loading
+        if (Disabled || IsLoading)
+            return;
+
+        // Invoca callback se registrado
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+    }
+}

@@ -1,0 +1,295 @@
+/*
+    ============================================================================
+    Título: Button Component Styles
+    Descrição: Estilos para componente de botão com múltiplas variantes,
+               tamanhos e estados (hover, active, disabled, loading).
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*/
+
+/* ============================================================================
+   BASE BUTTON STYLES
+   Estilos compartilhados por todos os botões
+   ============================================================================ */
+
+.btn {
+    /* RESET de estilos padrão do navegador */
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    
+    /* LAYOUT */
+    display: inline-flex; /* Permite alinhar ícones e texto */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    gap: 8px; /* Espaçamento entre ícone e texto */
+    
+    /* TIPOGRAFIA */
+    font-weight: 600; /* Semibold */
+    text-decoration: none; /* Remove underline de links */
+    text-align: center;
+    white-space: nowrap; /* Não quebra linha */
+    
+    /* VISUAL */
+    border-radius: 4px; /* Cantos levemente arredondados */
+    
+    /* TRANSIÇÕES suaves para hover */
+    transition: all 0.2s ease;
+    
+    /* Remove outline padrão e adiciona focus visível */
+    outline: none;
+}
+
+/* Estado FOCUS (acessibilidade) - anel visível ao navegar com teclado */
+.btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(108, 158, 163, 0.3); /* Anel na cor primária */
+}
+
+
+/* ============================================================================
+   BUTTON SIZES - Tamanhos (small, medium, large)
+   ============================================================================ */
+
+/* SMALL - Botões pequenos para ações secundárias */
+.btn--small {
+    padding: 6px 16px; /* Padding compacto */
+    font-size: 0.875rem; /* 14px */
+    min-height: 32px; /* Altura mínima para touch targets */
+}
+
+/* MEDIUM - Tamanho padrão (mais usado) */
+.btn--medium {
+    padding: 10px 24px; /* Padding confortável */
+    font-size: 0.9375rem; /* 15px */
+    min-height: 40px;
+}
+
+/* LARGE - Botões grandes para CTAs principais */
+.btn--large {
+    padding: 14px 32px; /* Padding generoso */
+    font-size: 1rem; /* 16px */
+    min-height: 48px;
+}
+
+
+/* ============================================================================
+   BUTTON VARIANTS - Variantes visuais
+   ============================================================================ */
+
+/* PRIMARY - Cor primária sólida (ação principal) */
+.btn--primary {
+    background: var(--color-primary); /* #6C9EA3 */
+    color: white;
+    border: 2px solid var(--color-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+    background: var(--color-dark); /* Escurece no hover */
+    border-color: var(--color-dark);
+    transform: translateY(-2px); /* Efeito de elevação */
+    box-shadow: 0 4px 12px rgba(108, 158, 163, 0.3);
+}
+
+.btn--primary:active:not(:disabled) {
+    transform: translateY(0); /* Volta ao normal ao clicar */
+}
+
+
+/* SECONDARY - Cor escura sólida */
+.btn--secondary {
+    background: var(--color-dark); /* #0D1C24 */
+    color: white;
+    border: 2px solid var(--color-dark);
+}
+
+.btn--secondary:hover:not(:disabled) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 28, 36, 0.3);
+}
+
+.btn--secondary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+
+/* OUTLINE - Apenas borda, fundo transparente */
+.btn--outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.btn--outline:hover:not(:disabled) {
+    background: var(--color-primary); /* Preenche no hover */
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn--outline:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+
+/* GHOST - Sem borda, apenas hover */
+.btn--ghost {
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid transparent; /* Borda transparente mantém o tamanho */
+}
+
+.btn--ghost:hover:not(:disabled) {
+    background: rgba(108, 158, 163, 0.1); /* Fundo levemente colorido */
+    border-color: transparent;
+}
+
+
+/* DANGER - Vermelho para ações destrutivas (deletar, remover) */
+.btn--danger {
+    background: #dc3545; /* Vermelho */
+    color: white;
+    border: 2px solid #dc3545;
+}
+
+.btn--danger:hover:not(:disabled) {
+    background: #c82333; /* Vermelho mais escuro */
+    border-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn--danger:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+
+/* ============================================================================
+   BUTTON STATES - Estados (disabled, loading)
+   ============================================================================ */
+
+/* DISABLED - Botão desabilitado */
+.btn:disabled,
+.btn--disabled {
+    opacity: 0.5; /* Fica mais transparente */
+    cursor: not-allowed; /* Cursor de "proibido" */
+    pointer-events: none; /* Não responde a eventos */
+}
+
+
+/* LOADING - Estado de carregamento */
+.btn--loading {
+    position: relative; /* Contexto para posicionar spinner */
+    pointer-events: none; /* Não clicável durante loading */
+}
+
+
+/* ============================================================================
+   BUTTON CONTENT - Elementos internos
+   ============================================================================ */
+
+/* Conteúdo do botão (texto) */
+.btn__content {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Ícones */
+.btn__icon {
+    display: inline-flex;
+    font-size: 1.2em; /* 20% maior que o texto */
+}
+
+/* Ícone à esquerda tem margem negativa para compensar gap */
+.btn__icon--left {
+    margin-left: -4px;
+}
+
+/* Ícone à direita tem margem negativa */
+.btn__icon--right {
+    margin-right: -4px;
+}
+
+
+/* ============================================================================
+   LOADING SPINNER - Animação de carregamento
+   ============================================================================ */
+
+/* Keyframe da animação de rotação */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Spinner circular */
+.btn__spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Borda transparente */
+    border-top-color: white; /* Topo colorido cria o efeito */
+    border-radius: 50%; /* Círculo perfeito */
+    animation: spin 0.6s linear infinite; /* Rotação contínua */
+}
+
+/* Texto de loading */
+.btn__loading-text {
+    margin-left: 8px;
+}
+
+
+/* ============================================================================
+   FULL WIDTH - Botão ocupa largura total
+   ============================================================================ */
+
+.btn--full-width {
+    width: 100%;
+}
+
+
+/* ============================================================================
+   ICON ONLY - Botão apenas com ícone (sem texto)
+   ============================================================================ */
+
+.btn--icon-only {
+    padding: 10px; /* Padding igual em todos os lados */
+    aspect-ratio: 1; /* Mantém quadrado */
+}
+
+.btn--icon-only.btn--small {
+    padding: 6px;
+}
+
+.btn--icon-only.btn--large {
+    padding: 14px;
+}
+
+
+/* ============================================================================
+   RESPONSIVE - Mobile
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    
+    /* Aumenta área de toque em mobile */
+    .btn {
+        min-height: 44px; /* Recomendação Apple para touch targets */
+    }
+    
+    .btn--small {
+        min-height: 36px;
+        padding: 8px 16px;
+    }
+    
+    .btn--large {
+        min-height: 52px;
+        padding: 16px 32px;
+    }
+}
