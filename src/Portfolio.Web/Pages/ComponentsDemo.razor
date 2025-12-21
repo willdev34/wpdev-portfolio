@@ -236,4 +236,155 @@
         </div>
     </section>
 
+    <section class="demo-section">
+        <h2 class="demo-section__title">7. SearchBar Component</h2>
+        <p class="demo-section__description">Campo de busca com ícone e clear button</p>
+        
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Busca Padrão</h3>
+            <SearchBar 
+                @bind-Value="searchTerm" 
+                Placeholder="Buscar projetos..."
+                OnSearch="HandleSearch" />
+            
+            @if (!string.IsNullOrEmpty(searchTerm))
+            {
+                <p style="margin-top: 16px; color: var(--color-text-muted);">
+                    Buscando por: <strong>@searchTerm</strong>
+                </p>
+            }
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Variantes de Tamanho</h3>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <SearchBar Class="search-bar--small" Placeholder="SearchBar pequena..." />
+                <SearchBar Placeholder="SearchBar média (padrão)..." />
+                <SearchBar Class="search-bar--large" Placeholder="SearchBar grande..." />
+            </div>
+        </div>
+    </section>
+
+    <section class="demo-section">
+        <h2 class="demo-section__title">8. FilterChip Component</h2>
+        <p class="demo-section__description">Chips clicáveis para filtros e tags</p>
+        
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Filtros Básicos (clique para ativar/desativar)</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="React" @bind-IsActive="filterReact" />
+                <FilterChip Label="C#" @bind-IsActive="filterCSharp" />
+                <FilterChip Label="TypeScript" @bind-IsActive="filterTypeScript" />
+                <FilterChip Label="PostgreSQL" @bind-IsActive="filterPostgreSQL" />
+                <FilterChip Label="Docker" @bind-IsActive="filterDocker" />
+            </div>
+            
+            @if (filterReact || filterCSharp || filterTypeScript || filterPostgreSQL || filterDocker)
+            {
+                <p style="margin-top: 16px; color: var(--color-text-muted);">
+                    Filtros ativos: 
+                    @if (filterReact) { <strong>React </strong> }
+                    @if (filterCSharp) { <strong>C# </strong> }
+                    @if (filterTypeScript) { <strong>TypeScript </strong> }
+                    @if (filterPostgreSQL) { <strong>PostgreSQL </strong> }
+                    @if (filterDocker) { <strong>Docker </strong> }
+                </p>
+            }
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Com Ícones</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="Frontend" Icon="🎨" />
+                <FilterChip Label="Backend" Icon="⚙️" />
+                <FilterChip Label="Mobile" Icon="📱" />
+                <FilterChip Label="DevOps" Icon="🚀" />
+            </div>
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Com Contador</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="React" Count="12" />
+                <FilterChip Label="C#" Count="8" />
+                <FilterChip Label="TypeScript" Count="15" />
+                <FilterChip Label="Python" Count="5" />
+            </div>
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Com Botão Remover</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="React" IsActive="true" ShowRemove="true" />
+                <FilterChip Label="C#" IsActive="true" ShowRemove="true" />
+                <FilterChip Label="Docker" IsActive="true" ShowRemove="true" />
+            </div>
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Tamanhos</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="Small" Size="small" />
+                <FilterChip Label="Medium (padrão)" Size="medium" />
+                <FilterChip Label="Large" Size="large" />
+            </div>
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Variantes</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="Default" Variant="default" IsActive="true" />
+                <FilterChip Label="Primary" Variant="primary" IsActive="true" />
+                <FilterChip Label="Secondary" Variant="secondary" IsActive="true" />
+                <FilterChip Label="Outline" Variant="outline" IsActive="true" />
+            </div>
+        </div>
+
+        <div class="demo-subsection">
+            <h3 class="demo-subsection__title">Estados</h3>
+            <div class="filter-chip-demo-row">
+                <FilterChip Label="Normal" />
+                <FilterChip Label="Ativo" IsActive="true" />
+                <FilterChip Label="Disabled" Disabled="true" />
+            </div>
+        </div>
+    </section>
+
 </div>
+
+@code {
+    /*
+        ========================================================================
+        SEARCH BAR DEMO - Estado e handlers
+        ========================================================================
+    */
+    
+    /// <summary>
+    /// Termo de busca atual
+    /// </summary>
+    private string searchTerm = string.Empty;
+    
+    /// <summary>
+    /// Handler executado quando usuário pressiona Enter ou clica em buscar
+    /// </summary>
+    private void HandleSearch()
+    {
+        // Em produção, aqui faria a busca real na API
+        // Por enquanto, apenas para demonstração
+    }
+
+    /*
+        ========================================================================
+        FILTER CHIP DEMO - Estado dos filtros
+        ========================================================================
+    */
+    
+    /// <summary>
+    /// Estados dos filtros (ativos/inativos)
+    /// </summary>
+    private bool filterReact = false;
+    private bool filterCSharp = false;
+    private bool filterTypeScript = false;
+    private bool filterPostgreSQL = false;
+    private bool filterDocker = false;
+}

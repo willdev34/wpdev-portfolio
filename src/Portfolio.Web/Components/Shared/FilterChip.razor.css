@@ -1,0 +1,258 @@
+/*
+    ============================================================================
+    Título: FilterChip Component Styles
+    Descrição: Estilos para chips de filtro clicáveis com estados ativo/inativo,
+               contador e botão remover. Design minimalista e responsivo.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*/
+
+/* ============================================================================
+   BASE FILTER CHIP STYLES
+   Estilos compartilhados por todos os chips
+   ============================================================================ */
+
+.filter-chip {
+    /* RESET de estilos padrão */
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    
+    /* LAYOUT */
+    display: inline-flex; /* Alinha ícone, label, count e remove */
+    align-items: center;
+    gap: 6px; /* Espaçamento entre elementos internos */
+    
+    /* VISUAL */
+    background: rgba(13, 28, 36, 0.05); /* Fundo cinza claro */
+    color: var(--color-dark);
+    border: 2px solid transparent; /* Borda transparente por padrão */
+    border-radius: 20px; /* Cantos bem arredondados (pill shape) */
+    
+    /* TIPOGRAFIA */
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap; /* Não quebra linha */
+    
+    /* ESPAÇAMENTO */
+    padding: 6px 14px;
+    
+    /* TRANSIÇÕES suaves */
+    transition: all 0.2s ease;
+}
+
+/* 
+   HOVER
+   Efeito ao passar mouse sobre o chip
+*/
+.filter-chip:hover:not(:disabled) {
+    background: rgba(13, 28, 36, 0.1); /* Fundo mais escuro */
+    transform: translateY(-1px); /* Sobe levemente */
+}
+
+/* 
+   ACTIVE (clicado)
+   Feedback visual ao clicar
+*/
+.filter-chip:active:not(:disabled) {
+    transform: translateY(0); /* Volta ao normal */
+}
+
+/* 
+   FOCUS (acessibilidade)
+   Outline visível ao navegar com teclado
+*/
+.filter-chip:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================================
+   FILTER CHIP ELEMENTS - Elementos internos
+   ============================================================================ */
+
+/* ÍCONE */
+.filter-chip__icon {
+    display: inline-flex;
+    font-size: 1em; /* Mesmo tamanho do texto */
+}
+
+/* LABEL (texto principal) */
+.filter-chip__label {
+    display: inline-flex;
+}
+
+/* CONTADOR */
+.filter-chip__count {
+    /* Visual diferenciado para o número */
+    display: inline-flex;
+    font-size: 0.75em; /* Menor que o label */
+    opacity: 0.7; /* Mais transparente */
+    font-weight: 500; /* Menos bold que o label */
+}
+
+/* BOTÃO REMOVER (X) */
+.filter-chip__remove {
+    /* Layout circular */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    
+    /* Visual */
+    font-size: 0.875em;
+    border-radius: 50%; /* Círculo perfeito */
+    margin-left: 2px; /* Pequeno espaço extra */
+    
+    /* Transição */
+    transition: background 0.2s ease;
+}
+
+.filter-chip__remove:hover {
+    background: rgba(0, 0, 0, 0.1); /* Fundo ao passar mouse */
+}
+
+
+/* ============================================================================
+   ACTIVE STATE - Chip selecionado/ativo
+   ============================================================================ */
+
+.filter-chip--active {
+    /* Visual destacado quando selecionado */
+    background: var(--color-primary); /* Fundo na cor primária */
+    color: white; /* Texto branco para contraste */
+    border-color: var(--color-primary);
+}
+
+.filter-chip--active:hover:not(:disabled) {
+    background: var(--color-dark); /* Escurece no hover */
+    border-color: var(--color-dark);
+}
+
+
+/* ============================================================================
+   DISABLED STATE - Chip desabilitado
+   ============================================================================ */
+
+.filter-chip:disabled {
+    opacity: 0.4; /* Fica transparente */
+    cursor: not-allowed; /* Cursor de proibido */
+    pointer-events: none; /* Não responde a eventos */
+}
+
+
+/* ============================================================================
+   SIZES - Tamanhos
+   ============================================================================ */
+
+/* SMALL - Chip pequeno */
+.filter-chip--small {
+    padding: 4px 10px;
+    font-size: 0.75rem; /* 12px */
+    gap: 4px;
+}
+
+.filter-chip--small .filter-chip__remove {
+    width: 14px;
+    height: 14px;
+}
+
+/* MEDIUM - Tamanho padrão (já definido acima) */
+/* Mantém os valores base */
+
+/* LARGE - Chip grande */
+.filter-chip--large {
+    padding: 8px 18px;
+    font-size: 1rem; /* 16px */
+    gap: 8px;
+}
+
+.filter-chip--large .filter-chip__remove {
+    width: 18px;
+    height: 18px;
+}
+
+
+/* ============================================================================
+   VARIANTS - Variantes de cor
+   ============================================================================ */
+
+/* DEFAULT - Cor neutra (já definido acima) */
+/* Mantém fundo cinza */
+
+/* PRIMARY - Cor primária quando ativo */
+.filter-chip--primary.filter-chip--active {
+    background: var(--color-primary); /* #6C9EA3 */
+    border-color: var(--color-primary);
+}
+
+.filter-chip--primary.filter-chip--active:hover:not(:disabled) {
+    background: var(--color-dark);
+    border-color: var(--color-dark);
+}
+
+/* SECONDARY - Cor escura quando ativo */
+.filter-chip--secondary.filter-chip--active {
+    background: var(--color-dark); /* #0D1C24 */
+    border-color: var(--color-dark);
+}
+
+.filter-chip--secondary.filter-chip--active:hover:not(:disabled) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+
+/* ============================================================================
+   OUTLINE VARIANT - Apenas borda, sem fundo
+   ============================================================================ */
+
+.filter-chip--outline {
+    background: transparent;
+    border-color: rgba(13, 28, 36, 0.2);
+}
+
+.filter-chip--outline:hover:not(:disabled) {
+    background: rgba(13, 28, 36, 0.05);
+    border-color: rgba(13, 28, 36, 0.3);
+}
+
+.filter-chip--outline.filter-chip--active {
+    background: transparent;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.filter-chip--outline.filter-chip--active:hover:not(:disabled) {
+    background: rgba(108, 158, 163, 0.1);
+}
+
+
+/* ============================================================================
+   RESPONSIVE - Mobile
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    
+    /* Aumenta área de toque em mobile */
+    .filter-chip {
+        min-height: 36px; /* Touch target mínimo */
+        padding: 8px 16px;
+    }
+    
+    .filter-chip--small {
+        min-height: 32px;
+        padding: 6px 12px;
+    }
+    
+    .filter-chip--large {
+        min-height: 44px;
+        padding: 10px 20px;
+    }
+}

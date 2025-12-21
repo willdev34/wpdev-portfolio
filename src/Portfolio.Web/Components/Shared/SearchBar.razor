@@ -1,0 +1,154 @@
+@*
+    ============================================================================
+    Título: SearchBar Component - Componente de Busca
+    Descrição: Campo de busca com ícone de lupa, placeholder customizável e
+               botão para limpar. Emite evento ao digitar (debounce opcional).
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*@
+
+<div class="search-bar @Class">
+    
+    @* 
+        ÍCONE DE BUSCA (LUPA)
+        Posicionado à esquerda do input
+        Feedback visual de que é um campo de busca
+    *@
+    <span class="search-bar__icon">🔍</span>
+    
+    @* 
+        INPUT DE BUSCA
+        - @bind:event="oninput": atualiza a cada tecla digitada (tempo real)
+        - @bind-value: binding bidirecional com Value
+        - placeholder: texto de ajuda quando campo vazio
+    *@
+    <input 
+        type="text"
+        class="search-bar__input"
+        placeholder="@Placeholder"
+        value="@Value"
+        @oninput="HandleInput"
+        @onkeydown="HandleKeyDown"
+        @attributes="AdditionalAttributes" />
+    
+    @* 
+        BOTÃO CLEAR (X)
+        Só aparece quando há texto digitado
+        Limpa o campo ao clicar
+    *@
+    @if (!string.IsNullOrEmpty(Value))
+    {
+        <button 
+            type="button"
+            class="search-bar__clear"
+            @onclick="HandleClear"
+            aria-label="Limpar busca">
+            ✕
+        </button>
+    }
+</div>
+
+@code {
+    // ========================================================================
+    // PARÂMETROS DO COMPONENTE
+    // ========================================================================
+
+    /// <summary>
+    /// Valor atual do campo de busca
+    /// Binding bidirecional: @bind-Value="searchTerm"
+    /// </summary>
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Callback executado quando o valor muda
+    /// Necessário para two-way binding funcionar
+    /// Exemplo: ValueChanged="term => searchTerm = term"
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Callback executado quando usuário pressiona Enter
+    /// Útil para disparar busca imediata
+    /// Exemplo: OnSearch="async () => await SearchProjects()"
+    /// </summary>
+    [Parameter]
+    public EventCallback OnSearch { get; set; }
+
+    /// <summary>
+    /// Texto placeholder exibido quando campo vazio
+    /// Dá contexto sobre o que pode ser buscado
+    /// Exemplo: "Buscar projetos...", "Pesquisar posts..."
+    /// </summary>
+    [Parameter]
+    public string Placeholder { get; set; } = "Buscar...";
+
+    /// <summary>
+    /// Classes CSS adicionais
+    /// Permite customização sem modificar componente
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Atributos HTML adicionais
+    /// Exemplo: aria-*, data-*, etc
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    // ========================================================================
+    // MÉTODOS
+    // ========================================================================
+
+    /// <summary>
+    /// Manipula mudanças no input (cada tecla digitada)
+    /// Atualiza Value e notifica componente pai via ValueChanged
+    /// </summary>
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        // Extrai novo valor do evento
+        var newValue = e.Value?.ToString() ?? string.Empty;
+        
+        // Atualiza propriedade local
+        Value = newValue;
+        
+        // Notifica componente pai (two-way binding)
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    /// <summary>
+    /// Manipula teclas pressionadas
+    /// Detecta Enter para disparar busca
+    /// </summary>
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        // Se Enter foi pressionado e há callback OnSearch registrado
+        if (e.Key == "Enter" && OnSearch.HasDelegate)
+        {
+            await OnSearch.InvokeAsync();
+        }
+    }
+
+    /// <summary>
+    /// Limpa o campo de busca
+    /// Executado ao clicar no botão X
+    /// </summary>
+    private async Task HandleClear()
+    {
+        // Limpa valor
+        Value = string.Empty;
+        
+        // Notifica componente pai
+        await ValueChanged.InvokeAsync(Value);
+        
+        // Dispara busca vazia (atualiza resultados)
+        if (OnSearch.HasDelegate)
+        {
+            await OnSearch.InvokeAsync();
+        }
+    }
+}

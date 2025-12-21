@@ -1,0 +1,239 @@
+@*
+    ============================================================================
+    Título: FilterChip Component - Componente de Chip de Filtro
+    Descrição: Chip clicável usado para filtros e tags. Suporta estado ativo/
+               inativo, ícone opcional e contador. Ideal para filtrar listas
+               por categorias, tecnologias, tags, etc.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*@
+
+<button 
+    type="button"
+    class="filter-chip @VariantClass @SizeClass @ActiveClass @Class"
+    @onclick="HandleClick"
+    disabled="@Disabled"
+    @attributes="AdditionalAttributes">
+    
+    @* 
+        ÍCONE OPCIONAL
+        Renderizado à esquerda do label
+        Pode ser emoji, símbolo unicode ou texto curto
+    *@
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <span class="filter-chip__icon">@Icon</span>
+    }
+    
+    @* 
+        LABEL (TEXTO PRINCIPAL)
+        Sempre presente, é o conteúdo principal do chip
+    *@
+    <span class="filter-chip__label">@Label</span>
+    
+    @* 
+        CONTADOR OPCIONAL
+        Mostra quantidade de itens associados ao filtro
+        Exemplo: "React (12)" - 12 projetos com React
+    *@
+    @if (Count.HasValue && Count.Value > 0)
+    {
+        <span class="filter-chip__count">@Count</span>
+    }
+    
+    @* 
+        BOTÃO REMOVER (X)
+        Aparece apenas quando IsActive = true e ShowRemove = true
+        Permite remover o filtro ativo
+    *@
+    @if (IsActive && ShowRemove)
+    {
+        <span class="filter-chip__remove" @onclick:stopPropagation="true" @onclick="HandleRemove">✕</span>
+    }
+</button>
+
+@code {
+    // ========================================================================
+    // PARÂMETROS DO COMPONENTE
+    // ========================================================================
+
+    /// <summary>
+    /// Texto exibido no chip (obrigatório)
+    /// Exemplo: "React", "C#", "Tutorial", "Frontend"
+    /// </summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Valor associado ao chip (usado para identificação)
+    /// Útil quando Label é apenas visual e Value é o ID real
+    /// Exemplo: Label="React.js" Value="react"
+    /// Se não fornecido, usa Label como Value
+    /// </summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Ícone opcional à esquerda do label
+    /// Pode ser emoji ou símbolo unicode
+    /// Exemplo: Icon="⚛️" para React, Icon="🔥" para Hot
+    /// </summary>
+    [Parameter]
+    public string? Icon { get; set; }
+
+    /// <summary>
+    /// Contador opcional (quantidade de itens)
+    /// Mostra número entre parênteses
+    /// Exemplo: Count=12 exibe "(12)"
+    /// </summary>
+    [Parameter]
+    public int? Count { get; set; }
+
+    /// <summary>
+    /// Estado ativo/inativo do chip
+    /// Quando true, aplica estilo de "selecionado"
+    /// Binding bidirecional: @bind-IsActive="isReactSelected"
+    /// </summary>
+    [Parameter]
+    public bool IsActive { get; set; } = false;
+
+    /// <summary>
+    /// Callback quando estado ativo muda
+    /// Necessário para two-way binding funcionar
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> IsActiveChanged { get; set; }
+
+    /// <summary>
+    /// Mostra botão X para remover quando ativo
+    /// Padrão: false (não mostra)
+    /// </summary>
+    [Parameter]
+    public bool ShowRemove { get; set; } = false;
+
+    /// <summary>
+    /// Estado desabilitado
+    /// Quando true, chip fica visualmente desabilitado e não clicável
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// Variante visual do chip
+    /// Opções: "default", "primary", "secondary"
+    /// - default: cor neutra (cinza)
+    /// - primary: cor primária quando ativo (#6C9EA3)
+    /// - secondary: cor escura quando ativo (#0D1C24)
+    /// </summary>
+    [Parameter]
+    public string Variant { get; set; } = "default";
+
+    /// <summary>
+    /// Tamanho do chip
+    /// Opções: "small", "medium" (padrão), "large"
+    /// </summary>
+    [Parameter]
+    public string Size { get; set; } = "medium";
+
+    /// <summary>
+    /// Classes CSS adicionais
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Callback executado ao clicar no chip
+    /// Recebe o Value (ou Label se Value não fornecido)
+    /// Exemplo: OnClick="value => FilterByTechnology(value)"
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnClick { get; set; }
+
+    /// <summary>
+    /// Callback executado ao clicar no botão remover (X)
+    /// Só é chamado se ShowRemove = true
+    /// Exemplo: OnRemove="value => RemoveFilter(value)"
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnRemove { get; set; }
+
+    /// <summary>
+    /// Atributos HTML adicionais
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    // ========================================================================
+    // PROPRIEDADES COMPUTADAS
+    // ========================================================================
+
+    /// <summary>
+    /// Retorna Value se fornecido, senão retorna Label
+    /// Usado para identificar o chip quando clicado
+    /// </summary>
+    private string ChipValue => Value ?? Label;
+
+    /// <summary>
+    /// Classe CSS da variante
+    /// </summary>
+    private string VariantClass => $"filter-chip--{Variant}";
+
+    /// <summary>
+    /// Classe CSS do tamanho
+    /// </summary>
+    private string SizeClass => $"filter-chip--{Size}";
+
+    /// <summary>
+    /// Classe CSS para estado ativo
+    /// </summary>
+    private string ActiveClass => IsActive ? "filter-chip--active" : string.Empty;
+
+    // ========================================================================
+    // MÉTODOS
+    // ========================================================================
+
+    /// <summary>
+    /// Manipula clique no chip (toggle on/off)
+    /// Inverte estado ativo e dispara callbacks
+    /// </summary>
+    private async Task HandleClick()
+    {
+        // Não faz nada se disabled
+        if (Disabled)
+            return;
+
+        // Inverte estado ativo
+        IsActive = !IsActive;
+
+        // Notifica mudança de estado (two-way binding)
+        await IsActiveChanged.InvokeAsync(IsActive);
+
+        // Dispara callback OnClick se registrado
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(ChipValue);
+        }
+    }
+
+    /// <summary>
+    /// Manipula clique no botão remover (X)
+    /// Desativa o chip e dispara callback OnRemove
+    /// stopPropagation evita que clique no X dispare HandleClick também
+    /// </summary>
+    private async Task HandleRemove()
+    {
+        // Desativa o chip
+        IsActive = false;
+
+        // Notifica mudança de estado
+        await IsActiveChanged.InvokeAsync(IsActive);
+
+        // Dispara callback OnRemove se registrado
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync(ChipValue);
+        }
+    }
+}

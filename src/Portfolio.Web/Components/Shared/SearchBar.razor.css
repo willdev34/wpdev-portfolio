@@ -1,0 +1,222 @@
+/*
+    ============================================================================
+    Título: SearchBar Component Styles
+    Descrição: Estilos para componente de busca com ícone, input e botão clear.
+               Layout compacto e responsivo com transições suaves.
+    Autor: Will
+    Empresa: WpDev
+    Data: 20/12/2024
+    ============================================================================
+*/
+
+/* ============================================================================
+   SEARCH BAR CONTAINER
+   Container flex que alinha ícone, input e botão clear
+   ============================================================================ */
+
+.search-bar {
+    /* LAYOUT */
+    display: flex;
+    align-items: center; /* Centraliza verticalmente todos os elementos */
+    gap: 12px; /* Espaçamento entre ícone, input e botão */
+    
+    /* VISUAL */
+    background: var(--color-bg-light); /* Fundo claro #F4F7F7 */
+    border: 2px solid rgba(13, 28, 36, 0.1); /* Borda sutil */
+    border-radius: 8px; /* Cantos arredondados */
+    
+    /* ESPAÇAMENTO */
+    padding: 12px 16px; /* Padding interno confortável */
+    
+    /* TRANSIÇÕES */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 
+   ESTADO FOCUS
+   Quando input está focado, destaca o container inteiro
+   Melhora feedback visual de onde usuário está
+*/
+.search-bar:focus-within {
+    border-color: var(--color-primary); /* Borda fica na cor primária */
+    box-shadow: 0 0 0 3px rgba(108, 158, 163, 0.1); /* Anel sutil */
+}
+
+
+/* ============================================================================
+   SEARCH ICON - Ícone de lupa
+   ============================================================================ */
+
+.search-bar__icon {
+    /* VISUAL */
+    font-size: 1.25rem; /* 20px - tamanho do emoji */
+    color: var(--color-text-muted); /* Cor suave */
+    
+    /* LAYOUT */
+    display: flex; /* Remove espaço extra de inline elements */
+    align-items: center;
+    flex-shrink: 0; /* Não encolhe quando input cresce */
+    
+    /* Transição suave de cor */
+    transition: color 0.2s ease;
+}
+
+/* Ícone fica mais escuro quando search bar está focada */
+.search-bar:focus-within .search-bar__icon {
+    color: var(--color-primary);
+}
+
+
+/* ============================================================================
+   SEARCH INPUT - Campo de texto
+   ============================================================================ */
+
+.search-bar__input {
+    /* RESET de estilos padrão */
+    border: none;
+    outline: none;
+    background: transparent;
+    
+    /* LAYOUT */
+    flex: 1; /* Ocupa todo espaço disponível */
+    width: 100%;
+    
+    /* TIPOGRAFIA */
+    font-family: var(--font-body); /* Inter */
+    font-size: 0.9375rem; /* 15px */
+    color: var(--color-dark);
+    
+    /* Remove espaçamento padrão */
+    padding: 0;
+    margin: 0;
+}
+
+/* 
+   PLACEHOLDER
+   Texto de ajuda quando campo está vazio
+*/
+.search-bar__input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.7; /* Mais suave */
+}
+
+/* 
+   FOCUS
+   Remove outline padrão do navegador
+   O feedback visual vem do container .search-bar:focus-within
+*/
+.search-bar__input:focus {
+    outline: none;
+}
+
+
+/* ============================================================================
+   CLEAR BUTTON - Botão X para limpar
+   ============================================================================ */
+
+.search-bar__clear {
+    /* RESET */
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    
+    /* VISUAL */
+    color: var(--color-text-muted);
+    font-size: 1.25rem; /* 20px */
+    cursor: pointer;
+    
+    /* LAYOUT */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0; /* Não encolhe */
+    
+    /* Forma circular no hover */
+    border-radius: 50%;
+    
+    /* TRANSIÇÕES */
+    transition: all 0.2s ease;
+}
+
+/* 
+   HOVER no botão clear
+   Fica mais visível e ganha fundo
+*/
+.search-bar__clear:hover {
+    color: var(--color-dark);
+    background: rgba(13, 28, 36, 0.05); /* Fundo sutil */
+    transform: scale(1.1); /* Cresce levemente */
+}
+
+/* 
+   ACTIVE (clique)
+   Feedback tátil ao clicar
+*/
+.search-bar__clear:active {
+    transform: scale(0.95); /* Encolhe ao clicar */
+}
+
+
+/* ============================================================================
+   VARIANTS - Variantes de tamanho
+   ============================================================================ */
+
+/* SearchBar pequena (para sidebars, headers compactos) */
+.search-bar--small {
+    padding: 8px 12px;
+}
+
+.search-bar--small .search-bar__input {
+    font-size: 0.875rem; /* 14px */
+}
+
+.search-bar--small .search-bar__icon,
+.search-bar--small .search-bar__clear {
+    font-size: 1rem; /* 16px */
+}
+
+/* SearchBar grande (para hero sections, destaque) */
+.search-bar--large {
+    padding: 16px 20px;
+}
+
+.search-bar--large .search-bar__input {
+    font-size: 1.125rem; /* 18px */
+}
+
+.search-bar--large .search-bar__icon,
+.search-bar--large .search-bar__clear {
+    font-size: 1.5rem; /* 24px */
+}
+
+
+/* ============================================================================
+   FULL WIDTH - Ocupa largura total
+   ============================================================================ */
+
+.search-bar--full-width {
+    width: 100%;
+}
+
+
+/* ============================================================================
+   RESPONSIVE - Mobile
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    
+    /* SearchBar ocupa largura total em mobile */
+    .search-bar {
+        width: 100%;
+    }
+    
+    /* Aumenta área de toque do botão clear */
+    .search-bar__clear {
+        width: 32px;
+        height: 32px;
+        font-size: 1.5rem;
+    }
+}

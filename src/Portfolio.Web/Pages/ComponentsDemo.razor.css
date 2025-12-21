@@ -183,3 +183,22 @@
         align-items: stretch;
     }
 }
+
+/* ============================================================================
+   FILTER CHIP DEMO - Estilos para seção de demonstração de chips
+   ============================================================================ */
+
+.filter-chip-demo-row {
+    /* Layout horizontal com wrap para os chips */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Mobile: mantém horizontal mas com wrap mais frequente */
+@media (max-width: 768px) {
+    .filter-chip-demo-row {
+        gap: 8px;
+    }
+}
