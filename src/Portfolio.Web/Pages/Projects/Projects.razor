@@ -1,341 +1,270 @@
-@* ====================================
-   Título: Projects.razor
-   Descrição: Página de listagem de todos os projetos
-   Autor: Will
-   Empresa: WpDev
-   Data: 20/12/2024
-   ==================================== *@
-
 @page "/projects"
-@using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Projects
+@using Portfolio.Web.Services
 @inject ProjectService ProjectService
+@inject NavigationManager Navigation
 
-<PageTitle>Projetos - WPDev</PageTitle>
+<PageTitle>Projetos - WPDev Portfolio</PageTitle>
 
-<!-- PAGE HEADER -->
-<section class="page-header">
-    <div class="container">
-        <div class="header-content fade-in">
-            <h1 class="page-title">
-                Projetos<br />
-                <span class="text-primary">& Portfolio</span>
-            </h1>
-            <p class="page-subtitle">
-                Seleção de trabalhos que demonstram expertise em<br />
-                arquitetura, design e desenvolvimento full-stack.
-            </p>
+<div class="projects-page">
+    <!-- Hero Section -->
+    <section class="projects-hero">
+        <h1 class="hero-title">Projetos</h1>
+        <p class="hero-description">
+            Uma coleção curada de trabalhos que refletem minha jornada como desenvolvedor,
+            explorando diferentes tecnologias e soluções criativas.
+        </p>
+    </section>
+
+    <!-- Search & Filters Section -->
+    <section class="projects-controls">
+        <div class="controls-wrapper">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <SearchBar 
+                    @bind-Value="searchQuery"
+                    Placeholder="Buscar projetos por nome ou descrição..."
+                    OnSearch="HandleSearch" />
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="filters-container">
+                <span class="filters-label">Tecnologias:</span>
+                <div class="filters-chips">
+                    @foreach (var tech in availableTechnologies)
+                    {
+                        <FilterChip 
+                            Label="@tech"
+                            IsActive="selectedTechnologies.Contains(tech)"
+                            OnClick="() => ToggleTechnology(tech)" />
+                    }
+                </div>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- PROJECTS GRID -->
-<section class="section projects-section">
-    <div class="container">
+    <!-- Projects Grid -->
+    <section class="projects-grid">
         @if (isLoading)
         {
-            <div class="loading-state">
-                <p>Carregando projetos...</p>
+            <!-- Loading Skeletons -->
+            <div class="grid">
+                @for (int i = 0; i < pageSize; i++)
+                {
+                    <LoadingSkeleton Variant="SkeletonVariant.Card" />
+                }
             </div>
         }
-        else if (projects.Any())
+        else if (filteredProjects == null || !filteredProjects.Any())
         {
-            <!-- Stats -->
-            <div class="projects-stats">
-                <p>@projects.Count projeto(s) encontrado(s)</p>
-            </div>
-
-            <!-- Grid -->
-            <div class="projects-grid">
-                @foreach (var project in projects)
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3>Nenhum projeto encontrado</h3>
+                <p>Tente ajustar os filtros ou realizar uma nova busca.</p>
+                @if (!string.IsNullOrEmpty(searchQuery) || selectedTechnologies.Any())
                 {
-                    <article class="project-card-large fade-in">
-                        <a href="/projects/@project.Id" class="project-link">
-                            <div class="project-image">
-                                <img src="@project.ImageUrl" alt="@project.Title" />
-                                <div class="project-overlay">
-                                    <span class="view-project">Ver Projeto →</span>
-                                </div>
-                            </div>
-                            <div class="project-content">
-                                <h2 class="project-title">@project.Title</h2>
-                                <p class="project-description">@project.ShortDescription</p>
-                                
-                                <div class="project-meta">
-                                    <div class="project-tech">
-                                        @foreach (var tech in project.Technologies.Take(4))
-                                        {
-                                            <span class="tech-pill">@tech</span>
-                                        }
-                                        @if (project.Technologies.Count > 4)
-                                        {
-                                            <span class="tech-pill">+@(project.Technologies.Count - 4)</span>
-                                        }
-                                    </div>
-                                    
-                                    @if (project.IsFeatured)
-                                    {
-                                        <span class="featured-badge">✨ Destaque</span>
-                                    }
-                                </div>
-                            </div>
-                        </a>
-                    </article>
+                    <Button 
+                        Variant="ButtonVariant.Secondary"
+                        OnClick="ClearFilters">
+                        Limpar Filtros
+                    </Button>
                 }
             </div>
         }
         else
         {
-            <div class="empty-state">
-                <h3>Nenhum projeto encontrado</h3>
-                <p>Em breve novos projetos serão adicionados ao portfólio.</p>
+            <!-- Projects Cards -->
+            <div class="grid">
+                @foreach (var project in paginatedProjects)
+                {
+                    <Card 
+                        Title="@project.Title"
+                        Description="@project.ShortDescription"
+                        ImageUrl="@project.ImageUrl"
+                        OnClick="() => NavigateToProject(project.Id)">
+                        <HeaderContent>
+                            @foreach (var tech in project.Technologies)
+                            {
+                                <span class="tech-tag">@tech</span>
+                            }
+                        </HeaderContent>
+                    </Card>
+                }
             </div>
+
+            <!-- Pagination -->
+            @if (totalPages > 1)
+            {
+                <div class="pagination-container">
+                    <Pagination 
+                        CurrentPage="currentPage"
+                        TotalPages="totalPages"
+                        OnPageChange="HandlePageChange" />
+                </div>
+            }
         }
-    </div>
-</section>
+    </section>
+</div>
 
 @code {
-    private List<ProjectCardDto> projects = new();
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    
+    // Data
+    private List<ProjectCardDto> allProjects = new();
+    private List<ProjectCardDto> filteredProjects = new();
+    private List<ProjectCardDto> paginatedProjects = new();
+    
+    // Search & Filters
+    private string searchQuery = string.Empty;
+    private HashSet<string> selectedTechnologies = new();
+    private List<string> availableTechnologies = new()
+    {
+        "C#", ".NET", "Blazor", "React", "Angular", 
+        "Vue.js", "TypeScript", "JavaScript", "Python",
+        "Docker", "Azure", "AWS", "PostgreSQL", "MongoDB"
+    };
+    
+    // Pagination
+    private int currentPage = 1;
+    private int pageSize = 9; // 3x3 grid
+    private int totalPages => (int)Math.Ceiling((double)filteredProjects.Count / pageSize);
+    
+    // UI State
     private bool isLoading = true;
 
+    // ============================================
+    // LIFECYCLE METHODS
+    // ============================================
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadProjects();
     }
 
+    // ============================================
+    // DATA LOADING
+    // ============================================
+    
     private async Task LoadProjects()
     {
         isLoading = true;
-        projects = await ProjectService.GetAllAsync();
-        isLoading = false;
+        StateHasChanged();
+
+        try
+        {
+            // Buscar todos os projetos da API
+            allProjects = await ProjectService.GetAllAsync();
+            
+            // Aplicar filtros
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar projetos: {ex.Message}");
+            allProjects = new List<ProjectCardDto>();
+            filteredProjects = new List<ProjectCardDto>();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // ============================================
+    // FILTERING & PAGINATION
+    // ============================================
+    
+    private void ApplyFilters()
+    {
+        // Começar com todos os projetos
+        var query = allProjects.AsEnumerable();
+
+        // Aplicar busca por texto
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var search = searchQuery.ToLower();
+            query = query.Where(p => 
+                p.Title.ToLower().Contains(search) || 
+                (p.ShortDescription?.ToLower().Contains(search) ?? false)
+            );
+        }
+
+        // Aplicar filtro por tecnologias (busca parcial, case-insensitive)
+        if (selectedTechnologies.Any())
+        {
+            query = query.Where(p => 
+                p.Technologies.Any(tech => 
+                    selectedTechnologies.Any(selected => 
+                        tech.Contains(selected, StringComparison.OrdinalIgnoreCase)
+                    )
+                )
+            );
+        }
+
+        // Atualizar lista filtrada
+        filteredProjects = query.ToList();
+
+        // Aplicar paginação
+        ApplyPagination();
+    }
+
+    private void ApplyPagination()
+    {
+        var skip = (currentPage - 1) * pageSize;
+        paginatedProjects = filteredProjects
+            .Skip(skip)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    // ============================================
+    // EVENT HANDLERS
+    // ============================================
+    
+    private void HandleSearch()
+    {
+        // Reset para primeira página ao fazer nova busca
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void ToggleTechnology(string tech)
+    {
+        if (selectedTechnologies.Contains(tech))
+        {
+            selectedTechnologies.Remove(tech);
+        }
+        else
+        {
+            selectedTechnologies.Add(tech);
+        }
+
+        // Reset para primeira página ao alterar filtros
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void HandlePageChange(int newPage)
+    {
+        currentPage = newPage;
+        ApplyPagination();
+        StateHasChanged();
+    }
+
+    private void ClearFilters()
+    {
+        searchQuery = string.Empty;
+        selectedTechnologies.Clear();
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void NavigateToProject(Guid projectId)
+    {
+        Navigation.NavigateTo($"/projects/{projectId}");
     }
 }
-
-<style>
-    /* ====================================
-       PROJECTS PAGE STYLES
-       ==================================== */
-
-    /* PAGE HEADER */
-    .page-header {
-        padding: var(--spacing-xxl) 0 var(--spacing-xl);
-        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
-    }
-
-    .header-content {
-        max-width: 800px;
-    }
-
-    .page-title {
-        font-size: clamp(3rem, 6vw, 5rem);
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: var(--spacing-md);
-        letter-spacing: -0.03em;
-    }
-
-    .page-subtitle {
-        font-size: clamp(1.125rem, 2vw, 1.25rem);
-        color: var(--color-dark);
-        opacity: 0.8;
-        line-height: 1.7;
-    }
-
-    /* PROJECTS SECTION */
-    .projects-section {
-        padding: var(--spacing-xl) 0 var(--spacing-xxl);
-    }
-
-    .projects-stats {
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-md);
-        border-bottom: 1px solid rgba(13, 28, 36, 0.1);
-    }
-
-    .projects-stats p {
-        font-size: 0.875rem;
-        color: var(--color-dark);
-        opacity: 0.6;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 0;
-    }
-
-    /* PROJECTS GRID */
-    .projects-grid {
-        display: grid;
-        gap: var(--spacing-xl);
-    }
-
-    .project-card-large {
-        display: block;
-        background: var(--color-white);
-        border-radius: 16px;
-        overflow: hidden;
-        transition: var(--transition-smooth);
-    }
-
-    .project-card-large:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(13, 28, 36, 0.1);
-    }
-
-    .project-link {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0;
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .project-image {
-        position: relative;
-        width: 100%;
-        height: 500px;
-        overflow: hidden;
-        background: var(--color-light);
-    }
-
-    .project-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .project-card-large:hover .project-image img {
-        transform: scale(1.05);
-    }
-
-    .project-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, transparent 0%, rgba(13, 28, 36, 0.8) 100%);
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: var(--spacing-lg);
-        opacity: 0;
-        transition: var(--transition-smooth);
-    }
-
-    .project-card-large:hover .project-overlay {
-        opacity: 1;
-    }
-
-    .view-project {
-        color: var(--color-white);
-        font-size: 1.125rem;
-        font-weight: 600;
-        letter-spacing: 0.02em;
-    }
-
-    .project-content {
-        padding: var(--spacing-lg);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .project-title {
-        font-size: clamp(1.75rem, 3vw, 2.25rem);
-        font-weight: 700;
-        margin-bottom: var(--spacing-sm);
-        color: var(--color-dark);
-        line-height: 1.2;
-    }
-
-    .project-description {
-        font-size: 1.0625rem;
-        line-height: 1.7;
-        color: var(--color-dark);
-        opacity: 0.8;
-        margin-bottom: var(--spacing-md);
-    }
-
-    .project-meta {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .project-tech {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .tech-pill {
-        display: inline-block;
-        padding: 0.375rem 0.875rem;
-        background: var(--color-light);
-        color: var(--color-primary);
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-radius: 20px;
-        transition: var(--transition-smooth);
-    }
-
-    .project-card-large:hover .tech-pill {
-        background: var(--color-primary);
-        color: var(--color-white);
-    }
-
-    .featured-badge {
-        display: inline-block;
-        padding: 0.375rem 0.875rem;
-        background: linear-gradient(135deg, #6C9EA3 0%, #8FB5BA 100%);
-        color: var(--color-white);
-        font-size: 0.875rem;
-        font-weight: 600;
-        border-radius: 20px;
-        align-self: flex-start;
-    }
-
-    /* STATES */
-    .loading-state,
-    .empty-state {
-        text-align: center;
-        padding: var(--spacing-xxl) var(--spacing-md);
-    }
-
-    .empty-state h3 {
-        font-size: 2rem;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .empty-state p {
-        font-size: 1.125rem;
-        color: var(--color-dark);
-        opacity: 0.7;
-    }
-
-    /* RESPONSIVE */
-    @@media (max-width: 1024px) {
-        .project-link {
-            grid-template-columns: 1fr;
-        }
-
-        .project-image {
-            height: 400px;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .page-header {
-            padding: var(--spacing-xl) 0 var(--spacing-lg);
-        }
-
-        .projects-grid {
-            gap: var(--spacing-lg);
-        }
-
-        .project-image {
-            height: 300px;
-        }
-
-        .project-content {
-            padding: var(--spacing-md);
-        }
-    }
-</style>

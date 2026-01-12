@@ -1,0 +1,341 @@
+@* ====================================
+   Título: Projects.razor
+   Descrição: Página de listagem de todos os projetos
+   Autor: Will
+   Empresa: WpDev
+   Data: 20/12/2024
+   ==================================== *@
+
+@page "/projects"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.Projects
+@inject ProjectService ProjectService
+
+<PageTitle>Projetos - WPDev</PageTitle>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <div class="container">
+        <div class="header-content fade-in">
+            <h1 class="page-title">
+                Projetos<br />
+                <span class="text-primary">& Portfolio</span>
+            </h1>
+            <p class="page-subtitle">
+                Seleção de trabalhos que demonstram expertise em<br />
+                arquitetura, design e desenvolvimento full-stack.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- PROJECTS GRID -->
+<section class="section projects-section">
+    <div class="container">
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                <p>Carregando projetos...</p>
+            </div>
+        }
+        else if (projects.Any())
+        {
+            <!-- Stats -->
+            <div class="projects-stats">
+                <p>@projects.Count projeto(s) encontrado(s)</p>
+            </div>
+
+            <!-- Grid -->
+            <div class="projects-grid">
+                @foreach (var project in projects)
+                {
+                    <article class="project-card-large fade-in">
+                        <a href="/projects/@project.Id" class="project-link">
+                            <div class="project-image">
+                                <img src="@project.ImageUrl" alt="@project.Title" />
+                                <div class="project-overlay">
+                                    <span class="view-project">Ver Projeto →</span>
+                                </div>
+                            </div>
+                            <div class="project-content">
+                                <h2 class="project-title">@project.Title</h2>
+                                <p class="project-description">@project.ShortDescription</p>
+                                
+                                <div class="project-meta">
+                                    <div class="project-tech">
+                                        @foreach (var tech in project.Technologies.Take(4))
+                                        {
+                                            <span class="tech-pill">@tech</span>
+                                        }
+                                        @if (project.Technologies.Count > 4)
+                                        {
+                                            <span class="tech-pill">+@(project.Technologies.Count - 4)</span>
+                                        }
+                                    </div>
+                                    
+                                    @if (project.IsFeatured)
+                                    {
+                                        <span class="featured-badge">✨ Destaque</span>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <h3>Nenhum projeto encontrado</h3>
+                <p>Em breve novos projetos serão adicionados ao portfólio.</p>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<ProjectCardDto> projects = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        isLoading = true;
+        projects = await ProjectService.GetAllAsync();
+        isLoading = false;
+    }
+}
+
+<style>
+    /* ====================================
+       PROJECTS PAGE STYLES
+       ==================================== */
+
+    /* PAGE HEADER */
+    .page-header {
+        padding: var(--spacing-xxl) 0 var(--spacing-xl);
+        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
+    }
+
+    .header-content {
+        max-width: 800px;
+    }
+
+    .page-title {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: var(--spacing-md);
+        letter-spacing: -0.03em;
+    }
+
+    .page-subtitle {
+        font-size: clamp(1.125rem, 2vw, 1.25rem);
+        color: var(--color-dark);
+        opacity: 0.8;
+        line-height: 1.7;
+    }
+
+    /* PROJECTS SECTION */
+    .projects-section {
+        padding: var(--spacing-xl) 0 var(--spacing-xxl);
+    }
+
+    .projects-stats {
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid rgba(13, 28, 36, 0.1);
+    }
+
+    .projects-stats p {
+        font-size: 0.875rem;
+        color: var(--color-dark);
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0;
+    }
+
+    /* PROJECTS GRID */
+    .projects-grid {
+        display: grid;
+        gap: var(--spacing-xl);
+    }
+
+    .project-card-large {
+        display: block;
+        background: var(--color-white);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: var(--transition-smooth);
+    }
+
+    .project-card-large:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(13, 28, 36, 0.1);
+    }
+
+    .project-link {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .project-image {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        overflow: hidden;
+        background: var(--color-light);
+    }
+
+    .project-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .project-card-large:hover .project-image img {
+        transform: scale(1.05);
+    }
+
+    .project-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(13, 28, 36, 0.8) 100%);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: var(--spacing-lg);
+        opacity: 0;
+        transition: var(--transition-smooth);
+    }
+
+    .project-card-large:hover .project-overlay {
+        opacity: 1;
+    }
+
+    .view-project {
+        color: var(--color-white);
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .project-content {
+        padding: var(--spacing-lg);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .project-title {
+        font-size: clamp(1.75rem, 3vw, 2.25rem);
+        font-weight: 700;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-dark);
+        line-height: 1.2;
+    }
+
+    .project-description {
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        color: var(--color-dark);
+        opacity: 0.8;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .project-meta {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .project-tech {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tech-pill {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        background: var(--color-light);
+        color: var(--color-primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 20px;
+        transition: var(--transition-smooth);
+    }
+
+    .project-card-large:hover .tech-pill {
+        background: var(--color-primary);
+        color: var(--color-white);
+    }
+
+    .featured-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        background: linear-gradient(135deg, #6C9EA3 0%, #8FB5BA 100%);
+        color: var(--color-white);
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 20px;
+        align-self: flex-start;
+    }
+
+    /* STATES */
+    .loading-state,
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-xxl) var(--spacing-md);
+    }
+
+    .empty-state h3 {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state p {
+        font-size: 1.125rem;
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 1024px) {
+        .project-link {
+            grid-template-columns: 1fr;
+        }
+
+        .project-image {
+            height: 400px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: var(--spacing-xl) 0 var(--spacing-lg);
+        }
+
+        .projects-grid {
+            gap: var(--spacing-lg);
+        }
+
+        .project-image {
+            height: 300px;
+        }
+
+        .project-content {
+            padding: var(--spacing-md);
+        }
+    }
+</style>
