@@ -101,7 +101,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazor", policy =>
     {
-        policy.WithOrigins("http://localhost:5237", "https://localhost:7257")
+        policy.WithOrigins(
+                "http://localhost:5237",
+                "https://localhost:7257",
+                "https://wpdev-portfolio-web.onrender.com"
+              )
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
