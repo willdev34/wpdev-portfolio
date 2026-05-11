@@ -1,19 +1,17 @@
-// ====================================
-// Título: BlogPostService.cs
-// Descrição: Service para comunicação com API de BlogPosts
-// Autor: Will
-// Empresa: WpDev
-// Data: 09/12/2024
-// ====================================
-
 using Portfolio.Web.DTOs.BlogPosts;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Portfolio.Web.Services;
 
 public class BlogPostService
 {
     private readonly HttpClient _httpClient;
+    
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public BlogPostService(HttpClient httpClient)
     {
@@ -24,11 +22,13 @@ public class BlogPostService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<List<BlogPostCardDto>>("api/blogposts");
+            var response = await _httpClient.GetFromJsonAsync<List<BlogPostCardDto>>(
+                "api/blogposts", _jsonOptions);
             return response ?? new List<BlogPostCardDto>();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Erro ao buscar posts: {ex.Message}");
             return new List<BlogPostCardDto>();
         }
     }
@@ -37,10 +37,12 @@ public class BlogPostService
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<BlogPostDto>($"api/blogposts/{id}");
+            return await _httpClient.GetFromJsonAsync<BlogPostDto>(
+                $"api/blogposts/{id}", _jsonOptions);
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Erro ao buscar post {id}: {ex.Message}");
             return null;
         }
     }
@@ -49,11 +51,13 @@ public class BlogPostService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<List<BlogPostCardDto>>("api/blogposts/published");
+            var response = await _httpClient.GetFromJsonAsync<List<BlogPostCardDto>>(
+                "api/blogposts", _jsonOptions);
             return response ?? new List<BlogPostCardDto>();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Erro ao buscar posts publicados: {ex.Message}");
             return new List<BlogPostCardDto>();
         }
     }
