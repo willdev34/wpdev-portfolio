@@ -1,0 +1,252 @@
+/* ====================================
+   BLOG PAGE - EDITORIAL DESIGN
+   Inspirado em diplo.studio
+   Cores: #6C9EA3, #0D1C24, #F4F7F7
+   ==================================== */
+
+/* ====================================
+   HERO SECTION
+   ==================================== */
+
+.blog-hero {
+    padding: 120px 0 80px 0;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 4rem;
+    font-weight: 600;
+    color: #0D1C24;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.hero-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.125rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ====================================
+   CONTROLS SECTION
+   ==================================== */
+
+.blog-controls {
+    margin-bottom: 60px;
+    padding: 0 20px;
+}
+
+.controls-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-container {
+    margin-bottom: 32px;
+}
+
+.filters-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.filters-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #0D1C24;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filters-chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+/* ====================================
+   BLOG GRID
+   ==================================== */
+
+.blog-content-section {
+    padding: 0 20px 120px 20px;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ====================================
+   BLOG CARD CUSTOMIZADO
+   ==================================== */
+
+.blog-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.blog-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    color: #666;
+    text-transform: capitalize;
+}
+
+.blog-reading {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    color: #6C9EA3;
+    font-weight: 500;
+}
+
+.blog-reading::before {
+    content: "•";
+    margin-right: 6px;
+    color: #ccc;
+}
+
+.blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.tag-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6C9EA3;
+    background-color: rgba(108, 158, 163, 0.1);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+    background-color: rgba(108, 158, 163, 0.2);
+}
+
+/* ====================================
+   EMPTY STATE
+   ==================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0D1C24;
+    margin: 0 0 12px 0;
+}
+
+.empty-state p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0 0 32px 0;
+}
+
+/* ====================================
+   PAGINATION
+   ==================================== */
+
+.pagination-container {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .blog-hero {
+        padding: 80px 20px 60px 20px;
+    }
+
+    .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .filters-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .blog-hero {
+        padding: 60px 20px 40px 20px;
+    }
+}
+
+/* ====================================
+   ANIMAÇÕES
+   ==================================== */
+
+.blog-grid > * {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.blog-grid > *:nth-child(1) { animation-delay: 0.05s; }
+.blog-grid > *:nth-child(2) { animation-delay: 0.1s; }
+.blog-grid > *:nth-child(3) { animation-delay: 0.15s; }
+.blog-grid > *:nth-child(4) { animation-delay: 0.2s; }
+.blog-grid > *:nth-child(5) { animation-delay: 0.25s; }
+.blog-grid > *:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

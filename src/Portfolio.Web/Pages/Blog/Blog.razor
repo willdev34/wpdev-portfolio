@@ -7,320 +7,270 @@
    ==================================== *@
 
 @page "/blog"
-@using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.BlogPosts
+@using Portfolio.Web.Services
 @inject BlogPostService BlogPostService
+@inject NavigationManager Navigation
 
-<PageTitle>Blog - WPDev</PageTitle>
+<PageTitle>Blog - WPDev Portfolio</PageTitle>
 
-<!-- PAGE HEADER -->
-<section class="page-header">
-    <div class="container">
-        <div class="header-content fade-in">
-            <h1 class="page-title">
-                Blog<br />
-                <span class="text-primary">& Artigos</span>
-            </h1>
-            <p class="page-subtitle">
-                Reflexões sobre desenvolvimento, arquitetura de software<br />
-                e tendências em tecnologia.
-            </p>
+<div class="blog-page">
+
+    <!-- Hero Section -->
+    <section class="blog-hero">
+        <h1 class="hero-title">Blog</h1>
+        <p class="hero-description">
+            Reflexões sobre desenvolvimento, arquitetura de software
+            e tendências em tecnologia.
+        </p>
+    </section>
+
+    <!-- Controls Section -->
+    <section class="blog-controls">
+        <div class="controls-wrapper">
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <SearchBar
+                    @bind-Value="searchQuery"
+                    Placeholder="Buscar posts por título ou conteúdo..."
+                    OnSearch="HandleSearch" />
+            </div>
+
+            <!-- Filter Chips por Tag -->
+            <div class="filters-container">
+                <span class="filters-label">Tags:</span>
+                <div class="filters-chips">
+                    @foreach (var tag in availableTags)
+                    {
+                        <FilterChip
+                            Label="@tag"
+                            IsActive="selectedTags.Contains(tag)"
+                            OnClick="() => ToggleTag(tag)" />
+                    }
+                </div>
+            </div>
+
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- BLOG POSTS -->
-<section class="section blog-section">
-    <div class="container">
+    <!-- Blog Posts Grid -->
+    <section class="blog-content-section">
+
         @if (isLoading)
         {
-            <div class="loading-state">
-                <p>Carregando posts...</p>
+            <div class="blog-grid">
+                @for (int i = 0; i < pageSize; i++)
+                {
+                    <LoadingSkeleton Variant="SkeletonVariant.Card" />
+                }
             </div>
         }
-        else if (posts.Any())
+        else if (filteredPosts == null || !filteredPosts.Any())
         {
-            <!-- Stats -->
-            <div class="blog-stats">
-                <p>@posts.Count post(s) publicado(s)</p>
-            </div>
-
-            <!-- Grid -->
-            <div class="blog-grid">
-                @foreach (var post in posts)
+            <div class="empty-state">
+                <div class="empty-icon">✍️</div>
+                <h3>Nenhum post encontrado</h3>
+                <p>Tente ajustar os filtros ou realizar uma nova busca.</p>
+                @if (!string.IsNullOrEmpty(searchQuery) || selectedTags.Any())
                 {
-                    <article class="blog-card fade-in">
-                        <a href="/blog/@post.Id" class="blog-link">
-                            <div class="blog-cover">
-                                <img src="@post.ThumbnailUrl" alt="@post.Title" />
-                                <div class="blog-overlay">
-                                    <span class="read-more">Ler artigo →</span>
-                                </div>
-                            </div>
-                            <div class="blog-content">
-                                <div class="blog-meta">
-                                    <time class="blog-date">@post.PublishedAt.ToString("dd MMM yyyy")</time>
-                                    <span class="blog-reading">@post.ReadTimeMinutes min de leitura</span>
-                                </div>
-                                <h2 class="blog-title">@post.Title</h2>
-                                <p class="blog-excerpt">@post.Excerpt</p>
-                                <div class="blog-tags">
-                                    @foreach (var tag in post.Tags.Take(3))
-                                    {
-                                        <span class="tag-pill">#@tag</span>
-                                    }
-                                </div>
-                            </div>
-                        </a>
-                    </article>
+                    <Button
+                        Variant="ButtonVariant.Secondary"
+                        OnClick="ClearFilters">
+                        Limpar Filtros
+                    </Button>
                 }
             </div>
         }
         else
         {
-            <div class="empty-state">
-                <h3>Nenhum post publicado</h3>
-                <p>Em breve novos artigos serão publicados.</p>
+            <div class="blog-grid">
+                @foreach (var post in paginatedPosts)
+                {
+                    <Card
+                        Title="@post.Title"
+                        Description="@post.Excerpt"
+                        OnClick="() => NavigateToPost(post.Id)">
+                        <HeaderContent>
+                            <div class="blog-meta-info">
+                                <time class="blog-date">
+                                    @post.PublishedAt.ToString("dd MMM yyyy")
+                                </time>
+                                <span class="blog-reading">
+                                    @post.ReadTimeMinutes min de leitura
+                                </span>
+                            </div>
+                        </HeaderContent>
+                        <FooterContent>
+                            <div class="blog-tags">
+                                @foreach (var tag in post.Tags.Take(3))
+                                {
+                                    <span class="tag-pill">#@tag</span>
+                                }
+                            </div>
+                        </FooterContent>
+                    </Card>
+                }
             </div>
+
+            @if (totalPages > 1)
+            {
+                <div class="pagination-container">
+                    <Pagination
+                        CurrentPage="currentPage"
+                        TotalPages="totalPages"
+                        OnPageChange="HandlePageChange" />
+                </div>
+            }
         }
-    </div>
-</section>
+
+    </section>
+
+</div>
 
 @code {
-    private List<BlogPostCardDto> posts = new();
+    // ============================================
+    // STATE
+    // ============================================
+
+    private List<BlogPostCardDto> allPosts = new();
+    private List<BlogPostCardDto> filteredPosts = new();
+    private List<BlogPostCardDto> paginatedPosts = new();
+
+    // Search & Filters
+    private string searchQuery = string.Empty;
+    private HashSet<string> selectedTags = new();
+    private List<string> availableTags = new()
+    {
+        "C#", ".NET", "Blazor", "React", "Angular",
+        "TypeScript", "JavaScript", "Python",
+        "Docker", "Azure", "Clean Architecture", "CQRS"
+    };
+
+    // Pagination
+    private int currentPage = 1;
+    private int pageSize = 6;
+    private int totalPages => (int)Math.Ceiling((double)filteredPosts.Count / pageSize);
+
+    // UI
     private bool isLoading = true;
+
+    // ============================================
+    // LIFECYCLE
+    // ============================================
 
     protected override async Task OnInitializedAsync()
     {
         await LoadPosts();
     }
 
+    // ============================================
+    // DATA
+    // ============================================
+
     private async Task LoadPosts()
     {
         isLoading = true;
-        posts = await BlogPostService.GetPublishedAsync();
-        isLoading = false;
+        StateHasChanged();
+
+        try
+        {
+            allPosts = await BlogPostService.GetAllAsync();
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar posts: {ex.Message}");
+            allPosts = new List<BlogPostCardDto>();
+            filteredPosts = new List<BlogPostCardDto>();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // ============================================
+    // FILTERS & PAGINATION
+    // ============================================
+
+    private void ApplyFilters()
+    {
+        var query = allPosts.AsEnumerable();
+
+        // Busca por texto
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var search = searchQuery.ToLower();
+            query = query.Where(p =>
+                p.Title.ToLower().Contains(search) ||
+                p.Excerpt.ToLower().Contains(search)
+            );
+        }
+
+        // Filtro por tags (busca parcial)
+        if (selectedTags.Any())
+        {
+            query = query.Where(p =>
+                p.Tags.Any(tag =>
+                    selectedTags.Any(selected =>
+                        tag.Contains(selected, StringComparison.OrdinalIgnoreCase)
+                    )
+                )
+            );
+        }
+
+        filteredPosts = query.ToList();
+        ApplyPagination();
+    }
+
+    private void ApplyPagination()
+    {
+        paginatedPosts = filteredPosts
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    // ============================================
+    // EVENTS
+    // ============================================
+
+    private void HandleSearch()
+    {
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void ToggleTag(string tag)
+    {
+        if (selectedTags.Contains(tag))
+            selectedTags.Remove(tag);
+        else
+            selectedTags.Add(tag);
+
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void HandlePageChange(int newPage)
+    {
+        currentPage = newPage;
+        ApplyPagination();
+        StateHasChanged();
+    }
+
+    private void ClearFilters()
+    {
+        searchQuery = string.Empty;
+        selectedTags.Clear();
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void NavigateToPost(Guid postId)
+    {
+        Navigation.NavigateTo($"/blog/{postId}");
     }
 }
-
-<style>
-    /* ====================================
-       BLOG PAGE STYLES
-       ==================================== */
-
-    /* PAGE HEADER */
-    .page-header {
-        padding: var(--spacing-xxl) 0 var(--spacing-xl);
-        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
-    }
-
-    .header-content {
-        max-width: 800px;
-    }
-
-    .page-title {
-        font-size: clamp(3rem, 6vw, 5rem);
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: var(--spacing-md);
-        letter-spacing: -0.03em;
-    }
-
-    .page-subtitle {
-        font-size: clamp(1.125rem, 2vw, 1.25rem);
-        color: var(--color-dark);
-        opacity: 0.8;
-        line-height: 1.7;
-    }
-
-    /* BLOG SECTION */
-    .blog-section {
-        padding: var(--spacing-xl) 0 var(--spacing-xxl);
-    }
-
-    .blog-stats {
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-md);
-        border-bottom: 1px solid rgba(13, 28, 36, 0.1);
-    }
-
-    .blog-stats p {
-        font-size: 0.875rem;
-        color: var(--color-dark);
-        opacity: 0.6;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 0;
-    }
-
-    /* BLOG GRID */
-    .blog-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-        gap: var(--spacing-lg);
-    }
-
-    .blog-card {
-        background: var(--color-white);
-        border-radius: 16px;
-        overflow: hidden;
-        transition: var(--transition-smooth);
-        display: flex;
-        flex-direction: column;
-    }
-
-    .blog-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 24px 48px rgba(13, 28, 36, 0.12);
-    }
-
-    .blog-link {
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .blog-cover {
-        position: relative;
-        width: 100%;
-        height: 280px;
-        overflow: hidden;
-        background: var(--color-light);
-    }
-
-    .blog-cover img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .blog-card:hover .blog-cover img {
-        transform: scale(1.08);
-    }
-
-    .blog-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, transparent 0%, rgba(13, 28, 36, 0.85) 100%);
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: var(--spacing-md);
-        opacity: 0;
-        transition: var(--transition-smooth);
-    }
-
-    .blog-card:hover .blog-overlay {
-        opacity: 1;
-    }
-
-    .read-more {
-        color: var(--color-white);
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 0.02em;
-    }
-
-    .blog-content {
-        padding: var(--spacing-md);
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .blog-meta {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        margin-bottom: var(--spacing-sm);
-        font-size: 0.875rem;
-        color: var(--color-dark);
-        opacity: 0.6;
-    }
-
-    .blog-date {
-        text-transform: capitalize;
-    }
-
-    .blog-reading::before {
-        content: "•";
-        margin-right: 0.5rem;
-    }
-
-    .blog-title {
-        font-size: clamp(1.375rem, 2.5vw, 1.625rem);
-        font-weight: 700;
-        line-height: 1.3;
-        margin-bottom: var(--spacing-sm);
-        color: var(--color-dark);
-    }
-
-    .blog-excerpt {
-        font-size: 1rem;
-        line-height: 1.7;
-        color: var(--color-dark);
-        opacity: 0.8;
-        margin-bottom: var(--spacing-md);
-        flex: 1;
-    }
-
-    .blog-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-top: auto;
-    }
-
-    .tag-pill {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        background: var(--color-light);
-        color: var(--color-primary);
-        font-size: 0.8125rem;
-        font-weight: 500;
-        border-radius: 16px;
-        transition: var(--transition-smooth);
-    }
-
-    .blog-card:hover .tag-pill {
-        background: var(--color-primary);
-        color: var(--color-white);
-    }
-
-    /* STATES */
-    .loading-state,
-    .empty-state {
-        text-align: center;
-        padding: var(--spacing-xxl) var(--spacing-md);
-    }
-
-    .empty-state h3 {
-        font-size: 2rem;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .empty-state p {
-        font-size: 1.125rem;
-        color: var(--color-dark);
-        opacity: 0.7;
-    }
-
-    /* RESPONSIVE */
-    @@media (max-width: 768px) {
-        .page-header {
-            padding: var(--spacing-xl) 0 var(--spacing-lg);
-        }
-
-        .blog-grid {
-            grid-template-columns: 1fr;
-            gap: var(--spacing-md);
-        }
-
-        .blog-cover {
-            height: 240px;
-        }
-    }
-</style>

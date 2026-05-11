@@ -1,0 +1,326 @@
+@* ====================================
+   Título: Blog.razor
+   Descrição: Página de listagem de posts do blog
+   Autor: Will
+   Empresa: WpDev
+   Data: 20/12/2024
+   ==================================== *@
+
+@page "/blog"
+@using Portfolio.Web.Services
+@using Portfolio.Web.DTOs.BlogPosts
+@inject BlogPostService BlogPostService
+
+<PageTitle>Blog - WPDev</PageTitle>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <div class="container">
+        <div class="header-content fade-in">
+            <h1 class="page-title">
+                Blog<br />
+                <span class="text-primary">& Artigos</span>
+            </h1>
+            <p class="page-subtitle">
+                Reflexões sobre desenvolvimento, arquitetura de software<br />
+                e tendências em tecnologia.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- BLOG POSTS -->
+<section class="section blog-section">
+    <div class="container">
+        @if (isLoading)
+        {
+            <div class="loading-state">
+                <p>Carregando posts...</p>
+            </div>
+        }
+        else if (posts.Any())
+        {
+            <!-- Stats -->
+            <div class="blog-stats">
+                <p>@posts.Count post(s) publicado(s)</p>
+            </div>
+
+            <!-- Grid -->
+            <div class="blog-grid">
+                @foreach (var post in posts)
+                {
+                    <article class="blog-card fade-in">
+                        <a href="/blog/@post.Id" class="blog-link">
+                            <div class="blog-cover">
+                                <img src="@post.ThumbnailUrl" alt="@post.Title" />
+                                <div class="blog-overlay">
+                                    <span class="read-more">Ler artigo →</span>
+                                </div>
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <time class="blog-date">@post.PublishedAt.ToString("dd MMM yyyy")</time>
+                                    <span class="blog-reading">@post.ReadTimeMinutes min de leitura</span>
+                                </div>
+                                <h2 class="blog-title">@post.Title</h2>
+                                <p class="blog-excerpt">@post.Excerpt</p>
+                                <div class="blog-tags">
+                                    @foreach (var tag in post.Tags.Take(3))
+                                    {
+                                        <span class="tag-pill">#@tag</span>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <h3>Nenhum post publicado</h3>
+                <p>Em breve novos artigos serão publicados.</p>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<BlogPostCardDto> posts = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPosts();
+    }
+
+    private async Task LoadPosts()
+    {
+        isLoading = true;
+        posts = await BlogPostService.GetPublishedAsync();
+        isLoading = false;
+    }
+}
+
+<style>
+    /* ====================================
+       BLOG PAGE STYLES
+       ==================================== */
+
+    /* PAGE HEADER */
+    .page-header {
+        padding: var(--spacing-xxl) 0 var(--spacing-xl);
+        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
+    }
+
+    .header-content {
+        max-width: 800px;
+    }
+
+    .page-title {
+        font-size: clamp(3rem, 6vw, 5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: var(--spacing-md);
+        letter-spacing: -0.03em;
+    }
+
+    .page-subtitle {
+        font-size: clamp(1.125rem, 2vw, 1.25rem);
+        color: var(--color-dark);
+        opacity: 0.8;
+        line-height: 1.7;
+    }
+
+    /* BLOG SECTION */
+    .blog-section {
+        padding: var(--spacing-xl) 0 var(--spacing-xxl);
+    }
+
+    .blog-stats {
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid rgba(13, 28, 36, 0.1);
+    }
+
+    .blog-stats p {
+        font-size: 0.875rem;
+        color: var(--color-dark);
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0;
+    }
+
+    /* BLOG GRID */
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .blog-card {
+        background: var(--color-white);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: var(--transition-smooth);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 24px 48px rgba(13, 28, 36, 0.12);
+    }
+
+    .blog-link {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .blog-cover {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        overflow: hidden;
+        background: var(--color-light);
+    }
+
+    .blog-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .blog-card:hover .blog-cover img {
+        transform: scale(1.08);
+    }
+
+    .blog-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(13, 28, 36, 0.85) 100%);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: var(--spacing-md);
+        opacity: 0;
+        transition: var(--transition-smooth);
+    }
+
+    .blog-card:hover .blog-overlay {
+        opacity: 1;
+    }
+
+    .read-more {
+        color: var(--color-white);
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .blog-content {
+        padding: var(--spacing-md);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .blog-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+        font-size: 0.875rem;
+        color: var(--color-dark);
+        opacity: 0.6;
+    }
+
+    .blog-date {
+        text-transform: capitalize;
+    }
+
+    .blog-reading::before {
+        content: "•";
+        margin-right: 0.5rem;
+    }
+
+    .blog-title {
+        font-size: clamp(1.375rem, 2.5vw, 1.625rem);
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-dark);
+    }
+
+    .blog-excerpt {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--color-dark);
+        opacity: 0.8;
+        margin-bottom: var(--spacing-md);
+        flex: 1;
+    }
+
+    .blog-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: auto;
+    }
+
+    .tag-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: var(--color-light);
+        color: var(--color-primary);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        border-radius: 16px;
+        transition: var(--transition-smooth);
+    }
+
+    .blog-card:hover .tag-pill {
+        background: var(--color-primary);
+        color: var(--color-white);
+    }
+
+    /* STATES */
+    .loading-state,
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-xxl) var(--spacing-md);
+    }
+
+    .empty-state h3 {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-state p {
+        font-size: 1.125rem;
+        color: var(--color-dark);
+        opacity: 0.7;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: var(--spacing-xl) 0 var(--spacing-lg);
+        }
+
+        .blog-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .blog-cover {
+            height: 240px;
+        }
+    }
+</style>
