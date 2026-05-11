@@ -1,7 +1,6 @@
 using Portfolio.Web.DTOs.BlogPosts;
-using System.Net.Http.Json;
+using Portfolio.Web.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Portfolio.Web.Services;
 
@@ -21,12 +20,7 @@ public class BlogPostService
             var response = await _httpClient.GetAsync("api/blogposts");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"JSON recebido: {json.Substring(0, Math.Min(100, json.Length))}");
-            var posts = JsonSerializer.Deserialize<List<BlogPostCardDto>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            });
+            var posts = JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.ListBlogPostCardDto);
             return posts ?? new List<BlogPostCardDto>();
         }
         catch (Exception ex)
@@ -43,10 +37,7 @@ public class BlogPostService
             var response = await _httpClient.GetAsync($"api/blogposts/{id}");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<BlogPostDto>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            return JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.BlogPostDto);
         }
         catch (Exception ex)
         {
