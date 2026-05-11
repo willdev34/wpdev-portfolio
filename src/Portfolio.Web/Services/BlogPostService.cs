@@ -1,17 +1,13 @@
 using Portfolio.Web.DTOs.BlogPosts;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Portfolio.Web.Services;
 
 public class BlogPostService
 {
     private readonly HttpClient _httpClient;
-    
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
 
     public BlogPostService(HttpClient httpClient)
     {
@@ -22,9 +18,16 @@ public class BlogPostService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<List<BlogPostCardDto>>(
-                "api/blogposts", _jsonOptions);
-            return response ?? new List<BlogPostCardDto>();
+            var response = await _httpClient.GetAsync("api/blogposts");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"JSON recebido: {json.Substring(0, Math.Min(100, json.Length))}");
+            var posts = JsonSerializer.Deserialize<List<BlogPostCardDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+            return posts ?? new List<BlogPostCardDto>();
         }
         catch (Exception ex)
         {
@@ -37,8 +40,13 @@ public class BlogPostService
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<BlogPostDto>(
-                $"api/blogposts/{id}", _jsonOptions);
+            var response = await _httpClient.GetAsync($"api/blogposts/{id}");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<BlogPostDto>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
         }
         catch (Exception ex)
         {
@@ -49,16 +57,6 @@ public class BlogPostService
 
     public async Task<List<BlogPostCardDto>> GetPublishedAsync()
     {
-        try
-        {
-            var response = await _httpClient.GetFromJsonAsync<List<BlogPostCardDto>>(
-                "api/blogposts", _jsonOptions);
-            return response ?? new List<BlogPostCardDto>();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro ao buscar posts publicados: {ex.Message}");
-            return new List<BlogPostCardDto>();
-        }
+        return await GetAllAsync();
     }
 }
