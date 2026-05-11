@@ -176,6 +176,11 @@
         try
         {
             allPosts = await BlogPostService.GetAllAsync();
+            Console.WriteLine($"Posts carregados: {allPosts.Count}");
+            foreach (var p in allPosts)
+            {
+                Console.WriteLine($"Post: {p.Title} - Tags: {p.Tags.Count}");
+            }
             ApplyFilters();
         }
         catch (Exception ex)
