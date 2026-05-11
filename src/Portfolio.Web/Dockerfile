@@ -1,7 +1,6 @@
 # ====================================
 # Dockerfile - Portfolio.Web (Blazor WASM)
-# Blazor WASM compila para arquivos estáticos
-# Usamos Nginx para servir os arquivos
+# Executado a partir da RAIZ do repositório
 # ====================================
 
 # STAGE 1: Build
@@ -20,8 +19,7 @@ RUN dotnet restore src/Portfolio.Web/Portfolio.Web.csproj
 COPY src/ src/
 
 # Build e publish
-WORKDIR /src/src/Portfolio.Web
-RUN dotnet publish Portfolio.Web.csproj -c Release -o /app/publish
+RUN dotnet publish src/Portfolio.Web/Portfolio.Web.csproj -c Release -o /app/publish
 
 # STAGE 2: Nginx para servir arquivos estáticos
 FROM nginx:alpine AS runtime
