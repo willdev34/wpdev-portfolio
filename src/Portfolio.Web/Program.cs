@@ -22,10 +22,10 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // ====================================
 // CONFIGURAÇÃO DO HTTPCLIENT
 // ====================================
-// IMPORTANTE: Aponta para a API que está rodando em http://localhost:5277
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5277/";
 builder.Services.AddScoped(sp => new HttpClient 
 { 
-    BaseAddress = new Uri("http://localhost:5277/") 
+    BaseAddress = new Uri(apiBaseUrl)
 });
 
 // ====================================
