@@ -1,9 +1,6 @@
 // ====================================
 // Título: BlogPostRepository.cs
 // Descrição: Implementação do Repository usando EF Core para BlogPost
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using Microsoft.EntityFrameworkCore;

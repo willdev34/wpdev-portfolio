@@ -1,9 +1,6 @@
 // ====================================
 // Título: ContactMessageRepository.cs
 // Descrição: Implementação do Repository usando EF Core para ContactMessage
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using Microsoft.EntityFrameworkCore;

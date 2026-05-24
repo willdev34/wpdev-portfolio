@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteTimelineEventCommand.cs
 // Descrição: Command para deletar um evento (soft delete - CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using MediatR;

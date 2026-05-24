@@ -1,9 +1,6 @@
 // ====================================
 // Título: TimelineEventRepository.cs
 // Descrição: Implementação do Repository usando EF Core para TimelineEvent
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +34,7 @@ public class TimelineEventRepository : ITimelineEventRepository
     public async Task<IEnumerable<TimelineEvent>> GetAllAsync()
     {
         return await _context.TimelineEvents
+            .Where(e => e.IsVisible)
             .OrderBy(e => e.Order)
             .ToListAsync();
     }

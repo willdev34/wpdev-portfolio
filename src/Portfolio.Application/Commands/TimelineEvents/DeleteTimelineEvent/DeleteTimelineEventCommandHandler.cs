@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteTimelineEventCommandHandler.cs
 // Descrição: Handler que processa DeleteTimelineEventCommand e marca evento como invisível
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using MediatR;
