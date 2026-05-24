@@ -6,13 +6,15 @@ public class TimelineEvent
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime Date { get; set; }
+    public DateTime? EndDate { get; set; }
+    public bool IsCurrent { get; set; } = false;
     public TimelineEventType Type { get; set; }
     public string? IconUrl { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
     public int Order { get; set; }
     public bool IsVisible { get; set; } = true;
-    
+
     // Auditoria
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

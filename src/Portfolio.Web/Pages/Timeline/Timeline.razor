@@ -51,6 +51,16 @@
                         <!-- Date -->
                         <div class="timeline-date">
                             <span>@evt.Date.ToString("MMM yyyy")</span>
+                            @if (evt.IsCurrent)
+                            {
+                                <span class="date-separator">→</span>
+                                <span class="date-current">Atual</span>
+                            }
+                            else if (evt.EndDate.HasValue)
+                            {
+                                <span class="date-separator">→</span>
+                                <span>@evt.EndDate.Value.ToString("MMM yyyy")</span>
+                            }
                             <span class="type-badge type-@evt.Type.ToLower()">@evt.Type</span>
                         </div>
 

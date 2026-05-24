@@ -1,9 +1,6 @@
 // ====================================
 // Título: TimelineEventCardDto.cs
 // Descrição: DTO resumido do TimelineEvent - usado para listagens
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.TimelineEvents;
@@ -27,6 +24,8 @@ public class TimelineEventCardDto
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime Date { get; set; }
+    public DateTime? EndDate { get; set; }
+    public bool IsCurrent { get; set; }
     
     // ==========================================
     // TIPO DO EVENTO

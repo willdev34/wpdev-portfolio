@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateTimelineEventDto.cs
 // Descrição: DTO para criação de novos eventos da timeline
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.TimelineEvents;
@@ -21,6 +18,8 @@ public class CreateTimelineEventDto
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime Date { get; set; }
+    public DateTime? EndDate { get; set; }
+    public bool IsCurrent { get; set; } = false;
     
     // ====================================
     // TIPO DO EVENTO

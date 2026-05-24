@@ -1,9 +1,6 @@
 // ====================================
 // Título: TimelineEventDto.cs
 // Descrição: DTO completo do TimelineEvent - usado para exibir detalhes de um evento
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.TimelineEvents;
@@ -26,6 +23,8 @@ public class TimelineEventDto
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime Date { get; set; }
+    public DateTime? EndDate { get; set; }
+    public bool IsCurrent { get; set; }
     
     // ==========================================
     // TIPO DO EVENTO
