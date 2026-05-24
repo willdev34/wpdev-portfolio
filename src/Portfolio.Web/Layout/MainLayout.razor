@@ -33,8 +33,33 @@
 
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="wpdev-main">
-        @Body
+        <ErrorBoundary @ref="errorBoundary">
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="exception">
+                <div class="error-container" style="padding: 4rem 2rem; text-align: center;">
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Algo deu errado por aqui</h2>
+                    <p style="opacity: 0.7; margin-bottom: 2rem;">Tente recarregar a página. Se o problema continuar, me avisa pelo contato.</p>
+                    <button class="btn btn-primary" @onclick="RecoverError">Tentar novamente</button>
+                </div>
+            </ErrorContent>
+        </ErrorBoundary>
     </main>
+
+    @code {
+        private ErrorBoundary? errorBoundary;
+
+        protected override void OnParametersSet()
+        {
+            errorBoundary?.Recover();
+        }
+
+        private void RecoverError()
+        {
+            errorBoundary?.Recover();
+        }
+    }
 
     <!-- FOOTER -->
     <footer class="wpdev-footer">

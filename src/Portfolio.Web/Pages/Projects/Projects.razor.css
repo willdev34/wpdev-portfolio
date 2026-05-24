@@ -263,3 +263,17 @@
     background-color: rgba(108, 158, 163, 0.2);
     transform: translateY(-2px);
 }
+
+/* ====================================
+   FIX: Remover outline de foco indesejado
+   ==================================== */
+
+.projects-hero h1:focus,
+.projects-hero:focus,
+.projects-hero *:focus {
+    outline: none;
+}
+
+.hero-title:focus {
+    outline: none;
+}

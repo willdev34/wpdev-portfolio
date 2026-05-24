@@ -6,87 +6,111 @@
 // Data: 07/12/2024
 // ====================================
 
-using System.Net.Http.Json;
+using System.Net;
+using System.Text.Json;
 using Portfolio.Web.DTOs.Projects;
+using Portfolio.Web.Json;
 
 namespace Portfolio.Web.Services;
 
-/// <summary>
-/// Serviço responsável por consumir a API de projetos
-/// Faz as requisições HTTP e retorna os DTOs
-/// </summary>
 public class ProjectService
 {
     private readonly HttpClient _httpClient;
 
-    // ====================================
-    // CONSTRUTOR - Injeção de Dependência
-    // ====================================
     public ProjectService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
     // ====================================
-    // GET ALL PROJECTS
+    // GET ALL: Busca todos os projetos
     // ====================================
-    /// <summary>
-    /// Busca todos os projetos ativos
-    /// Endpoint: GET /api/projects
-    /// </summary>
     public async Task<List<ProjectCardDto>> GetAllAsync()
     {
         try
         {
-            var projects = await _httpClient.GetFromJsonAsync<List<ProjectCardDto>>("api/projects");
+            var response = await _httpClient.GetAsync("api/projects");
+
+            // Se a API respondeu com erro, loga e retorna lista vazia
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[ProjectService] GetAllAsync retornou {(int)response.StatusCode} {response.StatusCode}");
+                return new List<ProjectCardDto>();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var projects = JsonSerializer.Deserialize(json, ProjectJsonContext.Default.ListProjectCardDto);
             return projects ?? new List<ProjectCardDto>();
+        }
+        catch (HttpRequestException ex)
+        {
+            // Falha de rede, CORS, DNS, API fora do ar
+            Console.WriteLine($"[ProjectService] Erro de rede em GetAllAsync: {ex.Message}");
+            return new List<ProjectCardDto>();
+        }
+        catch (JsonException ex)
+        {
+            // API retornou um JSON malformado ou com formato inesperado
+            Console.WriteLine($"[ProjectService] Erro de deserialização em GetAllAsync: {ex.Message}");
+            return new List<ProjectCardDto>();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erro ao buscar projetos: {ex.Message}");
+            // Qualquer outra coisa que não previmos
+            Console.WriteLine($"[ProjectService] Erro inesperado em GetAllAsync: {ex.Message}");
             return new List<ProjectCardDto>();
         }
     }
 
     // ====================================
-    // GET PROJECT BY ID
+    // GET BY ID: Busca projeto específico
     // ====================================
-    /// <summary>
-    /// Busca um projeto específico por ID
-    /// Endpoint: GET /api/projects/{id}
-    /// </summary>
     public async Task<ProjectDto?> GetByIdAsync(Guid id)
     {
         try
         {
-            var project = await _httpClient.GetFromJsonAsync<ProjectDto>($"api/projects/{id}");
-            return project;
+            var response = await _httpClient.GetAsync($"api/projects/{id}");
+
+            // 404 é caso de uso normal, não é erro de fato
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[ProjectService] GetByIdAsync({id}) retornou {(int)response.StatusCode} {response.StatusCode}");
+                return null;
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize(json, ProjectJsonContext.Default.ProjectDto);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"[ProjectService] Erro de rede em GetByIdAsync({id}): {ex.Message}");
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"[ProjectService] Erro de deserialização em GetByIdAsync({id}): {ex.Message}");
+            return null;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erro ao buscar projeto {id}: {ex.Message}");
+            Console.WriteLine($"[ProjectService] Erro inesperado em GetByIdAsync({id}): {ex.Message}");
             return null;
         }
     }
 
     // ====================================
-    // GET FEATURED PROJECTS
+    // GET FEATURED: Filtra projetos em destaque
     // ====================================
-    /// <summary>
-    /// Busca apenas projetos em destaque
-    /// Para usar na home page
-    /// </summary>
+    // OBS: Reutiliza GetAllAsync que já tem tratamento de erros completo.
+    // Como GetAllAsync nunca lança exceção, não precisamos de try/catch aqui.
     public async Task<List<ProjectCardDto>> GetFeaturedAsync()
     {
-        try
-        {
-            var allProjects = await GetAllAsync();
-            return allProjects.Where(p => p.IsFeatured).ToList();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro ao buscar projetos em destaque: {ex.Message}");
-            return new List<ProjectCardDto>();
-        }
+        var allProjects = await GetAllAsync();
+        return allProjects.Where(p => p.IsFeatured).ToList();
     }
 }

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portfolio.Web</title>
+    <title>WPDev - Portfolio</title>
     <base href="/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
@@ -12,25 +12,91 @@
     <link href="Portfolio.Web.styles.css" rel="stylesheet" />
 
     <!-- Google Fonts: Poppins + Inter -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================================
+        LOADING SCREEN - WPDev
+        ================================ */
+
+        /* Loader ocupa a tela inteira enquanto o Blazor inicializa */
+        .wpdev-loader-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #0D1C24;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .wpdev-loader-brand {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #F4F7F7;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+        }
+
+        .wpdev-loader-brand span {
+            color: #6C9EA3;
+        }
+
+        .wpdev-loader-bar {
+            width: 120px;
+            height: 2px;
+            background: rgba(244, 247, 247, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .wpdev-loader-bar::after {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 40%;
+            background: #6C9EA3;
+            border-radius: 2px;
+            animation: wpdev-slide 1.4s ease-in-out infinite;
+        }
+
+        @keyframes wpdev-slide {
+            0%   { transform: translateX(-100%); }
+            50%  { transform: translateX(200%); }
+            100% { transform: translateX(200%); }
+        }
+
+        .loading-progress,
+        .loading-progress-text {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
+        <svg class="loading-progress" style="display:none">
             <circle r="40%" cx="50%" cy="50%" />
             <circle r="40%" cx="50%" cy="50%" />
         </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-progress-text" style="display:none"></div>
+
+        <!-- Loader com fundo próprio, não contamina o #app -->
+        <div class="wpdev-loader-screen">
+            <div class="wpdev-loader-brand">WP<span>Dev</span></div>
+            <div class="wpdev-loader-bar"></div>
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+    <div id="blazor-error-ui" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; padding: 0.6rem 1.25rem 0.7rem 1.25rem; background: #fff3cd; color: #856404; box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2); z-index: 1000;">
+        Ocorreu um erro inesperado.
+        <a href="" class="reload" style="margin-left: 0.5rem; color: #856404; text-decoration: underline;">Recarregar</a>
+        <a class="dismiss" style="position: absolute; right: 0.75rem; top: 0.5rem; cursor: pointer;">🗙</a>
     </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 

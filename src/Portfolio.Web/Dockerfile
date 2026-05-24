@@ -27,9 +27,13 @@ FROM nginx:alpine AS runtime
 # Copiar arquivos publicados do Blazor
 COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 
-# Configuração do Nginx para Blazor (suporte a rotas SPA)
+# Configuração do Nginx
 COPY src/Portfolio.Web/nginx.conf /etc/nginx/nginx.conf
+
+# Script para substituir URL da API em runtime
+COPY src/Portfolio.Web/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

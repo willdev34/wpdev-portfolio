@@ -250,3 +250,17 @@
         transform: translateY(0);
     }
 }
+
+/* ====================================
+   FIX: Remover outline de foco indesejado
+   ==================================== */
+
+.blog-hero h1:focus,
+.blog-hero:focus,
+.blog-hero *:focus {
+    outline: none;
+}
+
+.hero-title:focus {
+    outline: none;
+}

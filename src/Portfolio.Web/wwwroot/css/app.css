@@ -4,6 +4,14 @@
    Inspiração: diplo.studio
    ==================================== */
 
+#blazor-error-ui {
+    display: none;
+}
+
+#blazor-error-ui[style*="display: block"] {
+    display: block !important;
+}
+
 /* ====================================
    1. CSS RESET & BASE
    ==================================== */
@@ -229,4 +237,21 @@ a:hover {
     .container {
         padding: 0 var(--spacing-sm);
     }
+}
+
+/* ====================================
+   FIX GLOBAL: Remover outline de foco 
+   indesejado em elementos não interativos
+   ==================================== */
+
+section:focus,
+div:focus,
+h1:focus,
+h2:focus,
+h3:focus,
+p:focus,
+article:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
 }
