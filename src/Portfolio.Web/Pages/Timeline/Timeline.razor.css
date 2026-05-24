@@ -1,0 +1,301 @@
+/* ====================================
+   TIMELINE PAGE - EDITORIAL DESIGN
+   Cores: #6C9EA3, #0D1C24, #F4F7F7
+   ==================================== */
+
+/* ====================================
+   HERO SECTION
+   ==================================== */
+
+.timeline-hero {
+    padding: 120px 0 80px 0;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 4rem;
+    font-weight: 600;
+    color: #0D1C24;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.hero-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.125rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ====================================
+   TIMELINE SECTION
+   ==================================== */
+
+.timeline-section {
+    padding: 0 20px 120px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline-container {
+    position: relative;
+    padding-left: 3rem;
+}
+
+/* Linha vertical */
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg,
+        #6C9EA3 0%,
+        rgba(108, 158, 163, 0.3) 100%
+    );
+}
+
+/* ====================================
+   TIMELINE ITEM
+   ==================================== */
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 48px;
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item:nth-child(1) { animation-delay: 0.05s; }
+.timeline-item:nth-child(2) { animation-delay: 0.1s; }
+.timeline-item:nth-child(3) { animation-delay: 0.15s; }
+.timeline-item:nth-child(4) { animation-delay: 0.2s; }
+.timeline-item:nth-child(5) { animation-delay: 0.25s; }
+
+/* ====================================
+   TIMELINE MARKER
+   ==================================== */
+
+.timeline-marker {
+    position: absolute;
+    left: -2.375rem;
+    top: 0.5rem;
+    z-index: 2;
+}
+
+.marker-dot {
+    width: 1rem;
+    height: 1rem;
+    background: #F4F7F7;
+    border: 3px solid #6C9EA3;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.marker-dot.marker-current {
+    width: 1.25rem;
+    height: 1.25rem;
+    background: #6C9EA3;
+    box-shadow: 0 0 0 4px rgba(108, 158, 163, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(108, 158, 163, 0.2); }
+    50% { box-shadow: 0 0 0 8px rgba(108, 158, 163, 0.1); }
+}
+
+/* ====================================
+   TIMELINE CONTENT
+   ==================================== */
+
+.timeline-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6C9EA3;
+    text-transform: capitalize;
+}
+
+.date-separator {
+    opacity: 0.5;
+}
+
+.date-current {
+    background: #6C9EA3;
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+
+/* ====================================
+   TIMELINE CARD
+   ==================================== */
+
+.timeline-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid rgba(13, 28, 36, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 20px;
+}
+
+.timeline-card:hover {
+    transform: translateX(8px);
+    border-color: rgba(108, 158, 163, 0.3);
+    box-shadow: 0 8px 24px rgba(13, 28, 36, 0.08);
+}
+
+.card-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #F4F7F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0D1C24;
+    margin: 0 0 4px 0;
+}
+
+.card-company {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #6C9EA3;
+    margin: 0 0 12px 0;
+}
+
+.card-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #666;
+    margin: 0 0 12px 0;
+}
+
+.current-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(108, 158, 163, 0.1);
+    color: #6C9EA3;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid rgba(108, 158, 163, 0.3);
+}
+
+/* ====================================
+   EMPTY STATE
+   ==================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0D1C24;
+    margin: 0 0 12px 0;
+}
+
+.empty-state p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #666;
+    margin: 0;
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .timeline-hero {
+        padding: 80px 20px 60px 20px;
+    }
+
+    .timeline-card {
+        flex-direction: column;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .timeline-hero {
+        padding: 60px 20px 40px 20px;
+    }
+}
+
+/* ====================================
+   ANIMAÇÕES
+   ==================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

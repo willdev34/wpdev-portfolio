@@ -1,9 +1,6 @@
 // ====================================
 // Título: TimelineEventDto.cs
 // Descrição: DTO para eventos da timeline profissional
-// Autor: Will
-// Empresa: WpDev
-// Data: 09/12/2024
 // ====================================
 
 namespace Portfolio.Web.DTOs.Timeline;
