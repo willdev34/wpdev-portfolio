@@ -39,28 +39,19 @@
         else
         {
             <div class="timeline-container">
-                @foreach (var evt in events.OrderByDescending(e => e.StartDate))
+                @foreach (var evt in events.OrderBy(e => e.Date))
                 {
                     <div class="timeline-item">
 
                         <!-- Marker -->
                         <div class="timeline-marker">
-                            <div class="marker-dot @(evt.IsCurrent ? "marker-current" : "")"></div>
+                            <div class="marker-dot @(evt.Type == "Work" ? "marker-current" : "")"></div>
                         </div>
 
                         <!-- Date -->
                         <div class="timeline-date">
-                            <span>@evt.StartDate.ToString("MMM yyyy")</span>
-                            @if (evt.IsCurrent)
-                            {
-                                <span class="date-separator">→</span>
-                                <span class="date-current">Atual</span>
-                            }
-                            else if (evt.EndDate.HasValue)
-                            {
-                                <span class="date-separator">→</span>
-                                <span>@evt.EndDate.Value.ToString("MMM yyyy")</span>
-                            }
+                            <span>@evt.Date.ToString("MMM yyyy")</span>
+                            <span class="type-badge type-@evt.Type.ToLower()">@evt.Type</span>
                         </div>
 
                         <!-- Card -->
@@ -68,16 +59,17 @@
                             @if (!string.IsNullOrEmpty(evt.IconUrl))
                             {
                                 <div class="card-icon">
-                                    <img src="@evt.IconUrl" alt="@evt.Company" />
+                                    <img src="@evt.IconUrl" alt="@evt.Title" />
                                 </div>
                             }
                             <div class="card-content">
                                 <h3 class="card-title">@evt.Title</h3>
-                                <p class="card-company">@evt.Company</p>
                                 <p class="card-description">@evt.Description</p>
-                                @if (evt.IsCurrent)
+                                @if (!string.IsNullOrEmpty(evt.LinkUrl))
                                 {
-                                    <span class="current-badge">✨ Posição Atual</span>
+                                    <a href="@evt.LinkUrl" target="_blank" class="card-link">
+                                        @(string.IsNullOrEmpty(evt.LinkText) ? "Ver mais" : evt.LinkText) →
+                                    </a>
                                 }
                             </div>
                         </div>

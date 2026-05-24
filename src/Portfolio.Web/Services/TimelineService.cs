@@ -23,7 +23,7 @@ public class TimelineService
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/timeline");
+            var response = await _httpClient.GetAsync("api/timelineevents");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -61,7 +61,7 @@ public class TimelineService
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/timeline/{id}");
+            var response = await _httpClient.GetAsync($"api/timelineevents/{id}");
 
             // 404 é caso esperado, não é bug
             if (response.StatusCode == HttpStatusCode.NotFound)
