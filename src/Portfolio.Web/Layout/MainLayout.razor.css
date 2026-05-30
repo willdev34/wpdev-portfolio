@@ -1,77 +1,445 @@
-.page {
-    position: relative;
+/* ====================================
+   MainLayout.razor.css
+   Estilos do layout principal WPDev
+   ==================================== */
+
+/* ================================
+   LAYOUT GERAL
+   ================================ */
+
+.wpdev-layout {
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
-main {
-    flex: 1;
-}
+/* ================================
+   HEADER
+   ================================ */
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
-
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
+.wpdev-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 64px;
     display: flex;
+    align-items: center;
+    background-color: rgba(244, 247, 247, 0.97);
+    border-bottom: 1px solid rgba(13, 28, 36, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.wpdev-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* ================================
+   BRAND / LOGO
+   ================================ */
+
+.brand-link {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.375rem;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: -0.03em;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.brand-wp {
+    color: #6C9EA3;
+}
+
+.brand-dev {
+    color: #0D1C24;
+}
+
+/* ================================
+   MENU DESKTOP
+   Visível apenas em telas >= 769px
+   ================================ */
+
+.nav-menu-desktop {
+    display: flex;
+    list-style: none !important;
+    margin: 0;
+    padding: 0;
+    gap: 2.5rem;
     align-items: center;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
-
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
-    }
+.nav-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0D1C24;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    position: relative;
+    padding-bottom: 2px;
+    transition: color 0.2s ease;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
+/* Underline animado no hover */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background-color: #6C9EA3;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #6C9EA3;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* ================================
+   BOTÃO HAMBURGUER
+   Visível apenas no mobile
+   ================================ */
+
+.nav-toggle {
+    display: none; /* esconde no desktop */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    /* z-index alto para ficar sobre o overlay quando aberto */
+    position: relative;
+    z-index: 10000;
+}
+
+.nav-toggle:hover {
+    background: rgba(108, 158, 163, 0.1);
+}
+
+/* As 3 linhas do hamburguer */
+.hb-line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: #0D1C24;
+    border-radius: 2px;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s ease;
+    transform-origin: center;
+}
+
+/* Animação hamburguer -> X */
+.hb-line--top.open {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.hb-line--mid.open {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hb-line--bot.open {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ================================
+   OVERLAY MOBILE
+   Fundo escuro ao abrir o menu
+   ================================ */
+
+.mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(13, 28, 36, 0.55);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.mobile-overlay--open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ================================
+   PAINEL MOBILE
+   Slide-in da direita
+   ================================ */
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    max-width: 88vw;
+    height: 100vh;
+    height: 100dvh; /* dynamic viewport para mobile */
+    background-color: #F4F7F7;
+    z-index: 9999;
+    /* começa fora da tela (direita) */
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(13, 28, 36, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Quando aberto: desliza para dentro */
+.mobile-menu--open {
+    transform: translateX(0);
+}
+
+/* Cabeçalho do painel mobile */
+.mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 64px;
+    border-bottom: 1px solid rgba(13, 28, 36, 0.08);
+    flex-shrink: 0;
+}
+
+.mobile-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #0D1C24;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mobile-close-btn:hover {
+    background: rgba(108, 158, 163, 0.12);
+    color: #6C9EA3;
+}
+
+/* Área de navegação */
+.mobile-nav {
+    flex: 1;
+    padding: 1rem 0;
+}
+
+/* Lista sem bullets */
+.mobile-nav-list {
+    list-style: none !important;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cada item começa "fora" e anima para dentro */
+.mobile-nav-item {
+    opacity: 0;
+    transform: translateX(16px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Quando menu está aberto: anima os itens com stagger */
+.mobile-menu--open .mobile-nav-item {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Delays em cascata (stagger) */
+.mobile-menu--open .mobile-nav-item:nth-child(1) { transition-delay: 0.06s; }
+.mobile-menu--open .mobile-nav-item:nth-child(2) { transition-delay: 0.11s; }
+.mobile-menu--open .mobile-nav-item:nth-child(3) { transition-delay: 0.16s; }
+.mobile-menu--open .mobile-nav-item:nth-child(4) { transition-delay: 0.21s; }
+.mobile-menu--open .mobile-nav-item:nth-child(5) { transition-delay: 0.26s; }
+.mobile-menu--open .mobile-nav-item:nth-child(6) { transition-delay: 0.31s; }
+
+/* Link de cada item */
+.mobile-nav-link {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.625rem;
+    font-weight: 700;
+    color: #0D1C24;
+    text-decoration: none;
+    padding: 0.625rem 1.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    border-bottom: 1px solid rgba(13, 28, 36, 0.06);
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.mobile-nav-link:hover {
+    color: #6C9EA3;
+    padding-left: 2rem;
+}
+
+/* Rodapé do painel */
+.mobile-menu-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid rgba(13, 28, 36, 0.08);
+    flex-shrink: 0;
+}
+
+.mobile-menu-footer p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: rgba(13, 28, 36, 0.35);
+    margin: 0;
+}
+
+/* ================================
+   CONTEÚDO PRINCIPAL
+   ================================ */
+
+.wpdev-main {
+    flex: 1;
+    /* compensa o header sticky de 64px */
+    /* (o sticky já não tira do fluxo, mas fica sobre o conteúdo) */
+}
+
+/* ================================
+   ERROR BOUNDARY
+   ================================ */
+
+.error-container {
+    padding: 4rem 2rem;
+    text-align: center;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.error-container h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    color: #0D1C24;
+    margin: 0;
+}
+
+.error-container p {
+    color: rgba(13, 28, 36, 0.6);
+    margin: 0;
+    max-width: 400px;
+}
+
+/* ================================
+   FOOTER
+   ================================ */
+
+.wpdev-footer {
+    background-color: #0D1C24;
+    color: #F4F7F7;
+    padding: 2.5rem 0;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-brand {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.02em;
+}
+
+.footer-tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    color: rgba(244, 247, 247, 0.45);
+    margin: 0;
+}
+
+.footer-right p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    color: rgba(244, 247, 247, 0.45);
+    margin: 0;
+}
+
+/* ================================
+   RESPONSIVIDADE
+   ================================ */
+
+/* MOBILE: <= 768px */
+@media (max-width: 768px) {
+
+    /* Mostra o hamburguer */
+    .nav-toggle {
+        display: flex !important;
     }
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
+    /* Esconde o menu desktop */
+    .nav-menu-desktop {
+        display: none !important;
     }
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
+}
+
+/* DESKTOP: >= 769px */
+@media (min-width: 769px) {
+
+    /* Esconde completamente o painel mobile e overlay no desktop */
+    .mobile-menu,
+    .mobile-overlay {
+        display: none !important;
     }
 
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
+    /* Garante que o hamburguer não apareça */
+    .nav-toggle {
+        display: none !important;
     }
 
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
+}
+
+/* ================================
+   ACESSIBILIDADE
+   Respeita preferência de sem animação
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .mobile-menu,
+    .mobile-overlay,
+    .hb-line,
+    .mobile-nav-item,
+    .mobile-nav-link,
+    .nav-link::after {
+        transition: none !important;
+        animation: none !important;
     }
+
 }
