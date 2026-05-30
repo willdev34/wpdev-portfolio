@@ -1,11 +1,15 @@
 // ====================================
 // Título: ContactService.cs
 // Descrição: Serviço para consumir endpoints de Contact da API
+// Fix produção: usa ContactJsonContext (Source Generators)
+//               ao invés de reflection
+// Fix rota: api/contactmessages (não api/contact)
 // ====================================
 
 using Portfolio.Web.DTOs.Contact;
+using Portfolio.Web.Json;
 using System.Net;
-using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace Portfolio.Web.Services;
@@ -19,17 +23,21 @@ public class ContactService
         _httpClient = httpClient;
     }
 
-    // Enviar nova mensagem de contato
-    // Esse método é diferente: faz POST, não GET
-    public async Task<bool> SendMessageAsync(ContactMessageDto message)
+    // Envia nova mensagem de contato via POST
+    // Usa SendContactMessageDto alinhado com a API
+    public async Task<bool> SendMessageAsync(SendContactMessageDto message)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/contact", message);
+            // Serializa usando Source Generator (fix produção)
+            var json = JsonSerializer.Serialize(message, ContactJsonContext.Default.SendContactMessageDto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("api/contactmessages", content);
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[ContactService] SendMessageAsync falhou. Status: {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[ContactService] SendMessageAsync falhou. Status: {(int)response.StatusCode}");
                 return false;
             }
 
@@ -42,7 +50,7 @@ public class ContactService
         }
         catch (JsonException ex)
         {
-            Console.WriteLine($"[ContactService] SendMessageAsync - Erro ao serializar payload: {ex.Message}");
+            Console.WriteLine($"[ContactService] SendMessageAsync - Erro ao serializar: {ex.Message}");
             return false;
         }
         catch (Exception ex)
@@ -52,80 +60,56 @@ public class ContactService
         }
     }
 
-    // Buscar todas as mensagens (uso interno/admin no futuro)
+    // Busca todas as mensagens (admin)
     public async Task<List<ContactMessageDto>> GetAllAsync()
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/contact");
+            var response = await _httpClient.GetAsync("api/contactmessages");
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[ContactService] GetAllAsync falhou. Status: {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[ContactService] GetAllAsync falhou. Status: {(int)response.StatusCode}");
                 return new List<ContactMessageDto>();
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            var messages = JsonSerializer.Deserialize<List<ContactMessageDto>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
 
-            return messages ?? new List<ContactMessageDto>();
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine($"[ContactService] GetAllAsync - Erro de rede: {ex.Message}");
-            return new List<ContactMessageDto>();
-        }
-        catch (JsonException ex)
-        {
-            Console.WriteLine($"[ContactService] GetAllAsync - Erro ao desserializar JSON: {ex.Message}");
-            return new List<ContactMessageDto>();
+            // Source Generator - funciona em produção
+            return JsonSerializer.Deserialize(json, ContactJsonContext.Default.ListContactMessageDto)
+                   ?? new List<ContactMessageDto>();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ContactService] GetAllAsync - Erro inesperado: {ex.Message}");
+            Console.WriteLine($"[ContactService] GetAllAsync - Erro: {ex.Message}");
             return new List<ContactMessageDto>();
         }
     }
 
-    // Buscar mensagem por ID (uso interno/admin no futuro)
+    // Busca mensagem por ID (admin)
     public async Task<ContactMessageDto?> GetByIdAsync(Guid id)
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/contact/{id}");
+            var response = await _httpClient.GetAsync($"api/contactmessages/{id}");
 
-            // 404 é caso esperado, não é bug
             if (response.StatusCode == HttpStatusCode.NotFound)
                 return null;
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[ContactService] GetByIdAsync({id}) falhou. Status: {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[ContactService] GetByIdAsync({id}) falhou. Status: {(int)response.StatusCode}");
                 return null;
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ContactMessageDto>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine($"[ContactService] GetByIdAsync({id}) - Erro de rede: {ex.Message}");
-            return null;
-        }
-        catch (JsonException ex)
-        {
-            Console.WriteLine($"[ContactService] GetByIdAsync({id}) - Erro ao desserializar JSON: {ex.Message}");
-            return null;
+
+            // Source Generator - funciona em produção
+            return JsonSerializer.Deserialize(json, ContactJsonContext.Default.ContactMessageDto);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ContactService] GetByIdAsync({id}) - Erro inesperado: {ex.Message}");
+            Console.WriteLine($"[ContactService] GetByIdAsync - Erro: {ex.Message}");
             return null;
         }
     }

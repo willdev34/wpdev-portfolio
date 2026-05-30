@@ -255,3 +255,42 @@ article:focus {
     border: none;
     box-shadow: none;
 }
+
+/* ================================
+   CONTACT FORM - Override Bootstrap
+   ================================ */
+
+.contact-main .field-input,
+.contact-main .field-select,
+.contact-main .field-textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1.5px solid rgba(13, 28, 36, 0.2) !important;
+    border-radius: 0 !important;
+    padding: 0.625rem 0 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+    color: #0D1C24 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.contact-main .field-input:focus,
+.contact-main .field-select:focus,
+.contact-main .field-textarea:focus {
+    border-bottom-color: #6C9EA3 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.contact-main .field-input::placeholder,
+.contact-main .field-textarea::placeholder {
+    color: rgba(13, 28, 36, 0.3) !important;
+}
+
+.contact-main .field-textarea {
+    resize: none !important;
+    min-height: 160px !important;
+}

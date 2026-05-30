@@ -1,9 +1,8 @@
 @* ====================================
    Título: Contact.razor
-   Descrição: Página de formulário de contato
-   Autor: Will
-   Empresa: WpDev
-   Data: 20/12/2024
+   Descrição: Página de contato minimalista
+   Refatorada: design editorial, SendContactMessageDto,
+               estilos movidos para Contact.razor.css
    ==================================== *@
 
 @page "/contact"
@@ -14,97 +13,178 @@
 <PageTitle>Contato - WPDev</PageTitle>
 
 <!-- PAGE HEADER -->
-<section class="page-header">
+<section class="contact-header">
     <div class="container">
-        <div class="header-content fade-in">
-            <h1 class="page-title">
-                Entre em<br />
-                <span class="text-primary">Contato</span>
-            </h1>
-            <p class="page-subtitle">
-                Tem um projeto em mente? Vamos conversar!<br />
-                Responderei o mais breve possível.
-            </p>
+        <p class="contact-eyebrow">Vamos conversar</p>
+        <h1 class="contact-title">
+            Entre em<br />
+            <span class="contact-title-accent">Contato</span>
+        </h1>
+        <p class="contact-subtitle">
+            Tem um projeto em mente? Responderei o mais breve possível.
+        </p>
+    </div>
+</section>
+
+<!-- DIVISOR -->
+<div class="contact-divider">
+    <div class="container">
+        <hr class="divider-line" />
+    </div>
+</div>
+
+<!-- CONTEÚDO -->
+<section class="contact-content">
+    <div class="container">
+        <div class="contact-grid">
+
+            @if (messageSent)
+            {
+                <!-- SUCESSO -->
+                <div class="contact-main">
+                    <div class="success-block">
+                        <div class="success-check">✓</div>
+                        <p class="success-label">Mensagem enviada</p>
+                        <h2 class="success-title">Obrigado pelo contato!</h2>
+                        <p class="success-text">
+                            Recebi sua mensagem e responderei em breve.
+                        </p>
+                        <button class="contact-submit-btn" @onclick="ResetForm">
+                            Enviar outra mensagem
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- FORMULÁRIO -->
+                <div class="contact-main">
+                    <EditForm Model="@formData" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+
+                        <!-- Nome -->
+                        <div class="field-group">
+                            <label class="field-label">Nome</label>
+                            <InputText class="field-input"
+                                       @bind-Value="formData.Name"
+                                       placeholder="Seu nome completo" />
+                            <ValidationMessage For="@(() => formData.Name)"
+                                               class="field-error" />
+                        </div>
+
+                        <!-- Email -->
+                        <div class="field-group">
+                            <label class="field-label">Email</label>
+                            <InputText class="field-input"
+                                       @bind-Value="formData.Email"
+                                       placeholder="seu@email.com" />
+                            <ValidationMessage For="@(() => formData.Email)"
+                                               class="field-error" />
+                        </div>
+
+                        <!-- Tipo -->
+                        <div class="field-group">
+                            <label class="field-label">Tipo de contato</label>
+                            <InputSelect class="field-select" @bind-Value="formData.Type">
+                                <option value="0">Geral</option>
+                                <option value="1">Oportunidade de emprego</option>
+                                <option value="2">Freelance</option>
+                                <option value="3">Parceria</option>
+                                <option value="4">Outro</option>
+                            </InputSelect>
+                        </div>
+
+                        <!-- Assunto -->
+                        <div class="field-group">
+                            <label class="field-label">Assunto</label>
+                            <InputText class="field-input"
+                                       @bind-Value="formData.Subject"
+                                       placeholder="Sobre o que gostaria de falar?" />
+                            <ValidationMessage For="@(() => formData.Subject)"
+                                               class="field-error" />
+                        </div>
+
+                        <!-- Mensagem -->
+                        <div class="field-group">
+                            <label class="field-label">Mensagem</label>
+                            <InputTextArea class="field-textarea"
+                                           @bind-Value="formData.Message"
+                                           placeholder="Escreva sua mensagem..."
+                                           rows="7" />
+                            <ValidationMessage For="@(() => formData.Message)"
+                                               class="field-error" />
+                        </div>
+
+                        <!-- Erro -->
+                        @if (hasError)
+                        {
+                            <div class="form-error-block">
+                                Ocorreu um erro ao enviar. Tente novamente.
+                            </div>
+                        }
+
+                        <!-- Botão -->
+                        <div class="field-actions">
+                            <button type="submit"
+                                    class="contact-submit-btn @(isSending ? "sending" : "")"
+                                    disabled="@isSending">
+                                @if (isSending)
+                                {
+                                    <span>Enviando...</span>
+                                }
+                                else
+                                {
+                                    <span>Enviar mensagem →</span>
+                                }
+                            </button>
+                        </div>
+
+                    </EditForm>
+                </div>
+
+                <!-- SIDEBAR -->
+                <aside class="contact-sidebar">
+
+                    <div class="sidebar-block">
+                        <p class="sidebar-label">Email direto</p>
+                        <a href="mailto:contato@wpdev.com.br"
+                           class="sidebar-email">
+                            contato@wpdev.com.br
+                        </a>
+                    </div>
+
+                    <div class="sidebar-block">
+                        <p class="sidebar-label">Redes</p>
+                        <div class="sidebar-links">
+                            <a href="https://github.com/willdev34"
+                               target="_blank"
+                               class="sidebar-social-link">
+                                GitHub ↗
+                            </a>
+                            <a href="https://www.linkedin.com/in/willdevfull/"
+                               target="_blank"
+                               class="sidebar-social-link">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-block sidebar-block--note">
+                        <p class="sidebar-label">Tempo de resposta</p>
+                        <p class="sidebar-note-text">
+                            Costumo responder em até 48 horas nos dias úteis.
+                        </p>
+                    </div>
+
+                </aside>
+            }
+
         </div>
     </div>
 </section>
 
-<!-- CONTACT FORM -->
-<section class="section contact-section">
-    <div class="container-narrow">
-        @if (messageSent)
-        {
-            <!-- Success Message -->
-            <div class="success-card fade-in">
-                <div class="success-icon">✓</div>
-                <h2>Mensagem Enviada!</h2>
-                <p>Obrigado pelo contato! Responderei em breve.</p>
-                <button class="btn btn-primary" @onclick="ResetForm">Enviar outra mensagem</button>
-            </div>
-        }
-        else
-        {
-            <!-- Contact Form -->
-            <div class="contact-card fade-in">
-                <EditForm Model="@contactMessage" OnValidSubmit="HandleSubmit">
-                    <DataAnnotationsValidator />
-                    
-                    <!-- Name Field -->
-                    <div class="form-group">
-                        <label for="name" class="form-label">Nome</label>
-                        <InputText id="name" class="form-input" @bind-Value="contactMessage.Name" placeholder="Seu nome completo" />
-                        <ValidationMessage For="@(() => contactMessage.Name)" class="form-error" />
-                    </div>
-
-                    <!-- Email Field -->
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email</label>
-                        <InputText id="email" type="email" class="form-input" @bind-Value="contactMessage.Email" placeholder="seu@email.com" />
-                        <ValidationMessage For="@(() => contactMessage.Email)" class="form-error" />
-                    </div>
-
-                    <!-- Subject Field -->
-                    <div class="form-group">
-                        <label for="subject" class="form-label">Assunto</label>
-                        <InputText id="subject" class="form-input" @bind-Value="contactMessage.Subject" placeholder="Sobre o que gostaria de falar?" />
-                        <ValidationMessage For="@(() => contactMessage.Subject)" class="form-error" />
-                    </div>
-
-                    <!-- Message Field -->
-                    <div class="form-group">
-                        <label for="message" class="form-label">Mensagem</label>
-                        <InputTextArea id="message" class="form-textarea" @bind-Value="contactMessage.Message" placeholder="Escreva sua mensagem..." rows="8" />
-                        <ValidationMessage For="@(() => contactMessage.Message)" class="form-error" />
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary btn-large" disabled="@isSending">
-                            @if (isSending)
-                            {
-                                <span>Enviando...</span>
-                            }
-                            else
-                            {
-                                <span>Enviar Mensagem →</span>
-                            }
-                        </button>
-                    </div>
-
-                    @if (hasError)
-                    {
-                        <div class="error-message">
-                            Ocorreu um erro ao enviar a mensagem. Tente novamente.
-                        </div>
-                    }
-                </EditForm>
-            </div>
-        }
-    </div>
-</section>
-
 @code {
-    private ContactMessageDto contactMessage = new();
+    private SendContactMessageDto formData = new();
     private bool isSending = false;
     private bool messageSent = false;
     private bool hasError = false;
@@ -116,8 +196,7 @@
 
         try
         {
-            contactMessage.SentAt = DateTime.UtcNow;
-            var success = await ContactService.SendMessageAsync(contactMessage);
+            var success = await ContactService.SendMessageAsync(formData);
 
             if (success)
             {
@@ -140,185 +219,8 @@
 
     private void ResetForm()
     {
-        contactMessage = new();
+        formData = new();
         messageSent = false;
         hasError = false;
     }
 }
-
-<style>
-    /* ====================================
-       CONTACT PAGE STYLES
-       ==================================== */
-
-    /* PAGE HEADER */
-    .page-header {
-        padding: var(--spacing-xxl) 0 var(--spacing-xl);
-        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
-    }
-
-    .header-content {
-        max-width: 800px;
-    }
-
-    .page-title {
-        font-size: clamp(3rem, 6vw, 5rem);
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: var(--spacing-md);
-        letter-spacing: -0.03em;
-    }
-
-    .page-subtitle {
-        font-size: clamp(1.125rem, 2vw, 1.25rem);
-        color: var(--color-dark);
-        opacity: 0.8;
-        line-height: 1.7;
-    }
-
-    /* CONTACT SECTION */
-    .contact-section {
-        padding: var(--spacing-xl) 0 var(--spacing-xxl);
-    }
-
-    /* CONTACT CARD */
-    .contact-card {
-        background: var(--color-white);
-        border-radius: 24px;
-        padding: var(--spacing-xl);
-        box-shadow: 0 12px 40px rgba(13, 28, 36, 0.1);
-    }
-
-    /* FORM STYLES */
-    .form-group {
-        margin-bottom: var(--spacing-lg);
-    }
-
-    .form-label {
-        display: block;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--color-dark);
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .form-input,
-    .form-textarea {
-        width: 100%;
-        padding: 1rem 1.25rem;
-        font-family: var(--font-body);
-        font-size: 1rem;
-        color: var(--color-dark);
-        background: var(--color-light);
-        border: 2px solid transparent;
-        border-radius: 12px;
-        transition: var(--transition-smooth);
-        outline: none;
-    }
-
-    .form-input:focus,
-    .form-textarea:focus {
-        background: var(--color-white);
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 4px rgba(108, 158, 163, 0.1);
-    }
-
-    .form-textarea {
-        resize: vertical;
-        min-height: 180px;
-    }
-
-    .form-error {
-        display: block;
-        margin-top: var(--spacing-xs);
-        font-size: 0.875rem;
-        color: #ef4444;
-    }
-
-    /* FORM ACTIONS */
-    .form-actions {
-        margin-top: var(--spacing-xl);
-    }
-
-    .btn-large {
-        width: 100%;
-        padding: 1.25rem 2rem;
-        font-size: 1.125rem;
-        font-weight: 600;
-    }
-
-    .btn-primary:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    /* ERROR MESSAGE */
-    .error-message {
-        margin-top: var(--spacing-md);
-        padding: var(--spacing-md);
-        background: #fee2e2;
-        border-left: 4px solid #ef4444;
-        border-radius: 8px;
-        color: #991b1b;
-        font-size: 0.9375rem;
-    }
-
-    /* SUCCESS CARD */
-    .success-card {
-        background: var(--color-white);
-        border-radius: 24px;
-        padding: var(--spacing-xxl);
-        box-shadow: 0 12px 40px rgba(13, 28, 36, 0.1);
-        text-align: center;
-    }
-
-    .success-icon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto var(--spacing-md);
-        background: linear-gradient(135deg, #6C9EA3 0%, #8FB5BA 100%);
-        color: var(--color-white);
-        font-size: 3rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-    }
-
-    .success-card h2 {
-        font-size: 2rem;
-        margin-bottom: var(--spacing-sm);
-        color: var(--color-dark);
-    }
-
-    .success-card p {
-        font-size: 1.125rem;
-        color: var(--color-dark);
-        opacity: 0.8;
-        margin-bottom: var(--spacing-lg);
-    }
-
-    /* RESPONSIVE */
-    @@media (max-width: 768px) {
-        .page-header {
-            padding: var(--spacing-xl) 0 var(--spacing-lg);
-        }
-
-        .contact-card,
-        .success-card {
-            padding: var(--spacing-lg);
-        }
-
-        .form-input,
-        .form-textarea {
-            padding: 0.875rem 1rem;
-        }
-
-        .btn-large {
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-        }
-    }
-</style>
