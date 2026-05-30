@@ -1,85 +1,240 @@
 ﻿@* ====================================
    Título: Home.razor
-   Descrição: Página inicial com hero editorial
-   Autor: Will
-   Empresa: WpDev
-   Data: 09/12/2024
+   Descrição: Página inicial editorial WPDev
+   Refatorada: design editorial, componentes,
+               estilos movidos para Home.razor.css
    ==================================== *@
 
 @page "/"
 @using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Projects
+@using Portfolio.Web.Components
 @inject ProjectService ProjectService
 
 <PageTitle>WPDev - Portfólio</PageTitle>
 
-<!-- HERO SECTION -->
-<section class="hero-section">
+<!-- ================================
+     HERO
+     ================================ -->
+<section class="home-hero">
     <div class="container">
-        <div class="hero-content fade-in">
-            <h1 class="hero-title">
-                Desenvolvendo<br />
-                <span class="text-primary">Soluções Digitais</span><br />
-                com Excelência
-            </h1>
-            <p class="hero-subtitle">
-                Portfólio de projetos com foco em arquitetura limpa,<br />
-                design moderno e experiência excepcional.
-            </p>
-            <div class="hero-cta">
-                <a href="/projects" class="btn btn-primary">Ver Projetos</a>
+        <div class="hero-inner">
+
+            <div class="hero-text">
+                <p class="hero-eyebrow">Desenvolvedor Full Stack</p>
+                <h1 class="hero-title">
+                    Construindo<br />
+                    software que<br />
+                    <span class="hero-title-accent">importa.</span>
+                </h1>
             </div>
+
+            <div class="hero-desc">
+                <p class="hero-subtitle">
+                    Portfólio de projetos com foco em arquitetura limpa,
+                    código de qualidade e experiência de usuário bem pensada.
+                </p>
+                <div class="hero-actions">
+                    <a href="/projects" class="home-btn home-btn--primary">
+                        Ver projetos
+                    </a>
+                    <a href="/contact" class="home-btn home-btn--ghost">
+                        Entrar em contato
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Linha decorativa no rodapé do hero -->
+    <div class="hero-bottom-line">
+        <div class="container">
+            <hr class="hero-divider" />
         </div>
     </div>
 </section>
 
-<!-- PROJETOS EM DESTAQUE -->
-<section class="section featured-projects">
+<!-- ================================
+     PROJETOS EM DESTAQUE
+     ================================ -->
+<section class="home-section">
     <div class="container">
+
         <div class="section-header">
-            <h2>Projetos em Destaque</h2>
-            <p class="section-subtitle">Trabalhos recentes e cases de sucesso</p>
+            <p class="section-eyebrow">Trabalhos recentes</p>
+            <h2 class="section-title">Projetos em destaque</h2>
         </div>
 
         @if (isLoading)
         {
-            <div class="loading-state">
-                <p>Carregando projetos...</p>
+            <div class="featured-grid">
+                <div class="featured-item featured-item--large">
+                    <LoadingSkeleton Lines="1" Height="320px" />
+                    <div style="margin-top:1.5rem">
+                        <LoadingSkeleton Lines="1" Width="60%" Height="28px" />
+                        <LoadingSkeleton Lines="2" />
+                    </div>
+                </div>
+                <div class="featured-stack">
+                    <div class="featured-item">
+                        <LoadingSkeleton Lines="1" Height="180px" />
+                        <div style="margin-top:1rem">
+                            <LoadingSkeleton Lines="1" Width="70%" Height="22px" />
+                            <LoadingSkeleton Lines="1" />
+                        </div>
+                    </div>
+                    <div class="featured-item">
+                        <LoadingSkeleton Lines="1" Height="180px" />
+                        <div style="margin-top:1rem">
+                            <LoadingSkeleton Lines="1" Width="70%" Height="22px" />
+                            <LoadingSkeleton Lines="1" />
+                        </div>
+                    </div>
+                </div>
             </div>
         }
         else if (projects.Any())
         {
-            <div class="projects-grid">
-                @foreach (var project in projects.Take(3))
-                {
-                    <div class="project-card fade-in">
-                        <div class="project-thumbnail">
-                            <img src="@project.ImageUrl" alt="@project.Title" />
+            <div class="featured-grid">
+
+                <!-- Projeto principal: maior -->
+                <a href="/projects/@projects[0].Id" class="featured-item featured-item--large">
+                    <div class="featured-thumb">
+                        @if (!string.IsNullOrEmpty(projects[0].ImageUrl))
+                        {
+                            <img src="@projects[0].ImageUrl" alt="@projects[0].Title" />
+                        }
+                        else
+                        {
+                            <div class="featured-thumb-placeholder"></div>
+                        }
+                    </div>
+                    <div class="featured-info">
+                        <div class="featured-tech-row">
+                            @foreach (var tech in projects[0].Technologies.Take(3))
+                            {
+                                <span class="featured-tech">@tech</span>
+                            }
                         </div>
-                        <div class="project-info">
-                            <h3 class="project-title">@project.Title</h3>
-                            <p class="project-description">@project.ShortDescription</p>
-                            <div class="project-tech">
-                                @foreach (var tech in project.Technologies.Take(3))
+                        <h3 class="featured-title">@projects[0].Title</h3>
+                        <p class="featured-desc">@projects[0].ShortDescription</p>
+                    </div>
+                </a>
+
+                <!-- Projetos secundários: stack vertical -->
+                <div class="featured-stack">
+                    @foreach (var project in projects.Skip(1).Take(2))
+                    {
+                        <a href="/projects/@project.Id" class="featured-item">
+                            <div class="featured-thumb featured-thumb--small">
+                                @if (!string.IsNullOrEmpty(project.ImageUrl))
                                 {
-                                    <span class="tech-tag">@tech</span>
+                                    <img src="@project.ImageUrl" alt="@project.Title" />
+                                }
+                                else
+                                {
+                                    <div class="featured-thumb-placeholder"></div>
                                 }
                             </div>
-                        </div>
-                    </div>
-                }
+                            <div class="featured-info">
+                                <div class="featured-tech-row">
+                                    @foreach (var tech in project.Technologies.Take(2))
+                                    {
+                                        <span class="featured-tech">@tech</span>
+                                    }
+                                </div>
+                                <h3 class="featured-title featured-title--small">@project.Title</h3>
+                                <p class="featured-desc featured-desc--small">@project.ShortDescription</p>
+                            </div>
+                        </a>
+                    }
+                </div>
+
             </div>
-            
+
             <div class="section-cta">
-                <a href="/projects" class="btn btn-primary">Ver Todos os Projetos</a>
+                <a href="/projects" class="home-btn home-btn--ghost">
+                    Ver todos os projetos →
+                </a>
             </div>
         }
         else
         {
-            <div class="empty-state">
-                <p>Nenhum projeto cadastrado ainda.</p>
+            <div class="home-empty">
+                <p>Nenhum projeto em destaque ainda.</p>
             </div>
         }
+
+    </div>
+</section>
+
+<!-- ================================
+     SKILLS / TECNOLOGIAS
+     ================================ -->
+<section class="home-section home-section--dark">
+    <div class="container">
+
+        <div class="section-header section-header--light">
+            <p class="section-eyebrow section-eyebrow--light">Stack técnico</p>
+            <h2 class="section-title section-title--light">Tecnologias que uso</h2>
+        </div>
+
+        <div class="skills-grid">
+
+            <div class="skill-group">
+                <p class="skill-group-label">Backend</p>
+                <ul class="skill-list">
+                    <li>.NET 8 / ASP.NET Core</li>
+                    <li>C# / Clean Architecture</li>
+                    <li>Entity Framework Core</li>
+                    <li>PostgreSQL / SQL Server</li>
+                    <li>CQRS / MediatR</li>
+                </ul>
+            </div>
+
+            <div class="skill-group">
+                <p class="skill-group-label">Frontend</p>
+                <ul class="skill-list">
+                    <li>Blazor WebAssembly</li>
+                    <li>React / TypeScript</li>
+                    <li>Angular</li>
+                    <li>HTML / CSS / JavaScript</li>
+                    <li>Tailwind CSS</li>
+                </ul>
+            </div>
+
+            <div class="skill-group">
+                <p class="skill-group-label">Infraestrutura</p>
+                <ul class="skill-list">
+                    <li>Docker / Docker Compose</li>
+                    <li>GitHub Actions / CI-CD</li>
+                    <li>Azure / Render</li>
+                    <li>Git / GitFlow</li>
+                    <li>Testes unitários e integração</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================================
+     CTA CONTATO
+     ================================ -->
+<section class="home-cta">
+    <div class="container">
+        <div class="cta-inner">
+            <p class="cta-eyebrow">Disponível para projetos</p>
+            <h2 class="cta-title">Tem um projeto em mente?</h2>
+            <p class="cta-text">
+                Estou aberto a conversas sobre oportunidades, freelas e parcerias.
+            </p>
+            <a href="/contact" class="home-btn home-btn--primary">
+                Entrar em contato
+            </a>
+        </div>
     </div>
 </section>
 
@@ -99,159 +254,3 @@
         isLoading = false;
     }
 }
-
-<style>
-    /* ====================================
-       HOME PAGE STYLES
-       ==================================== */
-
-    /* HERO SECTION */
-    .hero-section {
-        min-height: 85vh;
-        display: flex;
-        align-items: center;
-        padding: var(--spacing-xxl) 0;
-        background: linear-gradient(135deg, #F4F7F7 0%, #ffffff 100%);
-    }
-
-    .hero-content {
-        max-width: 900px;
-    }
-
-    .hero-title {
-        font-size: clamp(3rem, 6vw, 5.5rem);
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: var(--spacing-md);
-        letter-spacing: -0.03em;
-    }
-
-    .hero-subtitle {
-        font-size: clamp(1.125rem, 2vw, 1.375rem);
-        color: var(--color-dark);
-        opacity: 0.8;
-        margin-bottom: var(--spacing-lg);
-        line-height: 1.7;
-    }
-
-    .hero-cta {
-        margin-top: var(--spacing-lg);
-    }
-
-    /* FEATURED PROJECTS */
-    .featured-projects {
-        padding: var(--spacing-xxl) 0;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .section-subtitle {
-        font-size: 1.125rem;
-        color: var(--color-dark);
-        opacity: 0.7;
-        margin-top: var(--spacing-sm);
-    }
-
-    .projects-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: var(--spacing-lg);
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .project-card {
-        background: var(--color-white);
-        border-radius: 12px;
-        overflow: hidden;
-        transition: var(--transition-smooth);
-        cursor: pointer;
-    }
-
-    .project-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(13, 28, 36, 0.12);
-    }
-
-    .project-thumbnail {
-        width: 100%;
-        height: 300px;
-        overflow: hidden;
-        background: var(--color-light);
-    }
-
-    .project-thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: var(--transition-smooth);
-    }
-
-    .project-card:hover .project-thumbnail img {
-        transform: scale(1.05);
-    }
-
-    .project-info {
-        padding: var(--spacing-md);
-    }
-
-    .project-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: var(--spacing-sm);
-        color: var(--color-dark);
-    }
-
-    .project-description {
-        font-size: 1rem;
-        color: var(--color-dark);
-        opacity: 0.8;
-        margin-bottom: var(--spacing-md);
-        line-height: 1.6;
-    }
-
-    .project-tech {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .tech-tag {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        background: var(--color-light);
-        color: var(--color-primary);
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-radius: 20px;
-    }
-
-    .section-cta {
-        text-align: center;
-        margin-top: var(--spacing-xl);
-    }
-
-    /* LOADING & EMPTY STATES */
-    .loading-state,
-    .empty-state {
-        text-align: center;
-        padding: var(--spacing-xl);
-        color: var(--color-dark);
-        opacity: 0.7;
-    }
-
-    /* RESPONSIVE */
-    @@media (max-width: 768px) {
-        .hero-section {
-            min-height: 70vh;
-            padding: var(--spacing-xl) 0;
-        }
-
-        .projects-grid {
-            grid-template-columns: 1fr;
-            gap: var(--spacing-md);
-        }
-    }
-</style>

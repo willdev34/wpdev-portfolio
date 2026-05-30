@@ -1,0 +1,460 @@
+/* ====================================
+   Home.razor.css
+   Estilos da página inicial WPDev
+   ==================================== */
+
+/* ================================
+   HERO
+   ================================ */
+
+.home-hero {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--color-light);
+    padding: 6rem 0 0;
+}
+
+.hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: end;
+    padding-bottom: 4rem;
+}
+
+.hero-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0 0 1.5rem;
+}
+
+.hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(3.5rem, 7vw, 6.5rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    color: var(--color-dark);
+    margin: 0;
+}
+
+.hero-title-accent {
+    color: var(--color-primary);
+}
+
+.hero-desc {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.8;
+    color: var(--color-dark);
+    opacity: 0.65;
+    margin: 0 0 2.5rem;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-bottom-line {
+    margin-top: auto;
+}
+
+.hero-divider {
+    border: none;
+    border-top: 1px solid rgba(13, 28, 36, 0.1);
+    margin: 0;
+}
+
+/* ================================
+   BOTÕES
+   ================================ */
+
+.home-btn {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.875rem 1.75rem;
+    border-radius: 4px;
+    letter-spacing: -0.01em;
+    transition: background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+}
+
+.home-btn--primary {
+    background-color: var(--color-dark);
+    color: #F4F7F7;
+}
+
+.home-btn--primary:hover {
+    background-color: var(--color-primary);
+    color: #F4F7F7;
+    transform: translateY(-1px);
+}
+
+.home-btn--ghost {
+    background-color: transparent;
+    color: var(--color-dark);
+    border: 1.5px solid rgba(13, 28, 36, 0.25);
+}
+
+.home-btn--ghost:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* ================================
+   SEÇÕES GERAIS
+   ================================ */
+
+.home-section {
+    padding: 5rem 0 6rem;
+    background-color: var(--color-white);
+}
+
+.home-section--dark {
+    background-color: var(--color-dark);
+}
+
+.section-header {
+    margin-bottom: 3rem;
+}
+
+.section-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0 0 0.75rem;
+}
+
+.section-eyebrow--light {
+    color: rgba(108, 158, 163, 0.8);
+}
+
+.section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-dark);
+    margin: 0;
+    line-height: 1.1;
+}
+
+.section-title--light {
+    color: #F4F7F7;
+}
+
+.section-cta {
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(13, 28, 36, 0.08);
+}
+
+.home-empty {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: var(--color-dark);
+    opacity: 0.5;
+    padding: 4rem 0;
+}
+
+/* ================================
+   PROJETOS EM DESTAQUE
+   ================================ */
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.featured-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Item de projeto */
+.featured-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.featured-item:hover {
+    opacity: 0.85;
+}
+
+.featured-item:hover .featured-thumb img {
+    transform: scale(1.03);
+}
+
+/* Thumbnail */
+.featured-thumb {
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    background-color: var(--color-light);
+    border-radius: 4px;
+    margin-bottom: 1.25rem;
+}
+
+.featured-thumb--small {
+    height: 180px;
+}
+
+.featured-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    display: block;
+}
+
+.featured-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(108, 158, 163, 0.15) 0%,
+        rgba(108, 158, 163, 0.05) 100%
+    );
+}
+
+/* Info do projeto */
+.featured-info {
+    padding: 0;
+}
+
+.featured-tech-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.625rem;
+}
+
+.featured-tech {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+}
+
+.featured-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+}
+
+.featured-title--small {
+    font-size: 1.125rem;
+}
+
+.featured-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-dark);
+    opacity: 0.6;
+    margin: 0;
+}
+
+.featured-desc--small {
+    font-size: 0.875rem;
+}
+
+/* ================================
+   SKILLS
+   ================================ */
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+}
+
+.skill-group-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0 0 1.25rem;
+}
+
+.skill-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.skill-list li {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    color: rgba(244, 247, 247, 0.7);
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.4;
+}
+
+.skill-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 4px;
+    height: 4px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+}
+
+/* ================================
+   CTA CONTATO
+   ================================ */
+
+.home-cta {
+    padding: 6rem 0;
+    background-color: var(--color-light);
+    border-top: 1px solid rgba(13, 28, 36, 0.08);
+}
+
+.cta-inner {
+    max-width: 560px;
+}
+
+.cta-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0 0 1rem;
+}
+
+.cta-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-dark);
+    margin: 0 0 1rem;
+    line-height: 1.1;
+}
+
+.cta-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-dark);
+    opacity: 0.65;
+    margin: 0 0 2rem;
+}
+
+/* ================================
+   RESPONSIVIDADE
+   ================================ */
+
+@media (max-width: 1024px) {
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.5rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .featured-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .featured-thumb {
+        height: 240px;
+    }
+
+    .featured-thumb--small {
+        height: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-hero {
+        min-height: auto;
+        padding: 4rem 0 0;
+    }
+
+    .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding-bottom: 3rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+
+    .home-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .skills-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .home-section {
+        padding: 3.5rem 0 4rem;
+    }
+
+    .home-cta {
+        padding: 4rem 0;
+    }
+}
+
+/* ================================
+   ACESSIBILIDADE
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .home-btn,
+    .featured-item,
+    .featured-thumb img {
+        transition: none !important;
+    }
+}
