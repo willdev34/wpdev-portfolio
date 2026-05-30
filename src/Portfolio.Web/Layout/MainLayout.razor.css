@@ -3,19 +3,11 @@
    Estilos do layout principal WPDev
    ==================================== */
 
-/* ================================
-   LAYOUT GERAL
-   ================================ */
-
 .wpdev-layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
-
-/* ================================
-   HEADER
-   ================================ */
 
 .wpdev-header {
     position: sticky;
@@ -39,10 +31,6 @@
     width: 100%;
 }
 
-/* ================================
-   BRAND / LOGO
-   ================================ */
-
 .brand-link {
     font-family: 'Poppins', sans-serif;
     font-size: 1.375rem;
@@ -61,11 +49,6 @@
 .brand-dev {
     color: #0D1C24;
 }
-
-/* ================================
-   MENU DESKTOP
-   Visível apenas em telas >= 769px
-   ================================ */
 
 .nav-menu-desktop {
     display: flex;
@@ -88,7 +71,6 @@
     transition: color 0.2s ease;
 }
 
-/* Underline animado no hover */
 .nav-link::after {
     content: '';
     position: absolute;
@@ -108,13 +90,8 @@
     width: 100%;
 }
 
-/* ================================
-   BOTÃO HAMBURGUER
-   Visível apenas no mobile
-   ================================ */
-
 .nav-toggle {
-    display: none; /* esconde no desktop */
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -127,7 +104,6 @@
     padding: 10px;
     border-radius: 8px;
     transition: background 0.2s ease;
-    /* z-index alto para ficar sobre o overlay quando aberto */
     position: relative;
     z-index: 10000;
 }
@@ -136,19 +112,16 @@
     background: rgba(108, 158, 163, 0.1);
 }
 
-/* As 3 linhas do hamburguer */
 .hb-line {
     display: block;
     width: 22px;
     height: 2px;
     background-color: #0D1C24;
     border-radius: 2px;
-    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.2s ease;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     transform-origin: center;
 }
 
-/* Animação hamburguer -> X */
 .hb-line--top.open {
     transform: translateY(7px) rotate(45deg);
 }
@@ -161,11 +134,6 @@
 .hb-line--bot.open {
     transform: translateY(-7px) rotate(-45deg);
 }
-
-/* ================================
-   OVERLAY MOBILE
-   Fundo escuro ao abrir o menu
-   ================================ */
 
 .mobile-overlay {
     position: fixed;
@@ -184,11 +152,6 @@
     visibility: visible;
 }
 
-/* ================================
-   PAINEL MOBILE
-   Slide-in da direita
-   ================================ */
-
 .mobile-menu {
     position: fixed;
     top: 0;
@@ -196,10 +159,9 @@
     width: 300px;
     max-width: 88vw;
     height: 100vh;
-    height: 100dvh; /* dynamic viewport para mobile */
+    height: 100dvh;
     background-color: #F4F7F7;
     z-index: 9999;
-    /* começa fora da tela (direita) */
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
@@ -209,12 +171,10 @@
     overflow-x: hidden;
 }
 
-/* Quando aberto: desliza para dentro */
 .mobile-menu--open {
     transform: translateX(0);
 }
 
-/* Cabeçalho do painel mobile */
 .mobile-menu-header {
     display: flex;
     align-items: center;
@@ -244,33 +204,28 @@
     color: #6C9EA3;
 }
 
-/* Área de navegação */
 .mobile-nav {
     flex: 1;
     padding: 1rem 0;
 }
 
-/* Lista sem bullets */
 .mobile-nav-list {
     list-style: none !important;
     margin: 0;
     padding: 0;
 }
 
-/* Cada item começa "fora" e anima para dentro */
 .mobile-nav-item {
     opacity: 0;
     transform: translateX(16px);
     transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-/* Quando menu está aberto: anima os itens com stagger */
 .mobile-menu--open .mobile-nav-item {
     opacity: 1;
     transform: translateX(0);
 }
 
-/* Delays em cascata (stagger) */
 .mobile-menu--open .mobile-nav-item:nth-child(1) { transition-delay: 0.06s; }
 .mobile-menu--open .mobile-nav-item:nth-child(2) { transition-delay: 0.11s; }
 .mobile-menu--open .mobile-nav-item:nth-child(3) { transition-delay: 0.16s; }
@@ -278,7 +233,6 @@
 .mobile-menu--open .mobile-nav-item:nth-child(5) { transition-delay: 0.26s; }
 .mobile-menu--open .mobile-nav-item:nth-child(6) { transition-delay: 0.31s; }
 
-/* Link de cada item */
 .mobile-nav-link {
     display: block;
     font-family: 'Poppins', sans-serif;
@@ -298,7 +252,6 @@
     padding-left: 2rem;
 }
 
-/* Rodapé do painel */
 .mobile-menu-footer {
     padding: 1.25rem 1.5rem;
     border-top: 1px solid rgba(13, 28, 36, 0.08);
@@ -312,19 +265,9 @@
     margin: 0;
 }
 
-/* ================================
-   CONTEÚDO PRINCIPAL
-   ================================ */
-
 .wpdev-main {
     flex: 1;
-    /* compensa o header sticky de 64px */
-    /* (o sticky já não tira do fluxo, mas fica sobre o conteúdo) */
 }
-
-/* ================================
-   ERROR BOUNDARY
-   ================================ */
 
 .error-container {
     padding: 4rem 2rem;
@@ -350,10 +293,6 @@
     max-width: 400px;
 }
 
-/* ================================
-   FOOTER
-   ================================ */
-
 .wpdev-footer {
     background-color: #0D1C24;
     color: #F4F7F7;
@@ -376,6 +315,14 @@
     letter-spacing: -0.02em;
 }
 
+.footer-brand .brand-wp {
+    color: #6C9EA3;
+}
+
+.footer-brand .brand-dev {
+    color: #F4F7F7;
+}
+
 .footer-tagline {
     font-family: 'Inter', sans-serif;
     font-size: 0.8125rem;
@@ -390,48 +337,28 @@
     margin: 0;
 }
 
-/* ================================
-   RESPONSIVIDADE
-   ================================ */
-
-/* MOBILE: <= 768px */
 @media (max-width: 768px) {
-
-    /* Mostra o hamburguer */
     .nav-toggle {
         display: flex !important;
     }
 
-    /* Esconde o menu desktop */
     .nav-menu-desktop {
         display: none !important;
     }
-
 }
 
-/* DESKTOP: >= 769px */
 @media (min-width: 769px) {
-
-    /* Esconde completamente o painel mobile e overlay no desktop */
     .mobile-menu,
     .mobile-overlay {
         display: none !important;
     }
 
-    /* Garante que o hamburguer não apareça */
     .nav-toggle {
         display: none !important;
     }
-
 }
 
-/* ================================
-   ACESSIBILIDADE
-   Respeita preferência de sem animação
-   ================================ */
-
 @media (prefers-reduced-motion: reduce) {
-
     .mobile-menu,
     .mobile-overlay,
     .hb-line,
@@ -441,5 +368,4 @@
         transition: none !important;
         animation: none !important;
     }
-
 }

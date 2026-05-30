@@ -1,9 +1,6 @@
 // ====================================
 // Título: NowSectionsController.cs
 // Descrição: Controller REST API para gerenciar a seção "O que estou fazendo agora"
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

@@ -1,9 +1,12 @@
 // ====================================
 // Título: NowService.cs
 // Descrição: Serviço para consumir endpoints da seção Now da API
+// Fix produção: usa NowJsonContext (Source Generators) 
+//              ao invés de reflection
 // ====================================
 
 using Portfolio.Web.DTOs.Now;
+using Portfolio.Web.Json;
 using System.Net;
 using System.Text.Json;
 
@@ -18,83 +21,80 @@ public class NowService
         _httpClient = httpClient;
     }
 
-    // Buscar o conteúdo atual da seção Now
-    // É um único registro, então retornamos direto o objeto
+    // Busca o conteúdo atual da seção Now
+    // Endpoint retorna um único objeto (não lista)
     public async Task<NowSectionDto?> GetCurrentAsync()
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/now");
+            var response = await _httpClient.GetAsync("api/nowsection");
 
-            // 404 aqui pode significar que ainda não tem conteúdo cadastrado, tudo bem
+            // 404 significa que ainda não tem conteúdo cadastrado
             if (response.StatusCode == HttpStatusCode.NotFound)
                 return null;
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[NowService] GetCurrentAsync falhou. Status: {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[NowService] GetCurrentAsync falhou. Status: {(int)response.StatusCode}");
                 return null;
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<NowSectionDto>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+
+            // Source Generator - funciona em produção (sem reflection)
+            return JsonSerializer.Deserialize(json, NowJsonContext.Default.NowSectionDto);
         }
         catch (HttpRequestException ex)
         {
-            Console.WriteLine($"[NowService] GetCurrentAsync - Erro de rede: {ex.Message}");
+            Console.WriteLine($"[NowService] Erro de rede: {ex.Message}");
             return null;
         }
         catch (JsonException ex)
         {
-            Console.WriteLine($"[NowService] GetCurrentAsync - Erro ao desserializar JSON: {ex.Message}");
+            Console.WriteLine($"[NowService] Erro ao desserializar JSON: {ex.Message}");
             return null;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[NowService] GetCurrentAsync - Erro inesperado: {ex.Message}");
+            Console.WriteLine($"[NowService] Erro inesperado: {ex.Message}");
             return null;
         }
     }
 
-    // Buscar por ID caso precise acessar versões específicas
+    // Busca por ID para versões específicas
     public async Task<NowSectionDto?> GetByIdAsync(Guid id)
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/now/{id}");
+            var response = await _httpClient.GetAsync($"api/nowsections/{id}");
 
-            // 404 é caso esperado, não é bug
             if (response.StatusCode == HttpStatusCode.NotFound)
                 return null;
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[NowService] GetByIdAsync({id}) falhou. Status: {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[NowService] GetByIdAsync({id}) falhou. Status: {(int)response.StatusCode}");
                 return null;
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<NowSectionDto>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+
+            // Source Generator - funciona em produção (sem reflection)
+            return JsonSerializer.Deserialize(json, NowJsonContext.Default.NowSectionDto);
         }
         catch (HttpRequestException ex)
         {
-            Console.WriteLine($"[NowService] GetByIdAsync({id}) - Erro de rede: {ex.Message}");
+            Console.WriteLine($"[NowService] GetByIdAsync - Erro de rede: {ex.Message}");
             return null;
         }
         catch (JsonException ex)
         {
-            Console.WriteLine($"[NowService] GetByIdAsync({id}) - Erro ao desserializar JSON: {ex.Message}");
+            Console.WriteLine($"[NowService] GetByIdAsync - Erro ao desserializar JSON: {ex.Message}");
             return null;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[NowService] GetByIdAsync({id}) - Erro inesperado: {ex.Message}");
+            Console.WriteLine($"[NowService] GetByIdAsync - Erro inesperado: {ex.Message}");
             return null;
         }
     }

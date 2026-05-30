@@ -143,18 +143,19 @@ public class PortfolioDbContext : DbContext
             entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
             entity.Property(e => e.CurrentProject).HasMaxLength(200);
             entity.Property(e => e.CurrentProjectUrl).HasMaxLength(500);
-            
-            // Converter listas para JSON
+
+            // Usar JSON para serializar/deserializar as listas
+            // Compatível com o formato salvo no banco
             entity.Property(e => e.CurrentlyLearning)
                 .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
                 );
-            
+
             entity.Property(e => e.CurrentGoals)
                 .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
                 );
 
             entity.HasIndex(e => e.IsActive);
