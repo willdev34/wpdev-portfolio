@@ -43,6 +43,8 @@
     
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.6s ease;
+    --color-neutral: #A3A9AB;
 }
 
 html, body {
@@ -57,6 +59,22 @@ html, body {
 }
 
 /* ====================================
+   1B. NOISE TEXTURE
+   Overlay 3% — remove visual de template grátis
+   ==================================== */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9998;
+}
+
+/* ====================================
    2. TYPOGRAPHY
    ==================================== */
 h1, h2, h3, h4, h5, h6 {
@@ -65,21 +83,25 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
     margin-bottom: var(--spacing-md);
 }
-
 h1 {
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     font-weight: 800;
     letter-spacing: -0.02em;
+    line-height: 0.95;
 }
 
 h2 {
     font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.0;
 }
 
 h3 {
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
 }
 
 p {
@@ -254,6 +276,81 @@ article:focus {
     outline: none;
     border: none;
     box-shadow: none;
+}
+
+/* ====================================
+   8B. TEAL ACCENT — Utilitários Fase 1
+   ==================================== */
+
+/* Botão outline WPDev */
+.btn-outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    padding: 0.875rem 2rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: inline-block;
+}
+
+.btn-outline:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    transform: translateY(-2px);
+}
+
+/* Linha decorativa teal acima de seções */
+.accent-line::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background-color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+    border-radius: 2px;
+}
+
+/* Texto em teal */
+.text-accent {
+    color: var(--color-primary);
+}
+
+/* Tag / badge — tech stack e categorias */
+.tag-teal {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    color: var(--color-primary);
+    background-color: rgba(108, 158, 163, 0.1);
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* Focus global com teal (inputs fora do Contact) */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 2px 0 0 rgba(108, 158, 163, 0.3) !important;
+}
+
+/* Acessibilidade: respeitar prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+    body::before {
+        display: none;
+    }
 }
 
 /* ================================

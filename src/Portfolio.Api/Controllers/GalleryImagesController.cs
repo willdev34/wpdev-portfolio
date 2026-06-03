@@ -1,9 +1,6 @@
 // ====================================
 // Título: GalleryImagesController.cs
 // Descrição: Controller REST API para gerenciar imagens da galeria
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

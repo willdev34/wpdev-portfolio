@@ -1,9 +1,6 @@
 // ====================================
 // Título: GalleryImageDto.cs
 // Descrição: DTO para imagens da galeria
-// Autor: Will
-// Empresa: WpDev
-// Data: 09/12/2024
 // ====================================
 
 namespace Portfolio.Web.DTOs.Gallery;
