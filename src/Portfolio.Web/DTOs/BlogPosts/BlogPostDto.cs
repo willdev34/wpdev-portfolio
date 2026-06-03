@@ -1,9 +1,6 @@
 // ====================================
 // Título: BlogPostDto.cs
 // Descrição: DTO completo de post do blog
-// Autor: Will
-// Empresa: WpDev
-// Data: 09/12/2024
 // ====================================
 
 namespace Portfolio.Web.DTOs.BlogPosts;
