@@ -1,6 +1,7 @@
 /* ====================================
    Home.razor.css
    Estilos da página inicial WPDev
+   Fase 2: Hero escuro com profundidade
    ==================================== */
 
 /* ================================
@@ -12,8 +13,32 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background-color: var(--color-light);
+    background-color: var(--color-dark);
+    background-image:
+        radial-gradient(ellipse 70% 80% at 85% 20%, rgba(108, 158, 163, 0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 5% 90%, rgba(108, 158, 163, 0.05) 0%, transparent 50%);
     padding: 6rem 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Noise texture específica para o fundo escuro */
+.home-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Conteúdo acima do overlay de noise */
+.home-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 .hero-inner {
@@ -32,6 +57,20 @@
     text-transform: uppercase;
     color: var(--color-primary);
     margin: 0 0 1.5rem;
+    padding-top: 1.25rem;
+    position: relative;
+}
+
+/* Linha teal decorativa acima do eyebrow */
+.hero-eyebrow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 2px;
+    background-color: var(--color-primary);
+    border-radius: 1px;
 }
 
 .hero-title {
@@ -40,7 +79,7 @@
     font-weight: 800;
     line-height: 1.02;
     letter-spacing: -0.04em;
-    color: var(--color-dark);
+    color: #F4F7F7;
     margin: 0;
 }
 
@@ -59,8 +98,7 @@
     font-family: 'Inter', sans-serif;
     font-size: clamp(1rem, 1.5vw, 1.125rem);
     line-height: 1.8;
-    color: var(--color-dark);
-    opacity: 0.65;
+    color: rgba(244, 247, 247, 0.65);
     margin: 0 0 2.5rem;
 }
 
@@ -76,7 +114,7 @@
 
 .hero-divider {
     border: none;
-    border-top: 1px solid rgba(13, 28, 36, 0.1);
+    border-top: 1px solid rgba(244, 247, 247, 0.08);
     margin: 0;
 }
 
@@ -96,12 +134,15 @@
     letter-spacing: -0.01em;
     transition: background-color 0.2s ease,
                 color 0.2s ease,
+                border-color 0.2s ease,
                 transform 0.2s ease;
 }
 
+/* Padrão: contexto claro (CTA section) */
 .home-btn--primary {
     background-color: var(--color-dark);
     color: #F4F7F7;
+    border: 1.5px solid transparent;
 }
 
 .home-btn--primary:hover {
@@ -122,13 +163,37 @@
     transform: translateY(-1px);
 }
 
+/* Override: botões dentro do hero escuro */
+.home-hero .home-btn--primary {
+    background-color: var(--color-primary);
+    color: #F4F7F7;
+    border-color: transparent;
+}
+
+.home-hero .home-btn--primary:hover {
+    background-color: #5a8a8f;
+    color: #F4F7F7;
+    transform: translateY(-1px);
+}
+
+.home-hero .home-btn--ghost {
+    color: rgba(244, 247, 247, 0.75);
+    border-color: rgba(244, 247, 247, 0.18);
+}
+
+.home-hero .home-btn--ghost:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
 /* ================================
    SEÇÕES GERAIS
    ================================ */
 
 .home-section {
     padding: 5rem 0 6rem;
-    background-color: var(--color-white);
+    background-color: var(--color-light);
 }
 
 .home-section--dark {
@@ -198,7 +263,6 @@
     gap: 2rem;
 }
 
-/* Item de projeto */
 .featured-item {
     display: block;
     text-decoration: none;
@@ -215,7 +279,6 @@
     transform: scale(1.03);
 }
 
-/* Thumbnail */
 .featured-thumb {
     width: 100%;
     height: 320px;
@@ -247,7 +310,6 @@
     );
 }
 
-/* Info do projeto */
 .featured-info {
     padding: 0;
 }
