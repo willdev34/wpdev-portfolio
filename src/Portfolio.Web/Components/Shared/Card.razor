@@ -20,17 +20,22 @@
     @if (!string.IsNullOrEmpty(ImageUrl))
     {
         <div class="card__image">
-            @* 
-                Imagem responsiva com lazy loading
-                - loading="lazy": carrega apenas quando próxima ao viewport (economiza banda)
-                - alt: texto alternativo para acessibilidade e SEO
-            *@
             <img src="@ImageUrl" alt="@ImageAlt" loading="lazy" />
-            
-            @* 
-                Badge opcional sobre a imagem
-                Exemplos de uso: "Novo", "Destaque", "Em breve"
-            *@
+            @if (!string.IsNullOrEmpty(Badge))
+            {
+                <span class="card__badge">@Badge</span>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card__image card__image--placeholder">
+            <div class="card__placeholder-content">
+                @if (!string.IsNullOrEmpty(Title))
+                {
+                    <span class="card__placeholder-initial">@Title[0]</span>
+                }
+            </div>
             @if (!string.IsNullOrEmpty(Badge))
             {
                 <span class="card__badge">@Badge</span>
