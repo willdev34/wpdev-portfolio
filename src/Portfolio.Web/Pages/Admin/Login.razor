@@ -1,0 +1,110 @@
+@* ====================================
+   Título: Login.razor
+   Descrição: Página de login da área administrativa
+   ==================================== *@
+
+@page "/admin/login"
+@layout Portfolio.Web.Layout.AdminLoginLayout
+@using Portfolio.Web.Auth
+@using Portfolio.Web.DTOs.Auth
+@inject AuthService AuthService
+@inject JwtAuthStateProvider AuthProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Admin - WPDev</PageTitle>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-brand">
+            <span class="brand-text">WP<span class="brand-accent">Dev</span></span>
+            <span class="brand-label">Painel Administrativo</span>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="login-error">
+                @_errorMessage
+            </div>
+        }
+
+        <div class="login-form">
+            <div class="field">
+                <label class="field__label">Email</label>
+                <input class="field__input"
+                       type="email"
+                       placeholder="admin@wpdev.com"
+                       @bind="_email"
+                       @onkeydown="HandleKeyDown" />
+            </div>
+
+            <div class="field">
+                <label class="field__label">Senha</label>
+                <input class="field__input"
+                       type="password"
+                       placeholder="••••••••"
+                       @bind="_password"
+                       @onkeydown="HandleKeyDown" />
+            </div>
+
+            <button class="login-btn" @onclick="HandleLogin" disabled="@_isLoading">
+                @if (_isLoading)
+                {
+                    <span>Entrando...</span>
+                }
+                else
+                {
+                    <span>Entrar</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _errorMessage = string.Empty;
+    private bool _isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Se já estiver autenticado, redireciona para o dashboard
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo("/admin");
+    }
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrWhiteSpace(_email) || string.IsNullOrWhiteSpace(_password))
+        {
+            _errorMessage = "Preencha email e senha.";
+            return;
+        }
+
+        _isLoading = true;
+        _errorMessage = string.Empty;
+
+        var result = await AuthService.LoginAsync(new LoginRequestDto
+        {
+            Email = _email,
+            Password = _password
+        });
+
+        if (result is null)
+        {
+            _errorMessage = "Email ou senha incorretos.";
+            _isLoading = false;
+            return;
+        }
+
+        await AuthProvider.SaveTokenAsync(result.Token);
+        Navigation.NavigateTo("/admin");
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await HandleLogin();
+    }
+}

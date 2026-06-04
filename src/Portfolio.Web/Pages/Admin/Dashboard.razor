@@ -1,0 +1,115 @@
+@* ====================================
+   Título: Dashboard.razor
+   Descrição: Painel principal da área administrativa
+   ==================================== *@
+
+@page "/admin"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<PageTitle>Dashboard - WPDev Admin</PageTitle>
+
+<div class="dashboard">
+    <div class="dashboard__header">
+        <h1 class="dashboard__title">Dashboard</h1>
+        <p class="dashboard__subtitle">Bem-vindo ao painel WPDev.</p>
+    </div>
+
+    <div class="dashboard__grid">
+        <a class="dash-card" href="/admin/projects">
+            <span class="dash-card__icon">◈</span>
+            <span class="dash-card__label">Projetos</span>
+            <span class="dash-card__arrow">→</span>
+        </a>
+
+        <a class="dash-card" href="/admin/blog">
+            <span class="dash-card__icon">✦</span>
+            <span class="dash-card__label">Blog</span>
+            <span class="dash-card__arrow">→</span>
+        </a>
+
+        <a class="dash-card" href="/admin/timeline">
+            <span class="dash-card__icon">◎</span>
+            <span class="dash-card__label">Timeline</span>
+            <span class="dash-card__arrow">→</span>
+        </a>
+
+        <a class="dash-card" href="/admin/now">
+            <span class="dash-card__icon">◉</span>
+            <span class="dash-card__label">Now</span>
+            <span class="dash-card__arrow">→</span>
+        </a>
+
+        <a class="dash-card" href="/admin/messages">
+            <span class="dash-card__icon">◻</span>
+            <span class="dash-card__label">Mensagens</span>
+            <span class="dash-card__arrow">→</span>
+        </a>
+    </div>
+</div>
+
+<style>
+    .dashboard {
+        padding: 0;
+    }
+
+    .dashboard__header {
+        margin-bottom: 40px;
+    }
+
+    .dashboard__title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0D1C24;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+    }
+
+    .dashboard__subtitle {
+        color: #A3A9AB;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .dashboard__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .dash-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 24px;
+        background-color: #fff;
+        border: 1px solid #e8ecec;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #0D1C24;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.15s ease;
+    }
+
+    .dash-card:hover {
+        border-color: #6C9EA3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(108,158,163,0.15);
+    }
+
+    .dash-card__icon {
+        font-size: 1.1rem;
+        color: #6C9EA3;
+    }
+
+    .dash-card__label {
+        flex: 1;
+    }
+
+    .dash-card__arrow {
+        color: #A3A9AB;
+        font-size: 0.9rem;
+    }
+</style>

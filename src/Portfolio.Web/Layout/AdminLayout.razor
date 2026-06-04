@@ -1,0 +1,70 @@
+@* ====================================
+   Título: AdminLayout.razor
+   Descrição: Layout da área administrativa
+   ==================================== *@
+
+@inherits LayoutComponentBase
+@using Portfolio.Web.Auth
+@inject JwtAuthStateProvider AuthProvider
+@inject NavigationManager Navigation
+
+<div class="admin-shell">
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <span class="brand-text">WP<span class="brand-accent">Dev</span></span>
+            <span class="brand-label">Admin</span>
+        </div>
+
+        <nav class="admin-nav">
+            <a class="admin-nav__item" href="/admin">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+            <a class="admin-nav__item" href="/admin/projects">
+                <span class="nav-icon">◈</span>
+                Projetos
+            </a>
+            <a class="admin-nav__item" href="/admin/blog">
+                <span class="nav-icon">✦</span>
+                Blog
+            </a>
+            <a class="admin-nav__item" href="/admin/timeline">
+                <span class="nav-icon">◎</span>
+                Timeline
+            </a>
+            <a class="admin-nav__item" href="/admin/now">
+                <span class="nav-icon">◉</span>
+                Now
+            </a>
+            <a class="admin-nav__item" href="/admin/messages">
+                <span class="nav-icon">◻</span>
+                Mensagens
+            </a>
+        </nav>
+
+        <div class="admin-sidebar__footer">
+            <a class="admin-nav__item" href="/" target="_blank">
+                <span class="nav-icon">↗</span>
+                Ver site
+            </a>
+            <button class="admin-logout" @onclick="Logout">
+                <span class="nav-icon">⏻</span>
+                Sair
+            </button>
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <div class="admin-content">
+            @Body
+        </div>
+    </main>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthProvider.RemoveTokenAsync();
+        Navigation.NavigateTo("/admin/login");
+    }
+}
