@@ -1,35 +1,75 @@
 // ====================================
 // Título: Program.cs - API Entry Point
 // Descrição: Ponto de entrada da API, configura serviços e middleware
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
-using Microsoft.EntityFrameworkCore;
-using Portfolio.Infrastructure.Data;
+using System.Text;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Portfolio.Application.Interfaces;
+using Portfolio.Infrastructure.Data;
+using Portfolio.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ====================================
 // CONFIGURAÇÃO DO BANCO DE DADOS
 // ====================================
-// Registra o DbContext e configura a conexão com PostgreSQL
-// A connection string vem do appsettings.json
 builder.Services.AddDbContext<PortfolioDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ====================================
-// CONFIGURAÇÃO DO AUTOMAPPER
+// CONFIGURAÇÃO DO IDENTITY
 // ====================================
-// Registra todos os Profiles da camada Application
-// Isso permite converter automaticamente Entity ↔ DTO
-builder.Services.AddAutoMapper(config =>
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-    config.AddProfile<Portfolio.Application.Mappings.ProjectMappingProfile>();
-    config.AddProfile<Portfolio.Application.Mappings.BlogPostMappingProfile>();
+    // Requisitos de senha
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+
+    // Lockout após 5 tentativas erradas
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+
+    // Email único
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<PortfolioDbContext>()
+.AddDefaultTokenProviders();
+
+// ====================================
+// CONFIGURAÇÃO DO JWT
+// ====================================
+var jwtSecret = builder.Configuration["Jwt:Secret"]
+    ?? throw new InvalidOperationException("Jwt:Secret não configurado.");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtSecret))
+    };
 });
+
+builder.Services.AddAuthorization();
 
 // ====================================
 // CONFIGURAÇÃO DO AUTOMAPPER
@@ -47,56 +87,50 @@ builder.Services.AddAutoMapper(config =>
 // ====================================
 // REGISTRO DOS REPOSITORIES
 // ====================================
-// Registra o ProjectRepository para injeção de dependência
-// Sempre que alguém pedir IProjectRepository, o ASP.NET injeta ProjectRepository
-builder.Services.AddScoped<Portfolio.Application.Interfaces.IProjectRepository, 
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IProjectRepository,
                            Portfolio.Infrastructure.Repositories.ProjectRepository>();
 
-// Registra o BlogPostRepository para injeção de dependência
-builder.Services.AddScoped<Portfolio.Application.Interfaces.IBlogPostRepository, 
-                           Portfolio.Infrastructure.Repositories.BlogPostRepository>();  
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IBlogPostRepository,
+                           Portfolio.Infrastructure.Repositories.BlogPostRepository>();
 
-// Registra o TimelineEventRepository para injeção de dependência
-builder.Services.AddScoped<Portfolio.Application.Interfaces.ITimelineEventRepository, 
-                           Portfolio.Infrastructure.Repositories.TimelineEventRepository>();   
+builder.Services.AddScoped<Portfolio.Application.Interfaces.ITimelineEventRepository,
+                           Portfolio.Infrastructure.Repositories.TimelineEventRepository>();
 
-builder.Services.AddScoped<Portfolio.Application.Interfaces.IGalleryImageRepository, 
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IGalleryImageRepository,
                            Portfolio.Infrastructure.Repositories.GalleryImageRepository>();
 
-builder.Services.AddScoped<Portfolio.Application.Interfaces.IContactMessageRepository, 
-                           Portfolio.Infrastructure.Repositories.ContactMessageRepository>();  
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IContactMessageRepository,
+                           Portfolio.Infrastructure.Repositories.ContactMessageRepository>();
 
-builder.Services.AddScoped<Portfolio.Application.Interfaces.INowSectionRepository, 
-                           Portfolio.Infrastructure.Repositories.NowSectionRepository>();                                                         
+builder.Services.AddScoped<Portfolio.Application.Interfaces.INowSectionRepository,
+                           Portfolio.Infrastructure.Repositories.NowSectionRepository>();
+
+// ====================================
+// REGISTRO DO JWT SERVICE
+// ====================================
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 // ====================================
 // CONFIGURAÇÃO DO MEDIATR (CQRS)
 // ====================================
-// Registra todos os Handlers (Commands e Queries) da camada Application
-// O MediatR vai procurar automaticamente todos os IRequestHandler
-builder.Services.AddMediatR(cfg => 
-    cfg.RegisterServicesFromAssembly(typeof(Portfolio.Application.Queries.Projects.GetAllProjects.GetAllProjectsQuery).Assembly));
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(
+        typeof(Portfolio.Application.Queries.Projects.GetAllProjects.GetAllProjectsQuery).Assembly));
 
 // ====================================
 // CONFIGURAÇÃO DO FLUENTVALIDATION
 // ====================================
-// Registra todos os Validators da camada Application
-// As validações serão executadas automaticamente antes dos Handlers
-builder.Services.AddValidatorsFromAssembly(typeof(Portfolio.Application.Commands.Projects.CreateProject.CreateProjectCommandValidator).Assembly);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddValidatorsFromAssembly(
+    typeof(Portfolio.Application.Commands.Projects.CreateProject.CreateProjectCommandValidator).Assembly);
 
 // ====================================
 // CONFIGURAÇÃO DOS CONTROLLERS
 // ====================================
-// Habilita o uso de Controllers (API REST tradicional)
 builder.Services.AddControllers();
 
 // ====================================
 // CONFIGURAÇÃO DO CORS
 // ====================================
-// Permite que o Blazor (localhost:5237) acesse a API
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazor", policy =>
@@ -112,59 +146,72 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Permite enviar token JWT pelo Swagger
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Informe o token JWT. Exemplo: Bearer {token}"
+    });
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
 // ====================================
-// APLICAR MIGRATIONS AUTOMATICAMENTE
+// APLICAR MIGRATIONS E SEED ADMIN
 // ====================================
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
     db.Database.Migrate();
+
+    // Seed do usuário admin
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    var adminEmail = builder.Configuration["Admin:Email"] ?? "admin@wpdev.com";
+    var adminPassword = builder.Configuration["Admin:Password"] ?? "Admin@2024!";
+
+    if (await userManager.FindByEmailAsync(adminEmail) is null)
+    {
+        var admin = new AppUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            DisplayName = "Will - WpDev",
+            EmailConfirmed = true
+        };
+        await userManager.CreateAsync(admin, adminPassword);
+    }
 }
 
-// Swagger habilitado em todos os ambientes para popular dados
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
-// ====================================
-// USA O CORS
-// ====================================
 app.UseCors("AllowBlazor");
 
-// ====================================
-// MAPEAMENTO DOS CONTROLLERS
-// ====================================
-// Registra todos os Controllers da API
+// Ordem importa: Authentication antes de Authorization
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

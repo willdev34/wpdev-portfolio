@@ -1,9 +1,15 @@
+// ====================================
+// Título: PortfolioDbContext.cs
+// Descrição: Contexto principal do banco de dados, inclui Identity
+// ====================================
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Domain.Entities;
 
 namespace Portfolio.Infrastructure.Data;
 
-public class PortfolioDbContext : DbContext
+public class PortfolioDbContext : IdentityDbContext<AppUser>
 {
     public PortfolioDbContext(DbContextOptions<PortfolioDbContext> options)
         : base(options)
@@ -22,7 +28,6 @@ public class PortfolioDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurações das entidades
         ConfigureProject(modelBuilder);
         ConfigureBlogPost(modelBuilder);
         ConfigureTimelineEvent(modelBuilder);
@@ -42,8 +47,7 @@ public class PortfolioDbContext : DbContext
             entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
             entity.Property(e => e.DemoUrl).HasMaxLength(500);
             entity.Property(e => e.RepositoryUrl).HasMaxLength(500);
-            
-            // Converter lista para JSON
+
             entity.Property(e => e.Technologies)
                 .HasConversion(
                     v => string.Join(',', v),
@@ -65,8 +69,7 @@ public class PortfolioDbContext : DbContext
             entity.Property(e => e.Excerpt).IsRequired().HasMaxLength(500);
             entity.Property(e => e.Content).IsRequired();
             entity.Property(e => e.FeaturedImageUrl).HasMaxLength(500);
-            
-            // Converter lista para JSON
+
             entity.Property(e => e.Tags)
                 .HasConversion(
                     v => string.Join(',', v),
@@ -105,8 +108,7 @@ public class PortfolioDbContext : DbContext
             entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
             entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
             entity.Property(e => e.AltText).IsRequired().HasMaxLength(200);
-            
-            // Converter lista para JSON
+
             entity.Property(e => e.Tags)
                 .HasConversion(
                     v => string.Join(',', v),
@@ -144,8 +146,6 @@ public class PortfolioDbContext : DbContext
             entity.Property(e => e.CurrentProject).HasMaxLength(200);
             entity.Property(e => e.CurrentProjectUrl).HasMaxLength(500);
 
-            // Usar JSON para serializar/deserializar as listas
-            // Compatível com o formato salvo no banco
             entity.Property(e => e.CurrentlyLearning)
                 .HasConversion(
                     v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
