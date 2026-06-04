@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateBlogPostCommandValidator.cs
 // Descrição: Validações para atualização de post do blog
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using FluentValidation;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllGalleryImagesQueryHandler.cs
 // Descrição: Handler que processa GetAllGalleryImagesQuery e retorna as imagens
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

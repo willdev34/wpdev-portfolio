@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateContactMessageCommandHandler.cs
 // Descrição: Handler que processa CreateContactMessageCommand e cria a mensagem no banco
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

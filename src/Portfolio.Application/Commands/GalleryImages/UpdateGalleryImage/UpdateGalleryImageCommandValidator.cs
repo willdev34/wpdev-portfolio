@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateGalleryImageCommandValidator.cs
 // Descrição: Validações para atualização de imagem na galeria
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using FluentValidation;

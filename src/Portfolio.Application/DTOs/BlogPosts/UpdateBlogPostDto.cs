@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateBlogPostDto.cs
 // Descrição: DTO para atualização de posts existentes
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.BlogPosts;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: ContactMessageDto.cs
 // Descrição: DTO completo do ContactMessage - usado para exibir detalhes no admin
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.ContactMessages;

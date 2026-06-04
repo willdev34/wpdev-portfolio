@@ -1,9 +1,6 @@
 // ====================================
 // Título: INowSectionRepository.cs
 // Descrição: Interface do Repository para NowSection
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using Portfolio.Domain.Entities;

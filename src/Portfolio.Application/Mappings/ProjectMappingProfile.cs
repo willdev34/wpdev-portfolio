@@ -1,9 +1,6 @@
 // ====================================
 // Título: ProjectMappingProfile.cs (REFATORADO)
 // Descrição: Profile do AutoMapper para a entidade Project
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

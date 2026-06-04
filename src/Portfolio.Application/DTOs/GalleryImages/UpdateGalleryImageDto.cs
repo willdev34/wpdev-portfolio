@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateGalleryImageDto.cs
 // Descrição: DTO para atualização de imagens existentes
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.GalleryImages;

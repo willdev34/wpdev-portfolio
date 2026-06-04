@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetProjectByIdQuery
 // Descrição: Query para buscar um projeto específico por ID (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

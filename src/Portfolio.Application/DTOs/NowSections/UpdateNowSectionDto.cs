@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateNowSectionDto.cs
 // Descrição: DTO para atualização de seção Now existente
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.NowSections;

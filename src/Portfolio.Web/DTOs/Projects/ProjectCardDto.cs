@@ -1,9 +1,6 @@
 // ====================================
 // Título: ProjectCardDto.cs
 // Descrição: DTO para card de projeto (listagem)
-// Autor: Will
-// Empresa: WpDev
-// Data: 07/12/2024
 // ====================================
 
 namespace Portfolio.Web.DTOs.Projects;

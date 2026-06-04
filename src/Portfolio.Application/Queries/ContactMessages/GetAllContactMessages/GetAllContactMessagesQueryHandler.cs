@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllContactMessagesQueryHandler.cs
 // Descrição: Handler que processa GetAllContactMessagesQuery e retorna as mensagens
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

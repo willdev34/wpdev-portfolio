@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetBlogPostBySlugQuery.cs
 // Descrição: Query para buscar um post por Slug/URL amigável (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

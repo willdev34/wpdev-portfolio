@@ -1,9 +1,6 @@
 // ====================================
 // Título: ContactMessageDto.cs
 // Descrição: DTO para mensagens de contato
-// Autor: Will
-// Empresa: WpDev
-// Data: 09/12/2024
 // ====================================
 
 namespace Portfolio.Web.DTOs.Contact;

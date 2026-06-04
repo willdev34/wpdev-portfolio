@@ -1,9 +1,6 @@
 // ====================================
 // Título: Project.cs (REFATORADO)
 // Descrição: Entidade de domínio que representa um projeto do portfólio
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 namespace Portfolio.Domain.Entities;

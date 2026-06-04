@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateTimelineEventCommandValidator.cs
 // Descrição: Validações para criação de evento da timeline
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using FluentValidation;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateBlogPostDto.cs
 // Descrição: DTO para criação de novos posts do blog
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.BlogPosts;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: NowSectionDto.cs
 // Descrição: DTO completo do NowSection - usado para exibir a seção "O que estou fazendo agora"
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.NowSections;

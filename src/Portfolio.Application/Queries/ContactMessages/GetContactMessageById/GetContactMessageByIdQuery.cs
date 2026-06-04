@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetContactMessageByIdQuery.cs
 // Descrição: Query para buscar uma mensagem específica por ID (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

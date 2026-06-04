@@ -1,9 +1,6 @@
 // ====================================
 // Título: ProjectsController
 // Descrição: Controller REST API para gerenciar projetos do portfólio
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

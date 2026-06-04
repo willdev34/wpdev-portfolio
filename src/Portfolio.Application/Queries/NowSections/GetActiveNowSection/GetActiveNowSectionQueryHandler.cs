@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetActiveNowSectionQueryHandler.cs
 // Descrição: Handler que processa GetActiveNowSectionQuery e retorna a seção ativa
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

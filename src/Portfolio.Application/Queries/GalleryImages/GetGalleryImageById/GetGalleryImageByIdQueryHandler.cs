@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetGalleryImageByIdQueryHandler.cs
 // Descrição: Handler que processa GetGalleryImageByIdQuery e retorna a imagem
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

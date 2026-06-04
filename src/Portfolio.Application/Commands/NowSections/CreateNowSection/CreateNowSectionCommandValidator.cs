@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateNowSectionCommandValidator.cs
 // Descrição: Validações para criação de seção Now
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using FluentValidation;

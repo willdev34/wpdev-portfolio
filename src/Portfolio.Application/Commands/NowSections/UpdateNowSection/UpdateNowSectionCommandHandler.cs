@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateNowSectionCommandHandler.cs
 // Descrição: Handler que processa UpdateNowSectionCommand e atualiza a seção
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

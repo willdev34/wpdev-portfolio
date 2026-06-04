@@ -1,9 +1,6 @@
 // ====================================
 // Título: BlogPostsController.cs
 // Descrição: Controller REST API para gerenciar posts do blog
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllGalleryImagesQuery.cs
 // Descrição: Query para buscar todas as imagens da galeria (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllNowSectionsQuery.cs
 // Descrição: Query para buscar todas as seções Now (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

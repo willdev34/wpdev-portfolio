@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateBlogPostCommandHandler.cs
 // Descrição: Handler que processa CreateBlogPostCommand e cria o post no banco
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

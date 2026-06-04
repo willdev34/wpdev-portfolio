@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateTimelineEventCommandValidator.cs
 // Descrição: Validações para atualização de evento da timeline
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using FluentValidation;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateNowSectionCommandHandler.cs
 // Descrição: Handler que processa CreateNowSectionCommand e cria a seção no banco
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

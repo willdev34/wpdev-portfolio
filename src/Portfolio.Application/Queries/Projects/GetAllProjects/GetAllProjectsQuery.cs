@@ -1,8 +1,6 @@
 // ====================================
 // Título: GetAllProjectsQuery
 // Descrição: Query para buscar todos os projetos (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
 // Data: 23/11/2024
 // ====================================
 

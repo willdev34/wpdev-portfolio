@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetProjectByIdQueryHandler
 // Descrição: Handler que processa GetProjectByIdQuery e retorna o projeto
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteProjectCommand
 // Descrição: Command para deletar um projeto (soft delete - CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

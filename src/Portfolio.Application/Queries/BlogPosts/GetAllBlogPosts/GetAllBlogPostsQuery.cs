@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllBlogPostsQuery.cs
 // Descrição: Query para buscar todos os posts (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

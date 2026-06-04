@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateContactMessageCommand.cs
 // Descrição: Command para criar uma nova mensagem de contato (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateContactMessageDto.cs
 // Descrição: DTO para atualização de mensagem (ADMIN apenas)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.ContactMessages;

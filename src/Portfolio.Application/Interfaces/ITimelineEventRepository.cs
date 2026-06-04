@@ -1,9 +1,6 @@
 // ====================================
 // Título: ITimelineEventRepository.cs
 // Descrição: Interface do Repository para TimelineEvent
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using Portfolio.Domain.Entities;

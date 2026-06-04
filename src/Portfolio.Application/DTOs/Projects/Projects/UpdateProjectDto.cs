@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateProjectDto.cs (REFATORADO)
 // Descrição: DTO para atualização de projetos existentes
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.Projects;

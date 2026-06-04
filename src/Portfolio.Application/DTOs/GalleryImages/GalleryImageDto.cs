@@ -1,9 +1,6 @@
 // ====================================
 // Título: GalleryImageDto.cs
 // Descrição: DTO completo do GalleryImage - usado para exibir detalhes de uma imagem
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.GalleryImages;

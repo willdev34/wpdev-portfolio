@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteBlogPostCommand.cs
 // Descrição: Command para deletar um post (hard delete - CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

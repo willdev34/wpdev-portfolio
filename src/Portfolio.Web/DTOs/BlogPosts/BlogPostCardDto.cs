@@ -1,9 +1,6 @@
 // ====================================
 // Título: BlogPostCardDto.cs
 // Descrição: DTO para card de post do blog (listagem)
-// Autor: Will
-// Empresa: WpDev
-// Data: 09/12/2024
 // ====================================
 namespace Portfolio.Web.DTOs.BlogPosts;
 public class BlogPostCardDto

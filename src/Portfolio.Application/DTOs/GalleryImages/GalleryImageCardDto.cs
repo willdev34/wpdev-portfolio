@@ -1,9 +1,6 @@
 // ====================================
 // Título: GalleryImageCardDto.cs
 // Descrição: DTO resumido do GalleryImage - usado para grid de galeria
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.GalleryImages;

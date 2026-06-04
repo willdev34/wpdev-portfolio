@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateContactMessageCommandValidator.cs
 // Descrição: Validações para criação de mensagem de contato
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using FluentValidation;

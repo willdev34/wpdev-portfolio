@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateProjectCommandValidator.cs (REFATORADO)
 // Descrição: Validações para criação de projeto - Design Editorial
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using FluentValidation;

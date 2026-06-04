@@ -1,9 +1,6 @@
 // ====================================
 // Título: ProjectService.cs
 // Descrição: Serviço para consumir a API de projetos
-// Autor: Will
-// Empresa: WpDev
-// Data: 07/12/2024
 // ====================================
 
 using System.Net;

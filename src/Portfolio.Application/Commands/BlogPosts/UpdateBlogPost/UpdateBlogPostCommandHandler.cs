@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateBlogPostCommandHandler.cs
 // Descrição: Handler que processa UpdateBlogPostCommand e atualiza o post
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

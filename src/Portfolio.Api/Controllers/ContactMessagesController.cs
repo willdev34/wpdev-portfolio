@@ -1,9 +1,6 @@
 // ====================================
 // Título: ContactMessagesController.cs
 // Descrição: Controller REST API para gerenciar mensagens de contato
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

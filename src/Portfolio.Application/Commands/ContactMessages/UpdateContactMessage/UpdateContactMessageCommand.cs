@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateContactMessageCommand.cs
 // Descrição: Command para atualizar uma mensagem existente (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateGalleryImageCommandValidator.cs
 // Descrição: Validações para criação de imagem na galeria
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using FluentValidation;

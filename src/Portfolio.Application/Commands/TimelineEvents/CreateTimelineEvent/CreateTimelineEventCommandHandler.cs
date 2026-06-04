@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateTimelineEventCommandHandler.cs
 // Descrição: Handler que processa CreateTimelineEventCommand e cria o evento no banco
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using AutoMapper;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateBlogPostCommand.cs
 // Descrição: Command para criar um novo post do blog (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

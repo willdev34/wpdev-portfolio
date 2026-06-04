@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateProjectCommandHandler
 // Descrição: Handler que processa UpdateProjectCommand e atualiza o projeto
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

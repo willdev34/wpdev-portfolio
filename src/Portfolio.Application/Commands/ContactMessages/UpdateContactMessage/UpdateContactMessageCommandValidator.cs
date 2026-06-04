@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateContactMessageCommandValidator.cs
 // Descrição: Validações para atualização de mensagem de contato (ADMIN)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using FluentValidation;

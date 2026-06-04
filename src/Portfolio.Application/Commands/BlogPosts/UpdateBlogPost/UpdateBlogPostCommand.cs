@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateBlogPostCommand.cs
 // Descrição: Command para atualizar um post existente (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

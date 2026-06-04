@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetNowSectionByIdQuery.cs
 // Descrição: Query para buscar uma seção específica por ID (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

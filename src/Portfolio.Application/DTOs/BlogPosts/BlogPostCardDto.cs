@@ -1,9 +1,6 @@
 // ====================================
 // Título: BlogPostCardDto.cs
 // Descrição: DTO resumido do BlogPost - usado para listagens e grid de cards
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.BlogPosts;

@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllNowSectionsQueryHandler.cs
 // Descrição: Handler que processa GetAllNowSectionsQuery e retorna as seções
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

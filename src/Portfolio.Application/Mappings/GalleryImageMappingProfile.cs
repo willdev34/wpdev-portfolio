@@ -1,9 +1,6 @@
 // ====================================
 // Título: GalleryImageMappingProfile.cs
 // Descrição: Profile do AutoMapper para a entidade GalleryImage
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

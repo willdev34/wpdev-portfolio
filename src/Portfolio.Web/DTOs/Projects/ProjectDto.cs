@@ -1,9 +1,6 @@
 // ====================================
 // Título: ProjectDto.cs
 // Descrição: DTO completo do projeto
-// Autor: Will
-// Empresa: WpDev
-// Data: 07/12/2024
 // ====================================
 
 namespace Portfolio.Web.DTOs.Projects;

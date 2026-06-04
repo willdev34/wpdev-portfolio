@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateContactMessageDto.cs
 // Descrição: DTO para criação de mensagem de contato (formulário público)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.ContactMessages;

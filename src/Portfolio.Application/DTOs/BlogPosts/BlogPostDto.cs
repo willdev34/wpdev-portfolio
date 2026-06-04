@@ -1,9 +1,6 @@
 // ====================================
 // Título: BlogPostDto.cs
 // Descrição: DTO completo do BlogPost - usado para exibir detalhes de um post
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.BlogPosts;

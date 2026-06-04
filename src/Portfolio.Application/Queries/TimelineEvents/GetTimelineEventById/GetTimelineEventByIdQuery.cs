@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetTimelineEventByIdQuery.cs
 // Descrição: Query para buscar um evento específico por ID (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using MediatR;

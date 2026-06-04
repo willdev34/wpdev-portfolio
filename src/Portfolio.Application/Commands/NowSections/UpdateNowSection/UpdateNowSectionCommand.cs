@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateNowSectionCommand.cs
 // Descrição: Command para atualizar uma seção existente (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

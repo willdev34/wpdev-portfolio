@@ -1,9 +1,6 @@
 @* ====================================
    Título: Timeline.razor
    Descrição: Página de timeline profissional
-   Autor: Will
-   Empresa: WpDev
-   Data: 20/12/2024
    ==================================== *@
 
 @page "/timeline"

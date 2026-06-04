@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteGalleryImageCommand.cs
 // Descrição: Command para deletar uma imagem (soft delete - CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

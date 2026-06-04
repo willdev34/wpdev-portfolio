@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteGalleryImageCommandHandler.cs
 // Descrição: Handler que processa DeleteGalleryImageCommand e marca imagem como invisível
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

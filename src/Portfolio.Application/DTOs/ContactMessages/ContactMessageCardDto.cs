@@ -1,9 +1,6 @@
 // ====================================
 // Título: ContactMessageCardDto.cs
 // Descrição: DTO resumido do ContactMessage - usado para listagem no admin
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.ContactMessages;

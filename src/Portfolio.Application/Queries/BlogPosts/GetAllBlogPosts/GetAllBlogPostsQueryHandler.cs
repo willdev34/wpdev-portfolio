@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllBlogPostsQueryHandler.cs
 // Descrição: Handler que processa GetAllBlogPostsQuery e retorna os posts
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

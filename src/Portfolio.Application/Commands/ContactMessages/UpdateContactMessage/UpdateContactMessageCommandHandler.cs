@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateContactMessageCommandHandler.cs
 // Descrição: Handler que processa UpdateContactMessageCommand e atualiza a mensagem
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

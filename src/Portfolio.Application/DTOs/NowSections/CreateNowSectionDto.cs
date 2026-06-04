@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateNowSectionDto.cs
 // Descrição: DTO para criação de nova seção Now
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 namespace Portfolio.Application.DTOs.NowSections;

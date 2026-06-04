@@ -1,9 +1,6 @@
 // ====================================
 // Título: NowSectionMappingProfile.cs
 // Descrição: Profile do AutoMapper para a entidade NowSection
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using AutoMapper;

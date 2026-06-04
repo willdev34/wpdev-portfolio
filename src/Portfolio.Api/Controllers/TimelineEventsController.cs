@@ -1,9 +1,6 @@
 // ====================================
 // Título: TimelineEventsController.cs
 // Descrição: Controller REST API para gerenciar eventos da timeline
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using MediatR;

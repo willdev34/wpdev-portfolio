@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetGalleryImageByIdQuery.cs
 // Descrição: Query para buscar uma imagem específica por ID (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

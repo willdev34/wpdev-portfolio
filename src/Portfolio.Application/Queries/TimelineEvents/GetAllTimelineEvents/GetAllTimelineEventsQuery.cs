@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllTimelineEventsQuery.cs
 // Descrição: Query para buscar todos os eventos da timeline (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using MediatR;

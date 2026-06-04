@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteBlogPostCommandHandler.cs
 // Descrição: Handler que processa DeleteBlogPostCommand e deleta o post FISICAMENTE
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

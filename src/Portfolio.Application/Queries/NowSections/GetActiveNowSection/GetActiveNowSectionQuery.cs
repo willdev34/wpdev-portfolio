@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetActiveNowSectionQuery.cs
 // Descrição: Query para buscar a seção ATIVA (CQRS - Read)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

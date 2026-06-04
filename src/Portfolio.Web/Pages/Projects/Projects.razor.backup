@@ -1,9 +1,6 @@
 @* ====================================
    Título: Projects.razor
    Descrição: Página de listagem de todos os projetos
-   Autor: Will
-   Empresa: WpDev
-   Data: 20/12/2024
    ==================================== *@
 
 @page "/projects"

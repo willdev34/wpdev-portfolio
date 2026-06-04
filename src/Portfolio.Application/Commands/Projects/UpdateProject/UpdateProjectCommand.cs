@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateProjectCommand
 // Descrição: Command para atualizar um projeto existente (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using MediatR;

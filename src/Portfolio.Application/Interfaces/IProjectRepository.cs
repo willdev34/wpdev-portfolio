@@ -1,9 +1,6 @@
 // ====================================
 // Título: IProjectRepository.cs (REFATORADO)
 // Descrição: Interface do Repository - Design Editorial
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using Portfolio.Domain.Entities;

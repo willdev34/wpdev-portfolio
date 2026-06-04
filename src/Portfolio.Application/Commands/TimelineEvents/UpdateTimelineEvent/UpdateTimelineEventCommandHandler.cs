@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateTimelineEventCommandHandler.cs
 // Descrição: Handler que processa UpdateTimelineEventCommand e atualiza o evento
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using AutoMapper;

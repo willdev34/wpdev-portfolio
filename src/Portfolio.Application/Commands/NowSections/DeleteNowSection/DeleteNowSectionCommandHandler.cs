@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteNowSectionCommandHandler.cs
 // Descrição: Handler que processa DeleteNowSectionCommand e marca seção como inativa
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;

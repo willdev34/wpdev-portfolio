@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetAllProjectsQueryHandler
 // Descrição: Handler que processa GetAllProjectsQuery e retorna os projetos
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
 // ====================================
 
 using AutoMapper;

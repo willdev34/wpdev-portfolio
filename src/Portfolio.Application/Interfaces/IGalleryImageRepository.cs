@@ -1,9 +1,6 @@
 // ====================================
 // Título: IGalleryImageRepository.cs
 // Descrição: Interface do Repository para GalleryImage
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using Portfolio.Domain.Entities;

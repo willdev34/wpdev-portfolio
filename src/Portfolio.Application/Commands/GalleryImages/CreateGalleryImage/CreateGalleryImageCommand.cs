@@ -1,9 +1,6 @@
 // ====================================
 // Título: CreateGalleryImageCommand.cs
 // Descrição: Command para criar uma nova imagem na galeria (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
 // ====================================
 
 using MediatR;
