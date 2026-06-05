@@ -101,7 +101,7 @@
 
     <script>
         window.cloudinaryUploadBytes = async function (base64Data, fileName, contentType, cloudName, uploadPreset) {
-            console.log('[Cloudinary] Iniciando upload:', fileName, contentType, cloudName, uploadPreset);
+            console.log('[Cloudinary] Iniciando upload:', fileName);
             try {
                 const byteCharacters = atob(base64Data);
                 const byteArray = new Uint8Array(byteCharacters.length);
@@ -113,14 +113,10 @@
                 formData.append('file', blob, fileName);
                 formData.append('upload_preset', uploadPreset);
 
-                console.log('[Cloudinary] Enviando para:', `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
-
                 const response = await fetch(
                     `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
                     { method: 'POST', body: formData }
                 );
-
-                console.log('[Cloudinary] Status:', response.status);
 
                 if (!response.ok) {
                     const err = await response.text();
@@ -135,6 +131,39 @@
                 console.error('[Cloudinary] Exceção:', ex);
                 return null;
             }
+        };
+
+        window.setupImageUpload = function (inputId, previewId, urlFieldId, cloudName, uploadPreset) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            input.addEventListener('change', async function () {
+                const file = input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async function (e) {
+                    const base64 = e.target.result.split(',')[1];
+                    const url = await window.cloudinaryUploadBytes(
+                        base64, file.name, file.type, cloudName, uploadPreset);
+
+                    if (url) {
+                        const preview = document.getElementById(previewId);
+                        if (preview) {
+                            preview.src = url;
+                            preview.style.display = 'block';
+                        }
+                        const urlField = document.getElementById(urlFieldId);
+                        if (urlField) urlField.value = url;
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        window.getElementValue = function (id) {
+            const el = document.getElementById(id);
+            return el ? el.value : null;
         };
     </script>
 </body>

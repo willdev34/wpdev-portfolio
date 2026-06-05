@@ -1,22 +1,21 @@
 @* ====================================
    Título: ImageUpload.razor
-   Descrição: Componente de upload de imagem via Cloudinary
+   Descrição: Upload de imagem via Cloudinary usando JS puro (sem InputFile)
    ==================================== *@
 
-@using System.Text.Json
-@using System.Text.Json.Serialization
 @inject IJSRuntime JS
+@implements IAsyncDisposable
 
 <div class="image-upload">
-    @if (!string.IsNullOrEmpty(CurrentUrl))
+    @if (!string.IsNullOrEmpty(_previewUrl))
     {
         <div class="image-preview">
-            <img src="@CurrentUrl" alt="Preview" />
+            <img src="@_previewUrl" alt="Preview" />
             <button type="button" class="image-preview__remove" @onclick="RemoveImage">×</button>
         </div>
     }
 
-    <div class="image-upload__area @(_isDragging ? "dragging" : "")">
+    <div class="image-upload__area" id="upload-area-@_id">
         @if (_isUploading)
         {
             <div class="upload-progress">
@@ -26,15 +25,17 @@
         }
         else
         {
-            <label class="upload-label" for="img-upload">
+            <label class="upload-label" for="file-input-@_id">
                 <span class="upload-icon">↑</span>
                 <span class="upload-text">Clique ou arraste uma imagem</span>
                 <span class="upload-hint">PNG, JPG, WebP até 10MB</span>
             </label>
-            <InputFile id="img-upload"
-                    OnChange="HandleFileSelected"
-                    accept="image/*"
-                    class="upload-input" />
+            <input id="file-input-@_id"
+                   type="file"
+                   accept="image/*"
+                   class="upload-input" />
+            <img id="preview-@_id" style="display:none" alt="" />
+            <input id="url-@_id" type="hidden" value="@CurrentUrl" />
         }
     </div>
 
@@ -59,60 +60,46 @@
 
     private const string CloudName = "do0uq7w4n";
     private const string UploadPreset = "wpdev_portfolio";
-    private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
 
-    private bool _isUploading = false;
-    private bool _isDragging = false;
+    private string _id = Guid.NewGuid().ToString("N")[..8];
     private string _errorMessage = string.Empty;
+    private string _previewUrl = string.Empty;
+    private bool _isUploading = false;
+    private System.Threading.Timer? _pollTimer;
 
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    protected override void OnParametersSet()
     {
-        _errorMessage = string.Empty;
+        if (!string.IsNullOrEmpty(CurrentUrl) && string.IsNullOrEmpty(_previewUrl))
+            _previewUrl = CurrentUrl;
+    }
 
-        try
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            var file = e.File;
+            await JS.InvokeVoidAsync("setupImageUpload",
+                $"file-input-{_id}",
+                $"preview-{_id}",
+                $"url-{_id}",
+                CloudName,
+                UploadPreset);
 
-            if (file.Size > MaxFileSize)
+            // Polling para detectar quando a URL foi preenchida pelo JS
+            _pollTimer = new System.Threading.Timer(async _ =>
             {
-                _errorMessage = "Arquivo muito grande. Máximo 10MB.";
-                return;
-            }
-
-            // Lê o arquivo antes de qualquer re-render
-            using var ms = new MemoryStream();
-            await file.OpenReadStream(MaxFileSize).CopyToAsync(ms);
-            var buffer = ms.ToArray();
-            var contentType = file.ContentType;
-            var fileName = file.Name;
-
-            _isUploading = true;
-            StateHasChanged();
-
-            // Converte para base64 e envia via JS (fetch nativo do browser)
-            var base64 = Convert.ToBase64String(buffer);
-            var secureUrl = await JS.InvokeAsync<string?>(
-                "cloudinaryUploadBytes",
-                base64, fileName, contentType, CloudName, UploadPreset);
-
-            if (!string.IsNullOrEmpty(secureUrl))
-            {
-                CurrentUrl = secureUrl;
-                await OnUrlChanged.InvokeAsync(CurrentUrl);
-            }
-            else
-            {
-                _errorMessage = "Falha no upload. Verifique o console do navegador.";
-            }
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = $"Erro: {ex.Message}";
-            Console.WriteLine($"[ImageUpload] Erro: {ex}");
-        }
-        finally
-        {
-            _isUploading = false;
+                try
+                {
+                    var url = await JS.InvokeAsync<string?>("getElementValue", $"url-{_id}");
+                    if (!string.IsNullOrEmpty(url) && url != CurrentUrl && url.StartsWith("http"))
+                    {
+                        CurrentUrl = url;
+                        _previewUrl = url;
+                        await OnUrlChanged.InvokeAsync(url);
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }
+                catch { }
+            }, null, 1000, 1000);
         }
     }
 
@@ -120,18 +107,20 @@
     {
         var url = e.Value?.ToString() ?? string.Empty;
         CurrentUrl = url;
+        _previewUrl = url;
         await OnUrlChanged.InvokeAsync(url);
     }
 
     private async Task RemoveImage()
     {
         CurrentUrl = string.Empty;
+        _previewUrl = string.Empty;
         await OnUrlChanged.InvokeAsync(string.Empty);
     }
 
-    private class CloudinaryResponse
+    public async ValueTask DisposeAsync()
     {
-        [JsonPropertyName("secure_url")]
-        public string? SecureUrl { get; set; }
+        if (_pollTimer != null)
+            await _pollTimer.DisposeAsync();
     }
 }
