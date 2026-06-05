@@ -1,9 +1,6 @@
 // ====================================
 // Título: GetNowSectionByIdQueryHandler.cs
-// Descrição: Handler que processa GetNowSectionByIdQuery e retorna a seção
-// Autor: Will
-// Empresa: WpDev
-// Data: 06/12/2024
+// Descrição: Handler que processa GetNowSectionByIdQuery e retorna a seçãos
 // ====================================
 
 using AutoMapper;

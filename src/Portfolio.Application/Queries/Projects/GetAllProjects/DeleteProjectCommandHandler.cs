@@ -1,9 +1,6 @@
 // ====================================
 // Título: DeleteProjectCommandHandler
-// Descrição: Handler que processa DeleteProjectCommand e marca projeto como inativo
-// Autor: Will
-// Empresa: WpDev
-// Data: 23/11/2024
+// Descrição: Handler que processa DeleteProjectCommand e marca projeto como inativos
 // ====================================
 
 using MediatR;

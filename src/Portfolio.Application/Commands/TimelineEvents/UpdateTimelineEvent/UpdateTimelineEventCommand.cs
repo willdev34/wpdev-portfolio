@@ -1,9 +1,6 @@
 // ====================================
 // Título: UpdateTimelineEventCommand.cs
 // Descrição: Command para atualizar um evento existente (CQRS - Write)
-// Autor: Will
-// Empresa: WpDev
-// Data: 29/11/2024
 // ====================================
 
 using MediatR;

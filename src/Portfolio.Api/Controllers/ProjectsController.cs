@@ -20,6 +20,7 @@ namespace Portfolio.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Microsoft.AspNetCore.Authorization.Authorize]
 public class ProjectsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -41,6 +42,7 @@ public class ProjectsController : ControllerBase
     /// <returns>Lista de ProjectCardDto</returns>
     /// <response code="200">Retorna a lista de projetos</response>
     [HttpGet]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<ProjectCardDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ProjectCardDto>>> GetAll()
     {
@@ -65,6 +67,7 @@ public class ProjectsController : ControllerBase
     /// <response code="200">Retorna o projeto encontrado</response>
     /// <response code="404">Projeto não encontrado</response>
     [HttpGet("{id}")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(ProjectDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProjectDto>> GetById(Guid id)

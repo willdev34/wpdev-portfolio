@@ -1,0 +1,22 @@
+// ====================================
+// Título: UpdateProjectDto.cs
+// Descrição: DTO para atualização de projeto no admin
+// ====================================
+
+namespace Portfolio.Web.DTOs.Projects;
+
+public class UpdateProjectDto
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string? ShortDescription { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
+    public string? DemoUrl { get; set; }
+    public string? RepositoryUrl { get; set; }
+    public List<string> Technologies { get; set; } = new();
+    public int Year { get; set; }
+    public bool IsFeatured { get; set; }
+    public int Status { get; set; }
+    public bool IsActive { get; set; } = true;
+}

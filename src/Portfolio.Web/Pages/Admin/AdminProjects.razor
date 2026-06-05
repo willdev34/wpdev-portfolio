@@ -1,0 +1,124 @@
+@* ====================================
+   Título: AdminProjects.razor
+   Descrição: Listagem e gerenciamento de projetos no admin
+   ==================================== *@
+
+@page "/admin/projects"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject ProjectService ProjectService
+@inject NavigationManager Navigation
+
+<PageTitle>Projetos - WPDev Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-page__header">
+        <div>
+            <h1 class="admin-page__title">Projetos</h1>
+            <p class="admin-page__subtitle">@_projects.Count projeto(s) cadastrado(s)</p>
+        </div>
+        <a class="btn-primary" href="/admin/projects/new">+ Novo Projeto</a>
+    </div>
+
+    @if (_isLoading)
+    {
+        <p class="admin-loading">Carregando...</p>
+    }
+    else if (_projects.Count == 0)
+    {
+        <div class="admin-empty">
+            <p>Nenhum projeto cadastrado ainda.</p>
+            <a href="/admin/projects/new">Criar primeiro projeto</a>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Ano</th>
+                        <th>Status</th>
+                        <th>Destaque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var project in _projects)
+                    {
+                        <tr>
+                            <td class="td-title">@project.Title</td>
+                            <td>@project.Year</td>
+                            <td>
+                                <span class="tag">@GetStatusLabel(project)</span>
+                            </td>
+                            <td>@(project.IsFeatured ? "✦" : "–")</td>
+                            <td class="td-actions">
+                                <a class="btn-edit" href="/admin/projects/edit/@project.Id">Editar</a>
+                                <button class="btn-delete" @onclick="() => ConfirmDelete(project.Id, project.Title)">Excluir</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@if (_showConfirm)
+{
+    <div class="confirm-overlay">
+        <div class="confirm-box">
+            <p>Excluir <strong>@_deleteTitle</strong>?</p>
+            <p class="confirm-box__sub">Esta ação não pode ser desfeita.</p>
+            <div class="confirm-box__actions">
+                <button class="btn-cancel" @onclick="CancelDelete">Cancelar</button>
+                <button class="btn-confirm-delete" @onclick="ExecuteDelete">Excluir</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProjectCardDto> _projects = new();
+    private bool _isLoading = true;
+    private bool _showConfirm = false;
+    private Guid _deleteId;
+    private string _deleteTitle = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _projects = await ProjectService.GetAllAsync();
+        _isLoading = false;
+    }
+
+    private void ConfirmDelete(Guid id, string title)
+    {
+        _deleteId = id;
+        _deleteTitle = title;
+        _showConfirm = true;
+    }
+
+    private void CancelDelete()
+    {
+        _showConfirm = false;
+    }
+
+    private async Task ExecuteDelete()
+    {
+        var (success, error) = await ProjectService.DeleteAsync(_deleteId);
+        _showConfirm = false;
+
+        if (success)
+            _projects = await ProjectService.GetAllAsync();
+        else
+            Console.WriteLine($"[AdminProjects] Erro ao excluir: {error}");
+    }
+
+    private static string GetStatusLabel(ProjectCardDto p)
+    {
+        // ProjectCardDto não tem Status, mas podemos indicar destaque
+        return p.IsFeatured ? "Destaque" : "Ativo";
+    }
+}

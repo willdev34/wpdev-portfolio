@@ -1,0 +1,235 @@
+/* AdminProjectForm - Formulário de projeto */
+
+.back-link {
+    color: #A3A9AB;
+    text-decoration: none;
+    font-size: 0.875rem;
+    display: inline-block;
+    margin-bottom: 8px;
+    transition: color 0.15s;
+}
+
+.back-link:hover {
+    color: #6C9EA3;
+}
+
+.admin-page__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0D1C24;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.form-error {
+    background-color: rgba(224,85,85,0.1);
+    border: 1px solid rgba(224,85,85,0.25);
+    color: #e05555;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.form-section {
+    background: #fff;
+    border: 1px solid #e8ecec;
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-section__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0D1C24;
+    margin: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #A3A9AB;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.field__input,
+.field__textarea,
+.field__select {
+    background: #f8f9fa;
+    border: 1px solid #e8ecec;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #0D1C24;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.field__input:focus,
+.field__textarea:focus,
+.field__select:focus {
+    border-color: #6C9EA3;
+}
+
+.field__textarea {
+    resize: vertical;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.field--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.field--checkbox label {
+    font-size: 0.9rem;
+    color: #0D1C24;
+    cursor: pointer;
+}
+
+/* TECH TAGS */
+.tech-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-add-tech {
+    background: #6C9EA3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    width: 38px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.btn-add-tech:hover {
+    opacity: 0.85;
+}
+
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tech-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(108,158,163,0.12);
+    color: #6C9EA3;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tech-tag button {
+    background: none;
+    border: none;
+    color: #6C9EA3;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+
+.tech-tag button:hover {
+    opacity: 1;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-cancel {
+    padding: 11px 24px;
+    border-radius: 6px;
+    border: 1px solid #e8ecec;
+    background: #fff;
+    color: #0D1C24;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.btn-cancel:hover {
+    background: #f8f9fa;
+}
+
+.btn-save {
+    padding: 11px 28px;
+    border-radius: 6px;
+    border: none;
+    background: #6C9EA3;
+    color: #0D1C24;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+}
+
+.btn-save:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.btn-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-success {
+    background-color: rgba(108,158,163,0.12);
+    border: 1px solid rgba(108,158,163,0.3);
+    color: #4a8a8f;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+}

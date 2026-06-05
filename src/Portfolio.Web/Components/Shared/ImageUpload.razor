@@ -1,0 +1,137 @@
+@* ====================================
+   Título: ImageUpload.razor
+   Descrição: Componente de upload de imagem via Cloudinary
+   ==================================== *@
+
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject IJSRuntime JS
+
+<div class="image-upload">
+    @if (!string.IsNullOrEmpty(CurrentUrl))
+    {
+        <div class="image-preview">
+            <img src="@CurrentUrl" alt="Preview" />
+            <button type="button" class="image-preview__remove" @onclick="RemoveImage">×</button>
+        </div>
+    }
+
+    <div class="image-upload__area @(_isDragging ? "dragging" : "")">
+        @if (_isUploading)
+        {
+            <div class="upload-progress">
+                <div class="upload-spinner"></div>
+                <span>Enviando...</span>
+            </div>
+        }
+        else
+        {
+            <label class="upload-label" for="img-upload">
+                <span class="upload-icon">↑</span>
+                <span class="upload-text">Clique ou arraste uma imagem</span>
+                <span class="upload-hint">PNG, JPG, WebP até 10MB</span>
+            </label>
+            <InputFile id="img-upload"
+                    OnChange="HandleFileSelected"
+                    accept="image/*"
+                    class="upload-input" />
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <p class="upload-error">@_errorMessage</p>
+    }
+
+    <div class="upload-url-row">
+        <span class="upload-url-label">ou cole a URL</span>
+        <input class="field__input upload-url-input"
+               type="url"
+               placeholder="https://..."
+               value="@CurrentUrl"
+               @oninput="HandleUrlInput" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? CurrentUrl { get; set; }
+    [Parameter] public EventCallback<string> OnUrlChanged { get; set; }
+
+    private const string CloudName = "do0uq7w4n";
+    private const string UploadPreset = "wpdev_portfolio";
+    private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
+
+    private bool _isUploading = false;
+    private bool _isDragging = false;
+    private string _errorMessage = string.Empty;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        _errorMessage = string.Empty;
+
+        try
+        {
+            var file = e.File;
+
+            if (file.Size > MaxFileSize)
+            {
+                _errorMessage = "Arquivo muito grande. Máximo 10MB.";
+                return;
+            }
+
+            // Lê o arquivo antes de qualquer re-render
+            using var ms = new MemoryStream();
+            await file.OpenReadStream(MaxFileSize).CopyToAsync(ms);
+            var buffer = ms.ToArray();
+            var contentType = file.ContentType;
+            var fileName = file.Name;
+
+            _isUploading = true;
+            StateHasChanged();
+
+            // Converte para base64 e envia via JS (fetch nativo do browser)
+            var base64 = Convert.ToBase64String(buffer);
+            var secureUrl = await JS.InvokeAsync<string?>(
+                "cloudinaryUploadBytes",
+                base64, fileName, contentType, CloudName, UploadPreset);
+
+            if (!string.IsNullOrEmpty(secureUrl))
+            {
+                CurrentUrl = secureUrl;
+                await OnUrlChanged.InvokeAsync(CurrentUrl);
+            }
+            else
+            {
+                _errorMessage = "Falha no upload. Verifique o console do navegador.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Erro: {ex.Message}";
+            Console.WriteLine($"[ImageUpload] Erro: {ex}");
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+    }
+
+    private async Task HandleUrlInput(ChangeEventArgs e)
+    {
+        var url = e.Value?.ToString() ?? string.Empty;
+        CurrentUrl = url;
+        await OnUrlChanged.InvokeAsync(url);
+    }
+
+    private async Task RemoveImage()
+    {
+        CurrentUrl = string.Empty;
+        await OnUrlChanged.InvokeAsync(string.Empty);
+    }
+
+    private class CloudinaryResponse
+    {
+        [JsonPropertyName("secure_url")]
+        public string? SecureUrl { get; set; }
+    }
+}

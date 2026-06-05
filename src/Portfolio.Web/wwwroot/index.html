@@ -98,6 +98,34 @@
     </div>
 
     <script src="_framework/blazor.webassembly.js"></script>
+
+    <script>
+        window.cloudinaryUploadBytes = async function (base64Data, fileName, contentType, cloudName, uploadPreset) {
+            const byteCharacters = atob(base64Data);
+            const byteArray = new Uint8Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteArray[i] = byteCharacters.charCodeAt(i);
+            }
+            const blob = new Blob([byteArray], { type: contentType });
+            const formData = new FormData();
+            formData.append('file', blob, fileName);
+            formData.append('upload_preset', uploadPreset);
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                { method: 'POST', body: formData }
+            );
+
+            if (!response.ok) {
+                const err = await response.text();
+                console.error('[Cloudinary] Erro:', err);
+                return null;
+            }
+
+            const data = await response.json();
+            return data.secure_url ?? null;
+        };
+    </script>
 </body>
 
 </html>

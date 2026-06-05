@@ -20,7 +20,7 @@ public class ProjectService
     }
 
     // ====================================
-    // GET ALL: Busca todos os projetos
+    // GET ALL
     // ====================================
     public async Task<List<ProjectCardDto>> GetAllAsync()
     {
@@ -28,10 +28,9 @@ public class ProjectService
         {
             var response = await _httpClient.GetAsync("api/projects");
 
-            // Se a API respondeu com erro, loga e retorna lista vazia
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[ProjectService] GetAllAsync retornou {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[ProjectService] GetAllAsync retornou {(int)response.StatusCode}");
                 return new List<ProjectCardDto>();
             }
 
@@ -41,26 +40,23 @@ public class ProjectService
         }
         catch (HttpRequestException ex)
         {
-            // Falha de rede, CORS, DNS, API fora do ar
             Console.WriteLine($"[ProjectService] Erro de rede em GetAllAsync: {ex.Message}");
             return new List<ProjectCardDto>();
         }
         catch (JsonException ex)
         {
-            // API retornou um JSON malformado ou com formato inesperado
             Console.WriteLine($"[ProjectService] Erro de deserialização em GetAllAsync: {ex.Message}");
             return new List<ProjectCardDto>();
         }
         catch (Exception ex)
         {
-            // Qualquer outra coisa que não previmos
             Console.WriteLine($"[ProjectService] Erro inesperado em GetAllAsync: {ex.Message}");
             return new List<ProjectCardDto>();
         }
     }
 
     // ====================================
-    // GET BY ID: Busca projeto específico
+    // GET BY ID
     // ====================================
     public async Task<ProjectDto?> GetByIdAsync(Guid id)
     {
@@ -68,15 +64,12 @@ public class ProjectService
         {
             var response = await _httpClient.GetAsync($"api/projects/{id}");
 
-            // 404 é caso de uso normal, não é erro de fato
             if (response.StatusCode == HttpStatusCode.NotFound)
-            {
                 return null;
-            }
 
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[ProjectService] GetByIdAsync({id}) retornou {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[ProjectService] GetByIdAsync({id}) retornou {(int)response.StatusCode}");
                 return null;
             }
 
@@ -101,13 +94,92 @@ public class ProjectService
     }
 
     // ====================================
-    // GET FEATURED: Filtra projetos em destaque
+    // GET FEATURED
     // ====================================
-    // OBS: Reutiliza GetAllAsync que já tem tratamento de erros completo.
-    // Como GetAllAsync nunca lança exceção, não precisamos de try/catch aqui.
     public async Task<List<ProjectCardDto>> GetFeaturedAsync()
     {
         var allProjects = await GetAllAsync();
         return allProjects.Where(p => p.IsFeatured).ToList();
+    }
+
+    // ====================================
+    // CREATE (Admin)
+    // ====================================
+    public async Task<(bool Success, string? Error)> CreateAsync(CreateProjectDto dto)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(dto, ProjectJsonContext.Default.CreateProjectDto);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("api/projects", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[ProjectService] CreateAsync retornou {(int)response.StatusCode}: {error}");
+                return (false, $"Erro {(int)response.StatusCode}: {error}");
+            }
+
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ProjectService] Erro em CreateAsync: {ex.Message}");
+            return (false, ex.Message);
+        }
+    }
+
+    // ====================================
+    // UPDATE (Admin)
+    // ====================================
+    public async Task<(bool Success, string? Error)> UpdateAsync(UpdateProjectDto dto)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(dto, ProjectJsonContext.Default.UpdateProjectDto);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PutAsync($"api/projects/{dto.Id}", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[ProjectService] UpdateAsync({dto.Id}) retornou {(int)response.StatusCode}: {error}");
+                return (false, $"Erro {(int)response.StatusCode}: {error}");
+            }
+
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ProjectService] Erro em UpdateAsync: {ex.Message}");
+            return (false, ex.Message);
+        }
+    }
+
+    // ====================================
+    // DELETE (Admin)
+    // ====================================
+    public async Task<(bool Success, string? Error)> DeleteAsync(Guid id)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"api/projects/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[ProjectService] DeleteAsync({id}) retornou {(int)response.StatusCode}: {error}");
+                return (false, $"Erro {(int)response.StatusCode}: {error}");
+            }
+
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ProjectService] Erro em DeleteAsync: {ex.Message}");
+            return (false, ex.Message);
+        }
     }
 }
