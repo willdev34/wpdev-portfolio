@@ -6,6 +6,9 @@ namespace Portfolio.Web.Json;
 [JsonSerializable(typeof(List<BlogPostCardDto>))]
 [JsonSerializable(typeof(BlogPostCardDto))]
 [JsonSerializable(typeof(BlogPostDto))]
+[JsonSerializable(typeof(CreateBlogPostDto))]
+[JsonSerializable(typeof(UpdateBlogPostDto))]
+[JsonSerializable(typeof(List<string>))]
 [JsonSourceGenerationOptions(
     PropertyNameCaseInsensitive = true,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull

@@ -65,4 +65,77 @@ public class BlogPostService
     {
         return await GetAllAsync();
     }
+
+    // ====================================
+    // CREATE (Admin)
+    // ====================================
+    public async Task<(bool Success, string? Error)> CreateAsync(CreateBlogPostDto dto)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(dto, BlogPostJsonContext.Default.CreateBlogPostDto);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/blogposts", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[BlogPostService] CreateAsync retornou {(int)response.StatusCode}: {error}");
+                return (false, $"Erro {(int)response.StatusCode}: {error}");
+            }
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] Erro em CreateAsync: {ex.Message}");
+            return (false, ex.Message);
+        }
+    }
+
+    // ====================================
+    // UPDATE (Admin)
+    // ====================================
+    public async Task<(bool Success, string? Error)> UpdateAsync(UpdateBlogPostDto dto)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(dto, BlogPostJsonContext.Default.UpdateBlogPostDto);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"api/blogposts/{dto.Id}", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[BlogPostService] UpdateAsync({dto.Id}) retornou {(int)response.StatusCode}: {error}");
+                return (false, $"Erro {(int)response.StatusCode}: {error}");
+            }
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] Erro em UpdateAsync: {ex.Message}");
+            return (false, ex.Message);
+        }
+    }
+
+    // ====================================
+    // DELETE (Admin)
+    // ====================================
+    public async Task<(bool Success, string? Error)> DeleteAsync(Guid id)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"api/blogposts/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[BlogPostService] DeleteAsync({id}) retornou {(int)response.StatusCode}: {error}");
+                return (false, $"Erro {(int)response.StatusCode}: {error}");
+            }
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] Erro em DeleteAsync: {ex.Message}");
+            return (false, ex.Message);
+        }
+    }
 }

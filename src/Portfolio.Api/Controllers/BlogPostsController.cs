@@ -21,6 +21,7 @@ namespace Portfolio.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Microsoft.AspNetCore.Authorization.Authorize]
 public class BlogPostsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -42,6 +43,7 @@ public class BlogPostsController : ControllerBase
     /// <returns>Lista de BlogPostCardDto</returns>
     /// <response code="200">Retorna a lista de posts</response>
     [HttpGet]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetAll()
     {
@@ -66,6 +68,7 @@ public class BlogPostsController : ControllerBase
     /// <response code="200">Retorna o post encontrado</response>
     /// <response code="404">Post não encontrado</response>
     [HttpGet("{id}")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(BlogPostDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BlogPostDto>> GetById(Guid id)
@@ -99,6 +102,7 @@ public class BlogPostsController : ControllerBase
     /// <response code="200">Retorna o post encontrado</response>
     /// <response code="404">Post não encontrado</response>
     [HttpGet("slug/{slug}")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(BlogPostDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BlogPostDto>> GetBySlug(string slug)

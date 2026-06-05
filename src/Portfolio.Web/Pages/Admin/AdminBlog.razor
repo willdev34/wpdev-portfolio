@@ -1,0 +1,119 @@
+@* ====================================
+   Título: AdminBlog.razor
+   Descrição: Listagem e gerenciamento de posts do blog no admin
+   ==================================== *@
+
+@page "/admin/blog"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject BlogPostService BlogPostService
+@inject IJSRuntime JS
+
+@using Portfolio.Web.DTOs.BlogPosts
+
+<PageTitle>Blog - WPDev Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-page__header">
+        <div>
+            <h1 class="admin-page__title">Blog</h1>
+            <p class="admin-page__subtitle">@_posts.Count post(s) cadastrado(s)</p>
+        </div>
+        <a class="btn-primary" href="/admin/blog/new">+ Novo Post</a>
+    </div>
+
+    @if (_isLoading)
+    {
+        <p class="admin-loading">Carregando...</p>
+    }
+    else if (_posts.Count == 0)
+    {
+        <div class="admin-empty">
+            <p>Nenhum post cadastrado ainda.</p>
+            <a href="/admin/blog/new">Criar primeiro post</a>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tags</th>
+                        <th>Leitura</th>
+                        <th>Publicado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var post in _posts)
+                    {
+                        <tr>
+                            <td class="td-title">@post.Title</td>
+                            <td>
+                                @foreach (var tag in post.Tags.Take(2))
+                                {
+                                    <span class="tag">@tag</span>
+                                }
+                            </td>
+                            <td>@post.ReadTimeMinutes min</td>
+                            <td>@post.PublishedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="td-actions">
+                                <a class="btn-edit" href="/admin/blog/edit/@post.Id">Editar</a>
+                                <button class="btn-delete" @onclick="() => ConfirmDelete(post.Id, post.Title)">Excluir</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@if (_showConfirm)
+{
+    <div class="confirm-overlay">
+        <div class="confirm-box">
+            <p>Excluir <strong>@_deleteTitle</strong>?</p>
+            <p class="confirm-box__sub">Esta ação não pode ser desfeita.</p>
+            <div class="confirm-box__actions">
+                <button class="btn-cancel" @onclick="CancelDelete">Cancelar</button>
+                <button class="btn-confirm-delete" @onclick="ExecuteDelete">Excluir</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<BlogPostCardDto> _posts = new();
+    private bool _isLoading = true;
+    private bool _showConfirm = false;
+    private Guid _deleteId;
+    private string _deleteTitle = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _posts = await BlogPostService.GetAllAsync();
+        _isLoading = false;
+    }
+
+    private void ConfirmDelete(Guid id, string title)
+    {
+        _deleteId = id;
+        _deleteTitle = title;
+        _showConfirm = true;
+    }
+
+    private void CancelDelete() => _showConfirm = false;
+
+    private async Task ExecuteDelete()
+    {
+        var (success, error) = await BlogPostService.DeleteAsync(_deleteId);
+        _showConfirm = false;
+        if (success)
+            _posts = await BlogPostService.GetAllAsync();
+        else
+            Console.WriteLine($"[AdminBlog] Erro ao excluir: {error}");
+    }
+}

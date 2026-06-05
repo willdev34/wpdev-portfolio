@@ -1,0 +1,255 @@
+@* ====================================
+   Título: AdminBlogForm.razor
+   Descrição: Formulário de criação e edição de posts do blog
+   ==================================== *@
+
+@page "/admin/blog/new"
+@page "/admin/blog/edit/{Id:guid}"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject BlogPostService BlogPostService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+@using Portfolio.Web.DTOs.BlogPosts
+
+<PageTitle>@(_isEdit ? "Editar Post" : "Novo Post") - WPDev Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-page__header">
+        <div>
+            <a class="back-link" href="/admin/blog">← Blog</a>
+            <h1 class="admin-page__title">@(_isEdit ? "Editar Post" : "Novo Post")</h1>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <p class="admin-loading">Carregando...</p>
+    }
+    else
+    {
+        <div class="form-actions-wrapper">
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="form-error">@_errorMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(_successMessage))
+            {
+                <div class="form-success">@_successMessage</div>
+            }
+        </div>
+
+        <div class="form-grid">
+            <div class="form-section">
+                <h2 class="form-section__title">Informações Principais</h2>
+
+                <div class="field">
+                    <label class="field__label">Título *</label>
+                    <input class="field__input" value="@_form.Title"
+                        @oninput="GenerateSlug" placeholder="Título do post" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Slug *</label>
+                    <input class="field__input" @bind="_form.Slug" placeholder="url-do-post" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Resumo *</label>
+                    <textarea class="field__textarea" @bind="_form.Excerpt"
+                              placeholder="Resumo do post" rows="3"></textarea>
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Conteúdo * (Markdown)</label>
+                    <textarea class="field__textarea field__textarea--tall" @bind="_form.Content"
+                              placeholder="# Título&#10;&#10;Escreva em Markdown..." rows="12"></textarea>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field__label">Tempo de leitura (min)</label>
+                        <input class="field__input" type="number" @bind="_form.ReadTimeMinutes" />
+                    </div>
+                </div>
+
+                <div class="field field--checkbox">
+                    <input type="checkbox" id="published" @bind="_form.IsPublished" />
+                    <label for="published">Publicado</label>
+                </div>
+
+                <div class="field field--checkbox">
+                    <input type="checkbox" id="featured" @bind="_form.IsFeatured" />
+                    <label for="featured">Post em destaque</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section__title">Mídia e Tags</h2>
+
+                <div class="field">
+                    <label class="field__label">Imagem de capa</label>
+                    <ImageUpload CurrentUrl="@_form.FeaturedImageUrl"
+                                 OnUrlChanged="@(url => _form.FeaturedImageUrl = url)" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Tags</label>
+                    <div class="tech-input-row">
+                        <input class="field__input" @bind="_newTag"
+                               @onkeydown="HandleTagKeyDown" placeholder="Ex: .NET, Tutorial..." />
+                        <button class="btn-add-tech" type="button" @onclick="AddTag">+</button>
+                    </div>
+                    <div class="tech-tags">
+                        @foreach (var tag in _form.Tags)
+                        {
+                            <span class="tech-tag">
+                                @tag
+                                <button type="button" @onclick="() => RemoveTag(tag)">×</button>
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions-wrapper">
+            <div class="form-actions">
+                <a class="btn-cancel" href="/admin/blog">Cancelar</a>
+                <button class="btn-save" @onclick="HandleSubmit" disabled="@_isSaving">
+                    @(_isSaving ? "Salvando..." : "Salvar post")
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private bool _isEdit => Id.HasValue;
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+    private string _newTag = string.Empty;
+
+    private CreateBlogPostDto _form = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_isEdit)
+        {
+            var post = await BlogPostService.GetByIdAsync(Id!.Value);
+            if (post is null)
+            {
+                await JS.InvokeVoidAsync("eval", "window.location.href='/admin/blog'");
+                return;
+            }
+
+            _form = new CreateBlogPostDto
+            {
+                Title = post.Title,
+                Slug = post.Title.ToLower().Replace(" ", "-"),
+                Excerpt = post.Excerpt,
+                Content = post.Content,
+                FeaturedImageUrl = post.ThumbnailUrl,
+                Tags = new List<string>(post.Tags),
+                IsPublished = post.IsPublished,
+                ReadTimeMinutes = post.ReadTimeMinutes
+            };
+        }
+
+        _isLoading = false;
+    }
+
+    private void GenerateSlug(ChangeEventArgs e)
+    {
+        var title = e.Value?.ToString() ?? string.Empty;
+        _form.Title = title;
+        if (!_isEdit)
+        {
+            _form.Slug = title.ToLower()
+                .Replace(" ", "-")
+                .Replace("ã", "a").Replace("â", "a").Replace("á", "a").Replace("à", "a")
+                .Replace("é", "e").Replace("ê", "e")
+                .Replace("í", "i")
+                .Replace("ó", "o").Replace("ô", "o")
+                .Replace("ú", "u")
+                .Replace("ç", "c")
+                .Replace("ñ", "n");
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_form.Title) ||
+            string.IsNullOrWhiteSpace(_form.Slug) ||
+            string.IsNullOrWhiteSpace(_form.Content))
+        {
+            _errorMessage = "Título, slug e conteúdo são obrigatórios.";
+            return;
+        }
+
+        _isSaving = true;
+        _errorMessage = string.Empty;
+
+        if (_isEdit)
+        {
+            var updateDto = new UpdateBlogPostDto
+            {
+                Id = Id!.Value,
+                Title = _form.Title,
+                Slug = _form.Slug,
+                Excerpt = _form.Excerpt,
+                Content = _form.Content,
+                FeaturedImageUrl = _form.FeaturedImageUrl,
+                Tags = _form.Tags,
+                IsPublished = _form.IsPublished,
+                IsFeatured = _form.IsFeatured,
+                ReadTimeMinutes = _form.ReadTimeMinutes
+            };
+
+            var (success, error) = await BlogPostService.UpdateAsync(updateDto);
+            if (!success)
+            {
+                _errorMessage = error ?? "Erro ao atualizar post.";
+                _isSaving = false;
+                return;
+            }
+        }
+        else
+        {
+            var (success, error) = await BlogPostService.CreateAsync(_form);
+            if (!success)
+            {
+                _errorMessage = error ?? "Erro ao criar post.";
+                _isSaving = false;
+                return;
+            }
+        }
+
+        _successMessage = _isEdit ? "Post atualizado com sucesso." : "Post criado com sucesso.";
+        _isSaving = false;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(5000);
+        await JS.InvokeVoidAsync("eval", "window.location.href='/admin/blog'");
+    }
+
+    private void AddTag()
+    {
+        var tag = _newTag.Trim();
+        if (!string.IsNullOrWhiteSpace(tag) && !_form.Tags.Contains(tag))
+            _form.Tags.Add(tag);
+        _newTag = string.Empty;
+    }
+
+    private async Task HandleTagKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddTag();
+        await Task.CompletedTask;
+    }
+
+    private void RemoveTag(string tag) => _form.Tags.Remove(tag);
+}
