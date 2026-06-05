@@ -34,7 +34,7 @@
                    type="file"
                    accept="image/*"
                    class="upload-input" />
-            <img id="preview-@_id" style="display:none" alt="" />
+            <img id="preview-@_id" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:8px;" alt="" />
             <input id="url-@_id" type="hidden" value="@CurrentUrl" />
         }
     </div>
@@ -95,6 +95,8 @@
                         CurrentUrl = url;
                         _previewUrl = url;
                         await OnUrlChanged.InvokeAsync(url);
+                        // Esconde o preview JS após o Blazor assumir
+                        await JS.InvokeVoidAsync("eval", $"var el=document.getElementById('preview-{_id}');if(el)el.style.display='none'");
                         await InvokeAsync(StateHasChanged);
                     }
                 }
