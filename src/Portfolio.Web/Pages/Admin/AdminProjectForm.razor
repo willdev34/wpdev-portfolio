@@ -9,6 +9,7 @@
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>@(_isEdit ? "Editar Projeto" : "Novo Projeto") - WPDev Admin</PageTitle>
 
@@ -146,7 +147,7 @@
             // Projeto não encontrado: redireciona sem mensagem
             if (project is null)
             {
-                Navigation.NavigateTo("/admin/projects");
+                await JS.InvokeVoidAsync("eval", "window.location.href='/admin/projects'");
                 return;
             }
 
@@ -226,7 +227,7 @@
        await Task.Delay(100);
        await InvokeAsync(StateHasChanged);
        await Task.Delay(5000);
-       Navigation.NavigateTo("/admin/projects");
+       await JS.InvokeVoidAsync("eval", "window.location.href='/admin/projects'");
     }
 
     private void AddTech()
