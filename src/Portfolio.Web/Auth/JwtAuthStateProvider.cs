@@ -79,7 +79,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
             var payload = ParsePayload(token);
             if (payload.TryGetValue("exp", out var exp))
             {
-                var expValue = ((JsonElement)exp).GetInt64();
+                var expValue = exp.GetInt64();
                 var expDate = DateTimeOffset.FromUnixTimeSeconds(expValue);
                 return expDate < DateTimeOffset.UtcNow;
             }
@@ -98,17 +98,13 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
         foreach (var kvp in payload)
         {
-            var value = kvp.Value is JsonElement element
-                ? element.ToString()
-                : kvp.Value?.ToString() ?? string.Empty;
-
-            claims.Add(new Claim(kvp.Key, value));
+            claims.Add(new Claim(kvp.Key, kvp.Value.ToString()));
         }
 
         return claims;
     }
 
-    private static Dictionary<string, object> ParsePayload(string token)
+    private static Dictionary<string, JsonElement> ParsePayload(string token)
     {
         var parts = token.Split('.');
         if (parts.Length != 3)
@@ -116,7 +112,6 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
         var payload = parts[1];
 
-        // Corrige padding base64
         payload = payload.Replace('-', '+').Replace('_', '/');
         switch (payload.Length % 4)
         {
@@ -127,7 +122,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         var bytes = Convert.FromBase64String(payload);
         var json = System.Text.Encoding.UTF8.GetString(bytes);
 
-        return JsonSerializer.Deserialize<Dictionary<string, object>>(json)
-               ?? new();
+        return JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json)
+            ?? new();
     }
 }
