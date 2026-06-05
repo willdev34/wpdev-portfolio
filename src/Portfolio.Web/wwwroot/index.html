@@ -152,6 +152,11 @@
                         if (preview) {
                             preview.src = url;
                             preview.style.display = 'block';
+                            preview.style.width = '100%';
+                            preview.style.height = '160px';
+                            preview.style.objectFit = 'cover';
+                            preview.style.borderRadius = '8px';
+                            preview.style.marginBottom = '8px';
                         }
                         const urlField = document.getElementById(urlFieldId);
                         if (urlField) urlField.value = url;
