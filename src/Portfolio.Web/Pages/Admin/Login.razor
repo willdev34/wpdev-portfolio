@@ -99,7 +99,7 @@
         }
 
         await AuthProvider.SaveTokenAsync(result.Token);
-        Navigation.NavigateTo("/admin");
+        Navigation.NavigateTo("/admin", forceLoad: true);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
