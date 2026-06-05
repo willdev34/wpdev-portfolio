@@ -10,6 +10,7 @@
 @inject AuthService AuthService
 @inject JwtAuthStateProvider AuthProvider
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>Admin - WPDev</PageTitle>
 
@@ -99,7 +100,7 @@
         }
 
         await AuthProvider.SaveTokenAsync(result.Token);
-        Navigation.NavigateTo("/admin", forceLoad: true);
+        await JS.InvokeVoidAsync("eval", "window.location.href='/admin'");
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
