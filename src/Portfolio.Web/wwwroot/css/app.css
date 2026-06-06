@@ -56,6 +56,8 @@ html, body {
     background-color: var(--color-light);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 /* ====================================
@@ -208,6 +210,29 @@ a:hover {
 .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(13, 28, 36, 0.1);
+}
+
+/* ====================================
+   IMAGENS - Baseline global
+   Fix Safari: scoped CSS não aplica height em img
+   ==================================== */
+img {
+    max-width: 100%;
+}
+
+.brand-logo {
+    height: 44px !important;
+    width: auto !important;
+    max-width: none !important;
+    display: block;
+}
+
+.brand-logo--footer {
+    height: 40px !important;
+    width: auto !important;
+    max-width: none !important;
+    opacity: 0.9;
+    filter: brightness(0) invert(1);
 }
 
 /* ====================================
