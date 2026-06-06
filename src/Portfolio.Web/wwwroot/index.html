@@ -41,6 +41,13 @@
             margin-bottom: 2rem;
         }
 
+        .wpdev-loader-brand-img {
+            height: 56px;
+            width: auto;
+            margin-bottom: 2rem;
+            filter: brightness(0) invert(1);
+        }
+
         .wpdev-loader-brand span {
             color: #6C9EA3;
         }
@@ -86,7 +93,7 @@
 
         <!-- Loader com fundo próprio, não contamina o #app -->
         <div class="wpdev-loader-screen">
-            <div class="wpdev-loader-brand">WP<span>Dev</span></div>
+            <img src="/images/wpdev-logo.webp" alt="WPDev" class="wpdev-loader-brand-img" />
             <div class="wpdev-loader-bar"></div>
         </div>
     </div>

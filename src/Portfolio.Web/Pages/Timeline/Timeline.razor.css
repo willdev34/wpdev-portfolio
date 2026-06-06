@@ -4,10 +4,20 @@
    ==================================== */
 
 .timeline-hero {
-    padding: 120px 0 80px 0;
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
+    padding: 120px 5% 80px 5%;
+    text-align: left;
+    max-width: 900px;
+}
+
+.hero-eyebrow {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #6C9EA3;
+    text-transform: uppercase;
+    margin-bottom: 16px;
 }
 
 .hero-title {
@@ -26,6 +36,7 @@
     color: rgba(13, 28, 36, 0.55);
     line-height: 1.7;
     margin: 0;
+    max-width: 560px;
 }
 
 .timeline-section {

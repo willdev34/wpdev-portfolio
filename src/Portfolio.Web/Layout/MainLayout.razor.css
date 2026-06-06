@@ -369,3 +369,16 @@
         animation: none !important;
     }
 }
+
+/* LOGO IMAGEM */
+.brand-logo {
+    height: 44px;
+    width: auto;
+    display: block;
+}
+
+.brand-logo--footer {
+    height: 40px;
+    opacity: 0.9;
+    filter: brightness(0) invert(1);
+}
