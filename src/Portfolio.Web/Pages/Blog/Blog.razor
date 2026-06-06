@@ -87,6 +87,8 @@
                     <Card
                         Title="@post.Title"
                         Description="@post.Excerpt"
+                        ImageUrl="@post.FeaturedImageUrl"
+                        ImageAlt="@post.Title"
                         OnClick="() => NavigateToPost(post.Id)">
                         <HeaderContent>
                             <div class="blog-meta-info">

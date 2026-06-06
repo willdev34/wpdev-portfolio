@@ -7,15 +7,15 @@
 @page "/admin/blog/edit/{Id:guid}"
 @layout Portfolio.Web.Layout.AdminLayout
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Portfolio.Web.DTOs.BlogPosts
 @inject BlogPostService BlogPostService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-@using Portfolio.Web.DTOs.BlogPosts
-
 <PageTitle>@(_isEdit ? "Editar Post" : "Novo Post") - WPDev Admin</PageTitle>
 
 <div class="admin-page">
+
     <div class="admin-page__header">
         <div>
             <a class="back-link" href="/admin/blog">← Blog</a>
@@ -29,49 +29,47 @@
     }
     else
     {
-        <div class="form-actions-wrapper">
-            @if (!string.IsNullOrEmpty(_errorMessage))
-            {
-                <div class="form-error">@_errorMessage</div>
-            }
-            @if (!string.IsNullOrEmpty(_successMessage))
-            {
-                <div class="form-success">@_successMessage</div>
-            }
-        </div>
-
         <div class="form-grid">
+
             <div class="form-section">
                 <h2 class="form-section__title">Informações Principais</h2>
 
                 <div class="field">
                     <label class="field__label">Título *</label>
-                    <input class="field__input" value="@_form.Title"
-                        @oninput="GenerateSlug" placeholder="Título do post" />
+                    <input class="field__input"
+                           value="@_form.Title"
+                           @oninput="GenerateSlug"
+                           placeholder="Título do post" />
                 </div>
 
                 <div class="field">
                     <label class="field__label">Slug *</label>
-                    <input class="field__input" @bind="_form.Slug" placeholder="url-do-post" />
+                    <input class="field__input"
+                           @bind="_form.Slug"
+                           placeholder="url-do-post" />
                 </div>
 
                 <div class="field">
                     <label class="field__label">Resumo *</label>
-                    <textarea class="field__textarea" @bind="_form.Excerpt"
-                              placeholder="Resumo do post" rows="3"></textarea>
+                    <textarea class="field__textarea"
+                              @bind="_form.Excerpt"
+                              placeholder="Resumo do post"
+                              rows="3"></textarea>
                 </div>
 
                 <div class="field">
                     <label class="field__label">Conteúdo * (Markdown)</label>
-                    <textarea class="field__textarea field__textarea--tall" @bind="_form.Content"
-                              placeholder="# Título&#10;&#10;Escreva em Markdown..." rows="12"></textarea>
+                    <textarea class="field__textarea field__textarea--tall"
+                              @bind="_form.Content"
+                              placeholder="# Título&#10;&#10;Escreva em Markdown..."
+                              rows="12"></textarea>
                 </div>
 
-                <div class="field-row">
-                    <div class="field">
-                        <label class="field__label">Tempo de leitura (min)</label>
-                        <input class="field__input" type="number" @bind="_form.ReadTimeMinutes" />
-                    </div>
+                <div class="field">
+                    <label class="field__label">Tempo de leitura (min)</label>
+                    <input class="field__input"
+                           type="number"
+                           @bind="_form.ReadTimeMinutes" />
                 </div>
 
                 <div class="field field--checkbox">
@@ -91,14 +89,16 @@
                 <div class="field">
                     <label class="field__label">Imagem de capa</label>
                     <ImageUpload CurrentUrl="@_form.FeaturedImageUrl"
-                                 OnUrlChanged="@(url => _form.FeaturedImageUrl = url)" />
+                                 OnUrlChanged="@OnImageUrlChanged" />
                 </div>
 
                 <div class="field">
                     <label class="field__label">Tags</label>
                     <div class="tech-input-row">
-                        <input class="field__input" @bind="_newTag"
-                               @onkeydown="HandleTagKeyDown" placeholder="Ex: .NET, Tutorial..." />
+                        <input class="field__input"
+                               @bind="_newTag"
+                               @onkeydown="HandleTagKeyDown"
+                               placeholder="Ex: .NET, Tutorial..." />
                         <button class="btn-add-tech" type="button" @onclick="AddTag">+</button>
                     </div>
                     <div class="tech-tags">
@@ -112,9 +112,18 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="form-actions-wrapper">
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="form-error">@_errorMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(_successMessage))
+            {
+                <div class="form-success">@_successMessage</div>
+            }
             <div class="form-actions">
                 <a class="btn-cancel" href="/admin/blog">Cancelar</a>
                 <button class="btn-save" @onclick="HandleSubmit" disabled="@_isSaving">
@@ -123,6 +132,7 @@
             </div>
         </div>
     }
+
 </div>
 
 @code {
@@ -142,6 +152,7 @@
         if (_isEdit)
         {
             var post = await BlogPostService.GetByIdAsync(Id!.Value);
+
             if (post is null)
             {
                 await JS.InvokeVoidAsync("eval", "window.location.href='/admin/blog'");
@@ -154,7 +165,7 @@
                 Slug = post.Title.ToLower().Replace(" ", "-"),
                 Excerpt = post.Excerpt,
                 Content = post.Content,
-                FeaturedImageUrl = post.ThumbnailUrl,
+                FeaturedImageUrl = post.FeaturedImageUrl,
                 Tags = new List<string>(post.Tags),
                 IsPublished = post.IsPublished,
                 ReadTimeMinutes = post.ReadTimeMinutes
@@ -168,6 +179,7 @@
     {
         var title = e.Value?.ToString() ?? string.Empty;
         _form.Title = title;
+
         if (!_isEdit)
         {
             _form.Slug = title.ToLower()
@@ -212,6 +224,7 @@
             };
 
             var (success, error) = await BlogPostService.UpdateAsync(updateDto);
+
             if (!success)
             {
                 _errorMessage = error ?? "Erro ao atualizar post.";
@@ -222,6 +235,7 @@
         else
         {
             var (success, error) = await BlogPostService.CreateAsync(_form);
+
             if (!success)
             {
                 _errorMessage = error ?? "Erro ao criar post.";
@@ -235,6 +249,12 @@
         await InvokeAsync(StateHasChanged);
         await Task.Delay(5000);
         await JS.InvokeVoidAsync("eval", "window.location.href='/admin/blog'");
+    }
+
+    private Task OnImageUrlChanged(string url)
+    {
+        _form.FeaturedImageUrl = url;
+        return Task.CompletedTask;
     }
 
     private void AddTag()

@@ -1,6 +1,6 @@
 @* ====================================
    Título: ImageUpload.razor
-   Descrição: Upload de imagem via Cloudinary usando JS puro (sem InputFile)
+   Descrição: Upload de imagem via Cloudinary com callback direto para Blazor
    ==================================== *@
 
 @inject IJSRuntime JS
@@ -15,7 +15,7 @@
         </div>
     }
 
-    <div class="image-upload__area" id="upload-area-@_id">
+    <div class="image-upload__area">
         @if (_isUploading)
         {
             <div class="upload-progress">
@@ -34,8 +34,9 @@
                    type="file"
                    accept="image/*"
                    class="upload-input" />
-            <img id="preview-@_id" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:8px;" alt="" />
-            <input id="url-@_id" type="hidden" value="@CurrentUrl" />
+            <img id="preview-@_id"
+                 style="display:none;width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:8px;"
+                 alt="" />
         }
     </div>
 
@@ -65,7 +66,7 @@
     private string _errorMessage = string.Empty;
     private string _previewUrl = string.Empty;
     private bool _isUploading = false;
-    private System.Threading.Timer? _pollTimer;
+    private DotNetObjectReference<ImageUpload>? _dotNetRef;
 
     protected override void OnParametersSet()
     {
@@ -77,32 +78,25 @@
     {
         if (firstRender)
         {
+            _dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("setupImageUpload",
                 $"file-input-{_id}",
                 $"preview-{_id}",
-                $"url-{_id}",
+                _dotNetRef,
                 CloudName,
                 UploadPreset);
-
-            // Polling para detectar quando a URL foi preenchida pelo JS
-            _pollTimer = new System.Threading.Timer(async _ =>
-            {
-                try
-                {
-                    var url = await JS.InvokeAsync<string?>("getElementValue", $"url-{_id}");
-                    if (!string.IsNullOrEmpty(url) && url != CurrentUrl && url.StartsWith("http"))
-                    {
-                        CurrentUrl = url;
-                        _previewUrl = url;
-                        await OnUrlChanged.InvokeAsync(url);
-                        // Esconde o preview JS após o Blazor assumir
-                        await JS.InvokeVoidAsync("eval", $"var el=document.getElementById('preview-{_id}');if(el)el.style.display='none'");
-                        await InvokeAsync(StateHasChanged);
-                    }
-                }
-                catch { }
-            }, null, 1000, 1000);
         }
+    }
+
+    [JSInvokable]
+    public async Task OnImageUploaded(string url)
+    {
+        CurrentUrl = url;
+        _previewUrl = url;
+        _isUploading = false;
+        await JS.InvokeVoidAsync("eval", $"var el=document.getElementById('preview-{_id}');if(el)el.style.display='none'");
+        await OnUrlChanged.InvokeAsync(url);
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleUrlInput(ChangeEventArgs e)
@@ -122,7 +116,7 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_pollTimer != null)
-            await _pollTimer.DisposeAsync();
+        _dotNetRef?.Dispose();
+        await Task.CompletedTask;
     }
 }

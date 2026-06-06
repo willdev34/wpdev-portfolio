@@ -40,10 +40,10 @@ else
 {
     <!-- HERO -->
     <section class="post-hero">
-        @if (!string.IsNullOrEmpty(post.ThumbnailUrl))
+        @if (!string.IsNullOrEmpty(post.FeaturedImageUrl))
         {
             <div class="hero-image">
-                <img src="@post.ThumbnailUrl" alt="@post.Title" />
+                <img src="@post.FeaturedImageUrl" alt="@post.Title" />
             </div>
         }
         else

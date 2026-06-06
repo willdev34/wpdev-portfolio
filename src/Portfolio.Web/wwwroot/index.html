@@ -101,7 +101,6 @@
 
     <script>
         window.cloudinaryUploadBytes = async function (base64Data, fileName, contentType, cloudName, uploadPreset) {
-            console.log('[Cloudinary] Iniciando upload:', fileName);
             try {
                 const byteCharacters = atob(base64Data);
                 const byteArray = new Uint8Array(byteCharacters.length);
@@ -125,7 +124,6 @@
                 }
 
                 const data = await response.json();
-                console.log('[Cloudinary] URL:', data.secure_url);
                 return data.secure_url ?? null;
             } catch (ex) {
                 console.error('[Cloudinary] Exceção:', ex);
@@ -133,19 +131,28 @@
             }
         };
 
-        window.setupImageUpload = function (inputId, previewId, urlFieldId, cloudName, uploadPreset) {
+        window.setupImageUpload = function (inputId, previewId, dotNetRef, cloudName, uploadPreset) {
             const input = document.getElementById(inputId);
-            if (!input) return;
+            if (!input) {
+                console.error('[ImageUpload] Input não encontrado:', inputId);
+                return;
+            }
+
+            console.log('[ImageUpload] Setup OK para:', inputId);
 
             input.addEventListener('change', async function () {
                 const file = input.files[0];
                 if (!file) return;
+
+                console.log('[ImageUpload] Arquivo selecionado:', file.name);
 
                 const reader = new FileReader();
                 reader.onload = async function (e) {
                     const base64 = e.target.result.split(',')[1];
                     const url = await window.cloudinaryUploadBytes(
                         base64, file.name, file.type, cloudName, uploadPreset);
+
+                    console.log('[ImageUpload] URL retornada:', url);
 
                     if (url) {
                         const preview = document.getElementById(previewId);
@@ -157,18 +164,21 @@
                             preview.style.objectFit = 'cover';
                             preview.style.borderRadius = '8px';
                             preview.style.marginBottom = '8px';
+                            // Esconde após 2s quando Blazor assumir o preview
+                            setTimeout(() => { preview.style.display = 'none'; }, 2000);
                         }
-                        const urlField = document.getElementById(urlFieldId);
-                        if (urlField) urlField.value = url;
+
+                        // Notifica o Blazor diretamente via DotNetObjectReference
+                        try {
+                            await dotNetRef.invokeMethodAsync('OnImageUploaded', url);
+                            console.log('[ImageUpload] Blazor notificado com URL:', url);
+                        } catch (err) {
+                            console.error('[ImageUpload] Erro ao notificar Blazor:', err);
+                        }
                     }
                 };
                 reader.readAsDataURL(file);
             });
-        };
-
-        window.getElementValue = function (id) {
-            const el = document.getElementById(id);
-            return el ? el.value : null;
         };
     </script>
 </body>

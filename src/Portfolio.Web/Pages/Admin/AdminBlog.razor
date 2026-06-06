@@ -92,10 +92,14 @@
     private Guid _deleteId;
     private string _deleteTitle = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _posts = await BlogPostService.GetAllAsync();
-        _isLoading = false;
+        if (firstRender)
+        {
+            _posts = await BlogPostService.GetAllAsync();
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
 
     private void ConfirmDelete(Guid id, string title)

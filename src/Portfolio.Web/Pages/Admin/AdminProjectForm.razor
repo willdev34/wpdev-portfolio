@@ -75,7 +75,7 @@
                 <div class="field">
                     <label class="field__label">Imagem *</label>
                     <ImageUpload CurrentUrl="@_form.ImageUrl"
-                                OnUrlChanged="@(url => _form.ImageUrl = url)" />
+                                OnUrlChanged="@OnImageUrlChanged" />
                 </div>
 
                 <div class="field">
@@ -247,5 +247,12 @@
     private void RemoveTech(string tech)
     {
         _form.Technologies.Remove(tech);
+    }
+
+    private Task OnImageUrlChanged(string url)
+    {
+        _form.ImageUrl = url;
+        Console.WriteLine($"[AdminProjectForm] ImageUrl atualizado: {url}");
+        return Task.CompletedTask;
     }
 }

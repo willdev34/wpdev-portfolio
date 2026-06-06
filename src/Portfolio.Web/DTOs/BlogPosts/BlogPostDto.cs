@@ -11,7 +11,7 @@ public class BlogPostDto
     public string Title { get; set; } = string.Empty;
     public string Excerpt { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public string ThumbnailUrl { get; set; } = string.Empty;
+    public string FeaturedImageUrl { get; set; } = string.Empty;
     public DateTime PublishedAt { get; set; }
     public int ReadTimeMinutes { get; set; }
     public List<string> Tags { get; set; } = new();
