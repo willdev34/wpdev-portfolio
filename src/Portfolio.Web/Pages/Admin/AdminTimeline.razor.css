@@ -1,0 +1,236 @@
+/* AdminTimeline - Listagem de eventos da timeline */
+
+.admin-page {
+    padding: 32px;
+    max-width: 1100px;
+}
+
+.admin-page__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 16px;
+}
+
+.admin-page__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0D1C24;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.admin-page__subtitle {
+    font-size: 0.875rem;
+    color: #A3A9AB;
+    margin: 4px 0 0;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #0D1C24;
+    color: #F4F7F7;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+}
+
+.btn-primary:hover { opacity: 0.85; }
+
+.admin-loading {
+    color: #A3A9AB;
+    font-size: 0.9rem;
+    padding: 40px 0;
+}
+
+.admin-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: #A3A9AB;
+}
+
+.admin-empty a {
+    color: #6C9EA3;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.admin-table-wrapper {
+    background: #fff;
+    border: 1px solid #e8ecec;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.admin-table thead {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e8ecec;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #A3A9AB;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.admin-table td {
+    padding: 14px 16px;
+    color: #0D1C24;
+    border-bottom: 1px solid #f0f2f2;
+    vertical-align: middle;
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+
+.admin-table tr:hover td { background: #fafbfb; }
+
+.td-title {
+    font-weight: 600;
+    max-width: 280px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(108,158,163,0.12);
+    color: #6C9EA3;
+}
+
+.td-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-edit {
+    padding: 5px 14px;
+    border-radius: 5px;
+    background: transparent;
+    border: 1px solid #e8ecec;
+    color: #6C9EA3;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.btn-edit:hover {
+    background: #6C9EA3;
+    color: #fff;
+    border-color: #6C9EA3;
+}
+
+.btn-delete {
+    padding: 5px 14px;
+    border-radius: 5px;
+    background: transparent;
+    border: 1px solid #e8ecec;
+    color: #e05555;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.btn-delete:hover {
+    background: #e05555;
+    color: #fff;
+    border-color: #e05555;
+}
+
+/* Modal de confirmação */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,28,36,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.confirm-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.confirm-box p {
+    font-size: 1rem;
+    color: #0D1C24;
+    margin: 0 0 8px;
+}
+
+.confirm-box__sub {
+    font-size: 0.85rem;
+    color: #A3A9AB;
+    margin-bottom: 24px;
+}
+
+.confirm-box__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-cancel {
+    padding: 10px 22px;
+    border-radius: 6px;
+    border: 1px solid #e8ecec;
+    background: #fff;
+    color: #0D1C24;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.btn-cancel:hover { background: #f8f9fa; }
+
+.btn-confirm-delete {
+    padding: 10px 22px;
+    border-radius: 6px;
+    border: none;
+    background: #e05555;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+}
+
+.btn-confirm-delete:hover { opacity: 0.85; }
+
+@media (max-width: 768px) {
+    .admin-page { padding: 20px; }
+    .admin-table { font-size: 0.8rem; }
+    .admin-table th, .admin-table td { padding: 10px 12px; }
+}

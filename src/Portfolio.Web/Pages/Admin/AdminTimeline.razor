@@ -1,0 +1,120 @@
+@* ====================================
+   Título: AdminTimeline.razor
+   Descrição: Listagem e gerenciamento de eventos da timeline no admin
+   ==================================== *@
+
+@page "/admin/timeline"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject TimelineService TimelineService
+@inject IJSRuntime JS
+
+@using Portfolio.Web.DTOs.Timeline
+
+<PageTitle>Timeline - WPDev Admin</PageTitle>
+
+<div class="admin-page">
+    <div class="admin-page__header">
+        <div>
+            <h1 class="admin-page__title">Timeline</h1>
+            <p class="admin-page__subtitle">@_events.Count evento(s) cadastrado(s)</p>
+        </div>
+        <a class="btn-primary" href="/admin/timeline/new">+ Novo Evento</a>
+    </div>
+
+    @if (_isLoading)
+    {
+        <p class="admin-loading">Carregando...</p>
+    }
+    else if (_events.Count == 0)
+    {
+        <div class="admin-empty">
+            <p>Nenhum evento cadastrado ainda.</p>
+            <a href="/admin/timeline/new">Criar primeiro evento</a>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Ordem</th>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Atual</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var evt in _events.OrderBy(e => e.Order))
+                    {
+                        <tr>
+                            <td>@evt.Order</td>
+                            <td class="td-title">@evt.Title</td>
+                            <td><span class="tag">@evt.Type</span></td>
+                            <td>@evt.Date.ToString("MM/yyyy")</td>
+                            <td>@(evt.IsCurrent ? "Sim" : "-")</td>
+                            <td class="td-actions">
+                                <a class="btn-edit" href="/admin/timeline/edit/@evt.Id">Editar</a>
+                                <button class="btn-delete" @onclick="() => ConfirmDelete(evt.Id, evt.Title)">Excluir</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@if (_showConfirm)
+{
+    <div class="confirm-overlay">
+        <div class="confirm-box">
+            <p>Excluir <strong>@_deleteTitle</strong>?</p>
+            <p class="confirm-box__sub">Esta ação não pode ser desfeita.</p>
+            <div class="confirm-box__actions">
+                <button class="btn-cancel" @onclick="CancelDelete">Cancelar</button>
+                <button class="btn-confirm-delete" @onclick="ExecuteDelete">Excluir</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<TimelineEventDto> _events = new();
+    private bool _isLoading = true;
+    private bool _showConfirm = false;
+    private Guid _deleteId;
+    private string _deleteTitle = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _events = await TimelineService.GetAllAsync();
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ConfirmDelete(Guid id, string title)
+    {
+        _deleteId = id;
+        _deleteTitle = title;
+        _showConfirm = true;
+    }
+
+    private void CancelDelete() => _showConfirm = false;
+
+    private async Task ExecuteDelete()
+    {
+        var (success, error) = await TimelineService.DeleteAsync(_deleteId);
+        _showConfirm = false;
+        if (success)
+            _events = await TimelineService.GetAllAsync();
+        else
+            Console.WriteLine($"[AdminTimeline] Erro ao excluir: {error}");
+    }
+}

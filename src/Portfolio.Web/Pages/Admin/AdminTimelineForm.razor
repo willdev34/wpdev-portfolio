@@ -1,0 +1,266 @@
+@* ====================================
+   Título: AdminTimelineForm.razor
+   Descrição: Formulário de criação e edição de eventos da timeline
+   ==================================== *@
+
+@page "/admin/timeline/new"
+@page "/admin/timeline/edit/{Id:guid}"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Portfolio.Web.DTOs.Timeline
+@inject TimelineService TimelineService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@(_isEdit ? "Editar Evento" : "Novo Evento") - WPDev Admin</PageTitle>
+
+<div class="admin-page">
+
+    <div class="admin-page__header">
+        <div>
+            <a class="back-link" href="/admin/timeline">← Timeline</a>
+            <h1 class="admin-page__title">@(_isEdit ? "Editar Evento" : "Novo Evento")</h1>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <p class="admin-loading">Carregando...</p>
+    }
+    else
+    {
+        <div class="form-grid">
+
+            <div class="form-section">
+                <h2 class="form-section__title">Informações Principais</h2>
+
+                <div class="field">
+                    <label class="field__label">Título *</label>
+                    <input class="field__input"
+                           @bind="_form.Title"
+                           placeholder="Ex: Desenvolvedor Sênior na Empresa X" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Descrição *</label>
+                    <textarea class="field__textarea"
+                              @bind="_form.Description"
+                              placeholder="Descreva este evento da sua trajetória..."
+                              rows="4"></textarea>
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Tipo *</label>
+                    <select class="field__input" @bind="_form.Type">
+                        <option value="0">Educação</option>
+                        <option value="1">Trabalho</option>
+                        <option value="2">Projeto</option>
+                        <option value="3">Conquista</option>
+                        <option value="4">Certificação</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Ordem</label>
+                    <input class="field__input"
+                           type="number"
+                           @bind="_form.Order"
+                           placeholder="0" />
+                </div>
+
+                <div class="field field--checkbox">
+                    <input type="checkbox" id="isCurrent" @bind="_form.IsCurrent" />
+                    <label for="isCurrent">Posição atual</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section__title">Datas e Links</h2>
+
+                <div class="field">
+                    <label class="field__label">Data de início *</label>
+                    <input class="field__input"
+                           type="date"
+                           @bind="_form.Date" />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Data de fim</label>
+                    <input class="field__input"
+                           type="date"
+                           @bind="_form.EndDate" />
+                    <span class="field__hint">Deixe em branco se for posição atual</span>
+                </div>
+
+                <div class="field">
+                    <label class="field__label">URL do ícone</label>
+                    <input class="field__input"
+                           @bind="_form.IconUrl"
+                           placeholder="https://..." />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Link</label>
+                    <input class="field__input"
+                           @bind="_form.LinkUrl"
+                           placeholder="https://..." />
+                </div>
+
+                <div class="field">
+                    <label class="field__label">Texto do link</label>
+                    <input class="field__input"
+                           @bind="_form.LinkText"
+                           placeholder="Ex: Ver projeto" />
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-actions-wrapper">
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="form-error">@_errorMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(_successMessage))
+            {
+                <div class="form-success">@_successMessage</div>
+            }
+            <div class="form-actions">
+                <a class="btn-cancel" href="/admin/timeline">Cancelar</a>
+                <button class="btn-save" @onclick="HandleSubmit" disabled="@_isSaving">
+                    @(_isSaving ? "Salvando..." : "Salvar evento")
+                </button>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private bool _isEdit => Id.HasValue;
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+
+    private CreateTimelineEventDto _form = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_isEdit)
+        {
+            var evt = await TimelineService.GetByIdAsync(Id!.Value);
+
+            if (evt is null)
+            {
+                await JS.InvokeVoidAsync("eval", "window.location.href='/admin/timeline'");
+                return;
+            }
+
+            _form = new CreateTimelineEventDto
+            {
+                Title = evt.Title,
+                Description = evt.Description,
+                Date = evt.Date,
+                EndDate = evt.EndDate,
+                IsCurrent = evt.IsCurrent,
+                Type = ParseType(evt.Type),
+                IconUrl = evt.IconUrl,
+                LinkUrl = evt.LinkUrl,
+                LinkText = evt.LinkText,
+                Order = evt.Order
+            };
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_form.Title) ||
+            string.IsNullOrWhiteSpace(_form.Description))
+        {
+            _errorMessage = "Título e descrição são obrigatórios.";
+            return;
+        }
+
+        _isSaving = true;
+        _errorMessage = string.Empty;
+
+        // Garante que as datas são UTC antes de enviar ao backend
+        var dateUtc = DateTime.SpecifyKind(_form.Date, DateTimeKind.Utc);
+        var endDateUtc = _form.EndDate.HasValue
+            ? DateTime.SpecifyKind(_form.EndDate.Value, DateTimeKind.Utc)
+            : (DateTime?)null;
+
+        if (_isEdit)
+        {
+            var updateDto = new UpdateTimelineEventDto
+            {
+                Id = Id!.Value,
+                Title = _form.Title,
+                Description = _form.Description,
+                Date = dateUtc,
+                EndDate = endDateUtc,
+                IsCurrent = _form.IsCurrent,
+                Type = _form.Type,
+                IconUrl = _form.IconUrl,
+                LinkUrl = _form.LinkUrl,
+                LinkText = _form.LinkText,
+                Order = _form.Order
+            };
+
+            var (success, error) = await TimelineService.UpdateAsync(updateDto);
+
+            if (!success)
+            {
+                _errorMessage = error ?? "Erro ao atualizar evento.";
+                _isSaving = false;
+                return;
+            }
+        }
+        else
+        {
+            var createDto = new CreateTimelineEventDto
+            {
+                Title = _form.Title,
+                Description = _form.Description,
+                Date = dateUtc,
+                EndDate = endDateUtc,
+                IsCurrent = _form.IsCurrent,
+                Type = _form.Type,
+                IconUrl = _form.IconUrl,
+                LinkUrl = _form.LinkUrl,
+                LinkText = _form.LinkText,
+                Order = _form.Order
+            };
+
+            var (success, error) = await TimelineService.CreateAsync(createDto);
+
+            if (!success)
+            {
+                _errorMessage = error ?? "Erro ao criar evento.";
+                _isSaving = false;
+                return;
+            }
+        }
+
+        _successMessage = _isEdit ? "Evento atualizado com sucesso." : "Evento criado com sucesso.";
+        _isSaving = false;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1500);
+        await JS.InvokeVoidAsync("eval", "window.location.href='/admin/timeline'");
+    }
+
+    private static int ParseType(string type) => type switch
+    {
+        "Education" => 0,
+        "Work"      => 1,
+        "Project"   => 2,
+        "Achievement" => 3,
+        "Certification" => 4,
+        _ => int.TryParse(type, out var n) ? n : 1
+    };
+}

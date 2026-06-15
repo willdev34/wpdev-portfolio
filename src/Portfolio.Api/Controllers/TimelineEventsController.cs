@@ -11,6 +11,7 @@ using Portfolio.Application.Commands.TimelineEvents.DeleteTimelineEvent;
 using Portfolio.Application.DTOs.TimelineEvents;
 using Portfolio.Application.Queries.TimelineEvents.GetAllTimelineEvents;
 using Portfolio.Application.Queries.TimelineEvents.GetTimelineEventById;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Portfolio.Api.Controllers;
 
@@ -20,6 +21,7 @@ namespace Portfolio.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] 
 public class TimelineEventsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -43,6 +45,7 @@ public class TimelineEventsController : ControllerBase
     /// <response code="200">Retorna a lista de eventos</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<TimelineEventCardDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<TimelineEventCardDto>>> GetAll()
     {
         // Cria a query
@@ -66,6 +69,7 @@ public class TimelineEventsController : ControllerBase
     /// <response code="200">Retorna o evento encontrado</response>
     /// <response code="404">Evento não encontrado</response>
     [HttpGet("{id}")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(TimelineEventDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TimelineEventDto>> GetById(Guid id)
