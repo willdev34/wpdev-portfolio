@@ -11,6 +11,7 @@ using Portfolio.Web.DTOs.ContactMessages;
 namespace Portfolio.Web.Services;
 
 // Source Generators — obrigatório em Release (sem reflection)
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(List<ContactMessageCardDto>))]
 [JsonSerializable(typeof(ContactMessageDetailDto))]
 [JsonSerializable(typeof(UpdateContactMessageStatusDto))]
