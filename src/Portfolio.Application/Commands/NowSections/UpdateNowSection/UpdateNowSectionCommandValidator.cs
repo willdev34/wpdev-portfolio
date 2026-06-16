@@ -19,14 +19,16 @@ public class UpdateNowSectionCommandValidator : AbstractValidator<UpdateNowSecti
             .MinimumLength(10).WithMessage("O conteúdo deve ter no mínimo 10 caracteres")
             .MaximumLength(2000).WithMessage("O conteúdo deve ter no máximo 2000 caracteres");
 
-        RuleFor(x => x.SectionData.CurrentProject)
-            .MaximumLength(200).WithMessage("O nome do projeto deve ter no máximo 200 caracteres")
-            .When(x => !string.IsNullOrEmpty(x.SectionData.CurrentProject));
+        RuleFor(x => x.SectionData.CurrentProjects)
+            .Must(x => x.Count <= 10).WithMessage("Informe no máximo 10 projetos")
+            .When(x => x.SectionData.CurrentProjects != null && x.SectionData.CurrentProjects.Any());
 
-        RuleFor(x => x.SectionData.CurrentProjectUrl)
-            .MaximumLength(500).WithMessage("A URL do projeto deve ter no máximo 500 caracteres")
-            .Must(BeAValidUrl).WithMessage("A URL do projeto deve ser válida")
-            .When(x => !string.IsNullOrEmpty(x.SectionData.CurrentProjectUrl));
+        RuleForEach(x => x.SectionData.CurrentProjects)
+            .Must(p => !string.IsNullOrWhiteSpace(p.Name)).WithMessage("O nome do projeto é obrigatório")
+            .Must(p => p.Name.Length <= 200).WithMessage("O nome do projeto deve ter no máximo 200 caracteres")
+            .Must(p => string.IsNullOrEmpty(p.Url) || Uri.TryCreate(p.Url, UriKind.Absolute, out _))
+                .WithMessage("A URL do projeto deve ser válida")
+            .When(x => x.SectionData.CurrentProjects != null && x.SectionData.CurrentProjects.Any());
 
         RuleFor(x => x.SectionData.CurrentlyLearning)
             .Must(x => x.Count <= 10).WithMessage("Informe no máximo 10 tecnologias aprendendo")
@@ -43,14 +45,5 @@ public class UpdateNowSectionCommandValidator : AbstractValidator<UpdateNowSecti
         RuleForEach(x => x.SectionData.CurrentGoals)
             .MaximumLength(200).WithMessage("Cada objetivo deve ter no máximo 200 caracteres")
             .When(x => x.SectionData.CurrentGoals != null && x.SectionData.CurrentGoals.Any());
-    }
-
-    private bool BeAValidUrl(string? url)
-    {
-        if (string.IsNullOrEmpty(url))
-            return true;
-
-        return Uri.TryCreate(url, UriKind.Absolute, out var uriResult)
-               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 }

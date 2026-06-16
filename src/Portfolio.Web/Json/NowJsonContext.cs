@@ -5,6 +5,10 @@ namespace Portfolio.Web.Json;
 
 [JsonSerializable(typeof(List<NowSectionDto>))]
 [JsonSerializable(typeof(NowSectionDto))]
+[JsonSerializable(typeof(CreateNowSectionDto))]
+[JsonSerializable(typeof(UpdateNowSectionDto))]
+[JsonSerializable(typeof(List<ProjectLink>))]
+[JsonSerializable(typeof(ProjectLink))]
 [JsonSourceGenerationOptions(
     PropertyNameCaseInsensitive = true,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull

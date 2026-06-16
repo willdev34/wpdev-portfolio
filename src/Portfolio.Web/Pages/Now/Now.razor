@@ -78,26 +78,29 @@
                         <p class="now-block-text now-block-text--large">@nowSection.Content</p>
                     </div>
 
-                    <!-- Projeto atual -->
-                    @if (!string.IsNullOrEmpty(nowSection.CurrentProject))
+                    <!-- Projetos atuais -->
+                    @if (nowSection.CurrentProjects.Any())
                     {
                         <div class="now-block">
-                            <p class="now-block-label">Projeto em Andamento</p>
-                            <p class="now-block-text now-block-text--large">
-                                @if (!string.IsNullOrEmpty(nowSection.CurrentProjectUrl))
-                                {
-                                    <a href="@nowSection.CurrentProjectUrl"
-                                       target="_blank"
-                                       class="now-project-link">
-                                        @nowSection.CurrentProject
-                                        <span class="now-project-arrow">↗</span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    @nowSection.CurrentProject
-                                }
-                            </p>
+                            <p class="now-block-label">Projetos em Andamento</p>
+                            @foreach (var project in nowSection.CurrentProjects)
+                            {
+                                <p class="now-block-text now-block-text--large">
+                                    @if (!string.IsNullOrEmpty(project.Url))
+                                    {
+                                        <a href="@project.Url"
+                                        target="_blank"
+                                        class="now-project-link">
+                                            @project.Name
+                                            <span class="now-project-arrow">↗</span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        @project.Name
+                                    }
+                                </p>
+                            }
                         </div>
                     }
 

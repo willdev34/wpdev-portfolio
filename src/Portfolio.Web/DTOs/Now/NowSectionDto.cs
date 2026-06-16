@@ -9,8 +9,7 @@ public class NowSectionDto
 {
     public Guid Id { get; set; }
     public string Content { get; set; } = string.Empty;
-    public string CurrentProject { get; set; } = string.Empty;
-    public string CurrentProjectUrl { get; set; } = string.Empty;
+    public List<ProjectLink> CurrentProjects { get; set; } = new();
     public List<string> CurrentlyLearning { get; set; } = new();
     public List<string> CurrentGoals { get; set; } = new();
     public bool IsActive { get; set; }

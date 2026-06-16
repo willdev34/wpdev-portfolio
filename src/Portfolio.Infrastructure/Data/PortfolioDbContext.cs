@@ -143,19 +143,35 @@ public class PortfolioDbContext : IdentityDbContext<AppUser>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
-            entity.Property(e => e.CurrentProject).HasMaxLength(200);
-            entity.Property(e => e.CurrentProjectUrl).HasMaxLength(500);
+
+            entity.Property(e => e.CurrentProjects)
+                .HasConversion(
+                    v => System.Text.Json.JsonSerializer.Serialize(v,
+                        (System.Text.Json.JsonSerializerOptions?)null),
+                    v => string.IsNullOrWhiteSpace(v)
+                        ? new List<Portfolio.Domain.ValueObjects.ProjectLink>()
+                        : System.Text.Json.JsonSerializer.Deserialize<List<Portfolio.Domain.ValueObjects.ProjectLink>>(v,
+                            (System.Text.Json.JsonSerializerOptions?)null) ?? new List<Portfolio.Domain.ValueObjects.ProjectLink>()
+                );
 
             entity.Property(e => e.CurrentlyLearning)
                 .HasConversion(
-                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
-                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
+                    v => System.Text.Json.JsonSerializer.Serialize(v,
+                        (System.Text.Json.JsonSerializerOptions?)null),
+                    v => string.IsNullOrWhiteSpace(v)
+                        ? new List<string>()
+                        : System.Text.Json.JsonSerializer.Deserialize<List<string>>(v,
+                            (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
                 );
 
             entity.Property(e => e.CurrentGoals)
                 .HasConversion(
-                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
-                    v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
+                    v => System.Text.Json.JsonSerializer.Serialize(v,
+                        (System.Text.Json.JsonSerializerOptions?)null),
+                    v => string.IsNullOrWhiteSpace(v)
+                        ? new List<string>()
+                        : System.Text.Json.JsonSerializer.Deserialize<List<string>>(v,
+                            (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
                 );
 
             entity.HasIndex(e => e.IsActive);

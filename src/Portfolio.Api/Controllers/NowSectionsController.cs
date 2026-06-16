@@ -12,6 +12,7 @@ using Portfolio.Application.DTOs.NowSections;
 using Portfolio.Application.Queries.NowSections.GetAllNowSections;
 using Portfolio.Application.Queries.NowSections.GetNowSectionById;
 using Portfolio.Application.Queries.NowSections.GetActiveNowSection;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Portfolio.Api.Controllers;
 
@@ -23,6 +24,7 @@ namespace Portfolio.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class NowSectionsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -47,6 +49,7 @@ public class NowSectionsController : ControllerBase
     /// <response code="200">Retorna a seção ativa</response>
     /// <response code="404">Nenhuma seção ativa encontrada</response>
     [HttpGet("/api/nowsection")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(NowSectionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<NowSectionDto>> GetActive()

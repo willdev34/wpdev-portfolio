@@ -1,11 +1,4 @@
-// ====================================
-// Título: UpdateNowSectionDto.cs
-// Descrição: DTO para atualização de seção Now existente
-// ====================================
-
-using Portfolio.Domain.ValueObjects;
-
-namespace Portfolio.Application.DTOs.NowSections;
+namespace Portfolio.Web.DTOs.Now;
 
 public class UpdateNowSectionDto
 {

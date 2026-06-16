@@ -1,0 +1,287 @@
+@* ====================================
+   Título: AdminNow.razor
+   Descrição: Gerenciamento da seção "O que estou fazendo agora"
+   ==================================== *@
+
+@page "/admin/now"
+@layout Portfolio.Web.Layout.AdminLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject NowService NowService
+@inject IJSRuntime JS
+
+@using Portfolio.Web.DTOs.Now
+
+<PageTitle>Now - WPDev Admin</PageTitle>
+
+<div class="admin-page">
+
+    <div class="admin-page__header">
+        <div>
+            <h1 class="admin-page__title">Now</h1>
+            <p class="admin-page__subtitle">O que você está fazendo agora</p>
+        </div>
+        @if (_current is not null)
+        {
+            <span class="status-badge status-badge--active">Ativo</span>
+        }
+    </div>
+
+    @if (_isLoading)
+    {
+        <p class="admin-loading">Carregando...</p>
+    }
+    else
+    {
+        <div class="now-form-wrapper">
+
+            <div class="form-section">
+                <h2 class="form-section__title">Conteúdo principal</h2>
+
+                <div class="field">
+                    <label class="field__label">Texto principal *</label>
+                    <textarea class="field__textarea"
+                              @bind="_form.Content"
+                              placeholder="Descreva o que você está fazendo agora..."
+                              rows="5"></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section__title">Projetos atuais</h2>
+
+                <div class="field">
+                    <div class="project-input-row">
+                        <input class="field__input"
+                               @bind="_newProjectName"
+                               placeholder="Nome do projeto" />
+                        <input class="field__input"
+                               @bind="_newProjectUrl"
+                               placeholder="URL (https://...)" />
+                        <button class="btn-add-tech" type="button" @onclick="AddProject">+</button>
+                    </div>
+                    <div class="project-list">
+                        @foreach (var project in _form.CurrentProjects)
+                        {
+                            <div class="project-item">
+                                <div class="project-item__info">
+                                    <span class="project-item__name">@project.Name</span>
+                                    @if (!string.IsNullOrEmpty(project.Url))
+                                    {
+                                        <span class="project-item__url">@project.Url</span>
+                                    }
+                                </div>
+                                <button class="project-item__remove" type="button"
+                                        @onclick="() => RemoveProject(project)">×</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section__title">Aprendendo agora</h2>
+
+                <div class="field">
+                    <div class="tech-input-row">
+                        <input class="field__input"
+                               @bind="_newLearning"
+                               @onkeydown="HandleLearningKeyDown"
+                               placeholder="Ex: Blazor WASM, Clean Architecture..." />
+                        <button class="btn-add-tech" type="button" @onclick="AddLearning">+</button>
+                    </div>
+                    <div class="tech-tags">
+                        @foreach (var item in _form.CurrentlyLearning)
+                        {
+                            <span class="tech-tag">
+                                @item
+                                <button type="button" @onclick="() => RemoveLearning(item)">×</button>
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section__title">Objetivos atuais</h2>
+
+                <div class="field">
+                    <div class="tech-input-row">
+                        <input class="field__input"
+                               @bind="_newGoal"
+                               @onkeydown="HandleGoalKeyDown"
+                               placeholder="Ex: Lançar portfólio em produção..." />
+                        <button class="btn-add-tech" type="button" @onclick="AddGoal">+</button>
+                    </div>
+                    <div class="tech-tags">
+                        @foreach (var item in _form.CurrentGoals)
+                        {
+                            <span class="tech-tag">
+                                @item
+                                <button type="button" @onclick="() => RemoveGoal(item)">×</button>
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-actions-wrapper">
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="form-error">@_errorMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(_successMessage))
+            {
+                <div class="form-success">@_successMessage</div>
+            }
+            <div class="form-actions">
+                <button class="btn-save" @onclick="HandleSubmit" disabled="@_isSaving">
+                    @(_isSaving ? "Salvando..." : (_current is null ? "Criar seção Now" : "Atualizar seção Now"))
+                </button>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private NowSectionDto? _current;
+    private CreateNowSectionDto _form = new();
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+    private string _newLearning = string.Empty;
+    private string _newGoal = string.Empty;
+    private string _newProjectName = string.Empty;
+    private string _newProjectUrl = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _current = await NowService.GetCurrentAsync();
+
+            if (_current is not null)
+            {
+                _form = new CreateNowSectionDto
+                {
+                    Content = _current.Content,
+                    CurrentProjects = _current.CurrentProjects
+                        .Select(p => new ProjectLink { Name = p.Name, Url = p.Url })
+                        .ToList(),
+                    CurrentlyLearning = new List<string>(_current.CurrentlyLearning),
+                    CurrentGoals = new List<string>(_current.CurrentGoals)
+                };
+            }
+
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_form.Content))
+        {
+            _errorMessage = "O texto principal é obrigatório.";
+            return;
+        }
+
+        _isSaving = true;
+        _errorMessage = string.Empty;
+        _successMessage = string.Empty;
+
+        if (_current is not null)
+        {
+            var updateDto = new UpdateNowSectionDto
+            {
+                Id = _current.Id,
+                Content = _form.Content,
+                CurrentProjects = _form.CurrentProjects,
+                CurrentlyLearning = _form.CurrentlyLearning,
+                CurrentGoals = _form.CurrentGoals,
+                IsActive = true
+            };
+
+            var (success, error) = await NowService.UpdateAsync(updateDto);
+
+            if (!success)
+            {
+                _errorMessage = error ?? "Erro ao atualizar seção Now.";
+                _isSaving = false;
+                return;
+            }
+
+            _successMessage = "Seção Now atualizada com sucesso.";
+        }
+        else
+        {
+            var (success, error) = await NowService.CreateAsync(_form);
+
+            if (!success)
+            {
+                _errorMessage = error ?? "Erro ao criar seção Now.";
+                _isSaving = false;
+                return;
+            }
+
+            _successMessage = "Seção Now criada com sucesso.";
+            _current = await NowService.GetCurrentAsync();
+        }
+
+        _isSaving = false;
+        StateHasChanged();
+    }
+
+    private void AddProject()
+    {
+        var name = _newProjectName.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        _form.CurrentProjects.Add(new ProjectLink
+        {
+            Name = name,
+            Url = _newProjectUrl.Trim()
+        });
+
+        _newProjectName = string.Empty;
+        _newProjectUrl = string.Empty;
+    }
+
+    private void RemoveProject(ProjectLink project) =>
+        _form.CurrentProjects.Remove(project);
+
+    private void AddLearning()
+    {
+        var item = _newLearning.Trim();
+        if (!string.IsNullOrWhiteSpace(item) && !_form.CurrentlyLearning.Contains(item))
+            _form.CurrentlyLearning.Add(item);
+        _newLearning = string.Empty;
+    }
+
+    private async Task HandleLearningKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddLearning();
+        await Task.CompletedTask;
+    }
+
+    private void RemoveLearning(string item) => _form.CurrentlyLearning.Remove(item);
+
+    private void AddGoal()
+    {
+        var item = _newGoal.Trim();
+        if (!string.IsNullOrWhiteSpace(item) && !_form.CurrentGoals.Contains(item))
+            _form.CurrentGoals.Add(item);
+        _newGoal = string.Empty;
+    }
+
+    private async Task HandleGoalKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddGoal();
+        await Task.CompletedTask;
+    }
+
+    private void RemoveGoal(string item) => _form.CurrentGoals.Remove(item);
+}

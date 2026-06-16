@@ -1,11 +1,4 @@
-// ====================================
-// Título: CreateNowSectionDto.cs
-// Descrição: DTO para criação de nova seção Now
-// ====================================
-
-using Portfolio.Domain.ValueObjects;
-
-namespace Portfolio.Application.DTOs.NowSections;
+namespace Portfolio.Web.DTOs.Now;
 
 public class CreateNowSectionDto
 {
