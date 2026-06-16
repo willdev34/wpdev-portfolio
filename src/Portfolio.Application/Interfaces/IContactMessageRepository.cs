@@ -77,10 +77,11 @@ public interface IContactMessageRepository
     Task UpdateAsync(ContactMessage contactMessage);
     
     /// <summary>
-    /// Verifica se uma mensagem existe
+    /// Deleta uma mensagem fisicamente do banco (hard delete)
+    /// Usado pelo admin quando decide descartar uma mensagem definitivamente
     /// </summary>
-    /// <param name="id">ID da mensagem</param>
-    /// <returns>True se existir, False caso contrário</returns>
+    /// <param name="id">ID da mensagem a deletar</param>
+    Task DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     
     // ==========================================

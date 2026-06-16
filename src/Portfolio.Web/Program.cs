@@ -34,6 +34,7 @@ builder.Services.AddScoped<JwtAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(
     sp => sp.GetRequiredService<JwtAuthStateProvider>());
 
+
 // ====================================
 // REGISTRO DOS SERVIÇOS
 // ====================================
@@ -44,5 +45,7 @@ builder.Services.AddScoped<TimelineService>();
 builder.Services.AddScoped<GalleryService>();
 builder.Services.AddScoped<ContactService>();
 builder.Services.AddScoped<NowService>();
+builder.Services.AddScoped<ContactMessageService>();
+
 
 await builder.Build().RunAsync();

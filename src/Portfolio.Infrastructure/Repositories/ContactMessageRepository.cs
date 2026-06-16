@@ -142,15 +142,21 @@ public class ContactMessageRepository : IContactMessageRepository
     /// Salva todas as mudanças pendentes no banco de dados
     /// Retorna o número de registros afetados
     /// </summary>
+    /// <summary>
+    /// Deleta uma mensagem fisicamente do banco (hard delete)
+    /// </summary>
+    public async Task DeleteAsync(Guid id)
+    {
+        var message = await _context.ContactMessages.FindAsync(id);
+        if (message != null)
+        {
+            _context.ContactMessages.Remove(message);
+        }
+        await Task.CompletedTask;
+    }
     public async Task<int> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync();
     }
     
-    // ==========================================
-    // NOTA: SEM DELETE
-    // ==========================================
-    // ContactMessage NÃO tem método DeleteAsync()
-    // Todas mensagens são mantidas para auditoria
-    // Use Status = Archived ou Spam para "esconder"
 }

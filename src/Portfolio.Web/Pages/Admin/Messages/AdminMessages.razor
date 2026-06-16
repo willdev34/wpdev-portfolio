@@ -1,0 +1,595 @@
+@* ====================================
+   Título: AdminMessages.razor
+   Descrição: Listagem admin de mensagens de contato com toggle lida/não-lida e delete
+   ==================================== *@
+
+@page "/admin/messages"
+@layout AdminLayout
+@using Portfolio.Web.DTOs.ContactMessages
+@using Portfolio.Web.Services
+@inject ContactMessageService MessageService
+@inject IJSRuntime JS
+
+<PageTitle>Mensagens - Admin WPDev</PageTitle>
+
+<!-- HEADER -->
+<div class="admin-page-header">
+    <div class="admin-page-title">
+        <h1>Mensagens de Contato</h1>
+        <p>Mensagens recebidas pelo formulário público. Somente leitura.</p>
+    </div>
+    @if (messages.Any())
+    {
+        <div class="admin-page-stats">
+            <span class="stat-badge stat-total">@messages.Count total</span>
+            <span class="stat-badge stat-new">@messages.Count(m => m.Status == "New") não lidas</span>
+        </div>
+    }
+</div>
+
+<!-- ESTADOS -->
+@if (isLoading)
+{
+    <div class="admin-loading">
+        <p>Carregando mensagens...</p>
+    </div>
+}
+else if (errorMessage != null)
+{
+    <div class="admin-error">
+        <p>@errorMessage</p>
+        <button class="btn-admin btn-secondary" @onclick="LoadMessages">Tentar novamente</button>
+    </div>
+}
+else if (!messages.Any())
+{
+    <div class="admin-empty">
+        <p>Nenhuma mensagem recebida ainda.</p>
+    </div>
+}
+else
+{
+    <!-- TABELA -->
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Assunto</th>
+                    <th>Tipo</th>
+                    <th>Recebida em</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var msg in messages)
+                {
+                    <tr class="@(msg.Status == "New" ? "row-unread" : "")">
+                        <td>
+                            <span class="status-dot @GetStatusClass(msg.Status)" title="@msg.Status"></span>
+                        </td>
+                        <td class="col-name">@msg.Name</td>
+                        <td class="col-email">@msg.Email</td>
+                        <td class="col-subject">
+                            <button class="link-btn" @onclick="() => OpenDetail(msg)">@msg.Subject</button>
+                        </td>
+                        <td>
+                            <span class="type-pill">@msg.Type</span>
+                        </td>
+                        <td class="col-date">@msg.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="col-actions">
+                            @if (msg.Status == "New")
+                            {
+                                <button class="btn-admin btn-sm btn-secondary"
+                                        @onclick="() => ToggleRead(msg, true)"
+                                        disabled="@(processingId == msg.Id)">
+                                    Marcar como lida
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn-admin btn-sm btn-ghost"
+                                        @onclick="() => ToggleRead(msg, false)"
+                                        disabled="@(processingId == msg.Id)">
+                                    Desmarcar
+                                </button>
+                            }
+                            <button class="btn-admin btn-sm btn-danger"
+                                    @onclick="() => RequestDelete(msg)"
+                                    disabled="@(processingId == msg.Id)">
+                                Excluir
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<!-- MODAL DETALHE -->
+@if (selectedMessage != null)
+{
+    <div class="confirm-overlay" @onclick="CloseDetail">
+        <div class="detail-modal" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div>
+                    <h2>@selectedMessage.Subject</h2>
+                    <p class="modal-meta">De: @selectedMessage.Name (@selectedMessage.Email) — @selectedMessage.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <button class="modal-close" @onclick="CloseDetail">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span class="detail-label">Tipo</span>
+                    <span class="type-pill">@selectedMessage.Type</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="status-dot @GetStatusClass(selectedMessage.Status)"></span>
+                    <span>@selectedMessage.Status</span>
+                </div>
+                <div class="detail-message">
+                    <span class="detail-label">Mensagem</span>
+                    <p>@selectedMessage.Message</p>
+                </div>
+                @if (!string.IsNullOrEmpty(selectedMessage.IpAddress))
+                {
+                    <div class="detail-row detail-meta-small">
+                        <span class="detail-label">IP</span>
+                        <span>@selectedMessage.IpAddress</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- CONFIRM DELETE -->
+@if (messageToDelete != null)
+{
+    <div class="confirm-overlay">
+        <div class="confirm-dialog">
+            <h3>Excluir mensagem?</h3>
+            <p>A mensagem de <strong>@messageToDelete.Name</strong> será excluída permanentemente.</p>
+            <p class="confirm-subject">"@messageToDelete.Subject"</p>
+            <div class="confirm-actions">
+                <button class="btn-admin btn-secondary" @onclick="CancelDelete">Cancelar</button>
+                <button class="btn-admin btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                    @(isDeleting ? "Excluindo..." : "Excluir")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ContactMessageCardDto> messages = new();
+    private ContactMessageDetailDto? selectedMessage;
+    private ContactMessageCardDto? messageToDelete;
+    private bool isLoading = true;
+    private bool isDeleting = false;
+    private Guid? processingId;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMessages();
+    }
+
+    private async Task LoadMessages()
+    {
+        isLoading = true;
+        errorMessage = null;
+        messages = await MessageService.GetAllAsync();
+        if (messages == null)
+        {
+            messages = new List<ContactMessageCardDto>();
+            errorMessage = "Não foi possível carregar as mensagens.";
+        }
+        isLoading = false;
+    }
+
+    private async Task OpenDetail(ContactMessageCardDto msg)
+    {
+        selectedMessage = await MessageService.GetByIdAsync(msg.Id);
+    }
+
+    private void CloseDetail()
+    {
+        selectedMessage = null;
+    }
+
+    private async Task ToggleRead(ContactMessageCardDto msg, bool markAsRead)
+    {
+        processingId = msg.Id;
+        var success = await MessageService.ToggleReadAsync(msg.Id, markAsRead);
+        if (success)
+        {
+            msg.Status = markAsRead ? "Read" : "New";
+        }
+        processingId = null;
+    }
+
+    private void RequestDelete(ContactMessageCardDto msg)
+    {
+        messageToDelete = msg;
+    }
+
+    private void CancelDelete()
+    {
+        messageToDelete = null;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (messageToDelete == null) return;
+
+        isDeleting = true;
+        var success = await MessageService.DeleteAsync(messageToDelete.Id);
+
+        if (success)
+        {
+            messages.Remove(messageToDelete);
+        }
+
+        isDeleting = false;
+        messageToDelete = null;
+    }
+
+    private string GetStatusClass(string status) => status switch
+    {
+        "New" => "status-new",
+        "Read" => "status-read",
+        "Responded" => "status-responded",
+        "Archived" => "status-archived",
+        "Spam" => "status-spam",
+        _ => ""
+    };
+}
+
+<style>
+    .admin-page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .admin-page-title h1 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--color-dark);
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .admin-page-title p {
+        color: var(--color-gray);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .admin-page-stats {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .stat-badge {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+    }
+
+    .stat-total {
+        background: var(--color-light);
+        color: var(--color-dark);
+    }
+
+    .stat-new {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .admin-table-wrapper {
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid rgba(163, 169, 171, 0.2);
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .admin-table thead tr {
+        background: var(--color-light);
+    }
+
+    .admin-table th {
+        padding: 0.875rem 1rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-gray);
+        white-space: nowrap;
+    }
+
+    .admin-table td {
+        padding: 0.875rem 1rem;
+        border-top: 1px solid rgba(163, 169, 171, 0.15);
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr {
+        background: #fff;
+        transition: background 0.15s;
+    }
+
+    .admin-table tbody tr:hover {
+        background: var(--color-light);
+    }
+
+    .admin-table tbody tr.row-unread td {
+        font-weight: 600;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .status-new       { background: #f59e0b; }
+    .status-read      { background: var(--color-primary); }
+    .status-responded { background: #10b981; }
+    .status-archived  { background: var(--color-gray); }
+    .status-spam      { background: #ef4444; }
+
+    .type-pill {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        background: rgba(108, 158, 163, 0.12);
+        color: var(--color-primary);
+    }
+
+    .link-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        color: var(--color-dark);
+        font-size: inherit;
+        font-weight: inherit;
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        transition: text-decoration-color 0.2s;
+        text-align: left;
+    }
+
+    .link-btn:hover {
+        text-decoration-color: var(--color-primary);
+        color: var(--color-primary);
+    }
+
+    .col-name    { min-width: 130px; }
+    .col-email   { min-width: 160px; font-size: 0.85rem; color: var(--color-gray); }
+    .col-subject { min-width: 200px; }
+    .col-date    { white-space: nowrap; font-size: 0.82rem; color: var(--color-gray); }
+
+    .col-actions {
+        white-space: nowrap;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .btn-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-admin:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-sm {
+        font-size: 0.78rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    .btn-secondary {
+        background: var(--color-light);
+        color: var(--color-dark);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+        background: rgba(108, 158, 163, 0.15);
+    }
+
+    .btn-ghost {
+        background: transparent;
+        color: var(--color-gray);
+        border: 1px solid rgba(163, 169, 171, 0.3);
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+        background: var(--color-light);
+    }
+
+    .btn-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+        background: #fecaca;
+    }
+
+    .admin-loading,
+    .admin-error,
+    .admin-empty {
+        padding: 3rem;
+        text-align: center;
+        color: var(--color-gray);
+    }
+
+    .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(13, 28, 36, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .confirm-dialog {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 24px 48px rgba(13, 28, 36, 0.2);
+    }
+
+    .confirm-dialog h3 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--color-dark);
+        margin: 0 0 0.5rem;
+    }
+
+    .confirm-dialog p {
+        color: var(--color-gray);
+        margin: 0 0 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .confirm-subject {
+        font-style: italic;
+        color: var(--color-dark) !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .confirm-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .detail-modal {
+        background: #fff;
+        border-radius: 16px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 24px 48px rgba(13, 28, 36, 0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.5rem 1.5rem 1rem;
+        border-bottom: 1px solid rgba(163, 169, 171, 0.2);
+    }
+
+    .modal-header h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-dark);
+        margin: 0 0 0.25rem;
+    }
+
+    .modal-meta {
+        font-size: 0.82rem;
+        color: var(--color-gray);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--color-gray);
+        font-size: 1.1rem;
+        padding: 0.25rem;
+        flex-shrink: 0;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--color-dark); }
+
+    .modal-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-gray);
+        min-width: 60px;
+    }
+
+    .detail-message {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .detail-message p {
+        line-height: 1.7;
+        color: var(--color-dark);
+        background: var(--color-light);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 0;
+        font-size: 0.92rem;
+        white-space: pre-wrap;
+    }
+
+    .detail-meta-small span {
+        font-size: 0.8rem;
+        color: var(--color-gray);
+        font-family: monospace;
+    }
+</style>
