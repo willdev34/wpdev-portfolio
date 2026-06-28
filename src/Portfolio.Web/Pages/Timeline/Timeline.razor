@@ -1,6 +1,7 @@
 @page "/timeline"
 @using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Timeline
+@using Portfolio.Web.Helpers
 @inject TimelineService TimelineService
 
 <SeoHead Title="Timeline - WPDev"
@@ -72,7 +73,7 @@
                             @if (!string.IsNullOrEmpty(evt.IconUrl))
                             {
                                 <div class="card-icon">
-                                    <img src="@evt.IconUrl" alt="@evt.Title" />
+                                    <img src="@CloudinaryUrlHelper.Optimize(evt.IconUrl, CloudinaryUrlHelper.IconWidth)" alt="@evt.Title" loading="lazy" decoding="async" />
                                 </div>
                             }
                             <div class="card-content">

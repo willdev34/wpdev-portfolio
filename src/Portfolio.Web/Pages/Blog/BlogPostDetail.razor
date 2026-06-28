@@ -8,6 +8,7 @@
 @using Portfolio.Web.DTOs.BlogPosts
 @using Portfolio.Web.Components
 @using Markdig
+@using Portfolio.Web.Helpers
 @inject BlogPostService BlogPostService
 @inject NavigationManager Navigation
 
@@ -47,7 +48,7 @@ else
         @if (!string.IsNullOrEmpty(post.FeaturedImageUrl))
         {
             <div class="hero-image">
-                <img src="@post.FeaturedImageUrl" alt="@post.Title" />
+                <img src="@CloudinaryUrlHelper.Optimize(post.FeaturedImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@post.Title" loading="eager" decoding="async" />
             </div>
         }
         else

@@ -17,7 +17,7 @@
     @if (!string.IsNullOrEmpty(ImageUrl))
     {
         <div class="card__image">
-            <img src="@ImageUrl" alt="@ImageAlt" loading="lazy" />
+            <img src="@Portfolio.Web.Helpers.CloudinaryUrlHelper.Optimize(ImageUrl, Portfolio.Web.Helpers.CloudinaryUrlHelper.ThumbnailWidth)" alt="@ImageAlt" loading="lazy" decoding="async" />
             @if (!string.IsNullOrEmpty(Badge))
             {
                 <span class="card__badge">@Badge</span>

@@ -9,6 +9,7 @@
 @using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Projects
 @using Portfolio.Web.Components
+@using Portfolio.Web.Helpers
 @inject ProjectService ProjectService
 
 <SeoHead Title="WPDev - Portfólio de William, Desenvolvedor Full Stack"
@@ -105,7 +106,7 @@
                     <div class="featured-thumb">
                         @if (!string.IsNullOrEmpty(projects[0].ImageUrl))
                         {
-                            <img src="@projects[0].ImageUrl" alt="@projects[0].Title" />
+                            <img src="@CloudinaryUrlHelper.Optimize(projects[0].ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@projects[0].Title" loading="eager" decoding="async" />
                         }
                         else
                         {
@@ -132,7 +133,7 @@
                             <div class="featured-thumb featured-thumb--small">
                                 @if (!string.IsNullOrEmpty(project.ImageUrl))
                                 {
-                                    <img src="@project.ImageUrl" alt="@project.Title" />
+                                    <img src="@CloudinaryUrlHelper.Optimize(project.ImageUrl, CloudinaryUrlHelper.ThumbnailWidth)" alt="@project.Title" loading="lazy" decoding="async" />
                                 }
                                 else
                                 {

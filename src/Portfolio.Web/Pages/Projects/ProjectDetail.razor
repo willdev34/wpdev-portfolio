@@ -8,6 +8,7 @@
 @using Portfolio.Web.DTOs.Projects
 @using Portfolio.Web.Shared
 @using Portfolio.Web.Components
+@using Portfolio.Web.Helpers
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
 
@@ -47,7 +48,7 @@ else
         @if (!string.IsNullOrEmpty(project.ImageUrl))
         {
             <div class="hero-image">
-                <img src="@project.ImageUrl" alt="@project.Title" />
+                <img src="@CloudinaryUrlHelper.Optimize(project.ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@project.Title" loading="eager" decoding="async" />
             </div>
         }
         else
