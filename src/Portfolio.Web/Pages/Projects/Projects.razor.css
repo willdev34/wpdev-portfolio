@@ -10,8 +10,9 @@
 
 .projects-hero {
     padding: 120px 5% 80px 5%;
-    text-align: left;
+    text-align: center;
     max-width: 900px;
+    margin: 0 auto;
 }
 
 .hero-eyebrow {
@@ -38,9 +39,9 @@
 .hero-description {
     font-family: 'Inter', sans-serif;
     font-size: 1.125rem;
-    color: #A3A9AB;
+    color: rgba(13, 28, 36, 0.55);
     line-height: 1.7;
-    margin: 0;
+    margin: 0 auto;
     max-width: 560px;
 }
 

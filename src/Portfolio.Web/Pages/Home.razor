@@ -11,6 +11,7 @@
 @using Portfolio.Web.Components
 @using Portfolio.Web.Helpers
 @inject ProjectService ProjectService
+@inject IJSRuntime JS
 
 <SeoHead Title="WPDev - Portfólio de William, Desenvolvedor Full Stack"
          Description="Portfólio de William, desenvolvedor Full Stack especializado em .NET, Blazor WebAssembly e arquitetura de software. Projetos, blog técnico e timeline de carreira."
@@ -20,6 +21,10 @@
      HERO
      ================================ -->
 <section class="home-hero">
+    <video class="hero-bg-video" autoplay muted loop playsinline preload="none" poster="/images/hero-poster.webp">
+        <source src="https://res.cloudinary.com/do0uq7w4n/video/upload/q_auto,f_auto/v1782685612/hero-code-optimized_oun8qf.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
     <div class="container">
         <div class="hero-inner">
 
@@ -28,7 +33,7 @@
                 <h1 class="hero-title">
                     Construindo<br />
                     software que<br />
-                    <span class="hero-title-accent">importa.</span>
+                    <span class="hero-title-accent">importa<span class="hero-cursor">.</span><span class="hero-cursor-blink">|</span></span>
                 </h1>
             </div>
 
@@ -61,7 +66,7 @@
 <!-- ================================
      PROJETOS EM DESTAQUE
      ================================ -->
-<section class="home-section">
+<section class="home-section scroll-reveal">
     <div class="container">
 
         <div class="section-header">
@@ -175,7 +180,7 @@
 <!-- ================================
      SKILLS / TECNOLOGIAS
      ================================ -->
-<section class="home-section home-section--dark">
+<section class="home-section home-section--dark scroll-reveal">
     <div class="container">
 
         <div class="section-header section-header--light">
@@ -226,7 +231,7 @@
 <!-- ================================
      CTA CONTATO
      ================================ -->
-<section class="home-cta">
+<section class="home-cta scroll-reveal">
     <div class="container">
         <div class="cta-inner">
             <p class="cta-eyebrow">Disponível para projetos</p>
@@ -255,5 +260,16 @@
         isLoading = true;
         projects = await ProjectService.GetFeaturedAsync();
         isLoading = false;
+    }
+
+    private bool _scrollRevealInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_scrollRevealInitialized && projects != null && projects.Count > 0)
+        {
+            _scrollRevealInitialized = true;
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
     }
 }

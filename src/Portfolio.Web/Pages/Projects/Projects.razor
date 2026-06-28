@@ -3,6 +3,8 @@
 @using Portfolio.Web.Services
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
+
 
 <SeoHead Title="Projetos - WPDev"
          Description="Conheça os projetos desenvolvidos por William: aplicações .NET, Blazor, APIs REST e soluções de arquitetura limpa para clientes e portfólio pessoal."
@@ -20,7 +22,7 @@
     </section>
 
     <!-- Search & Filters Section -->
-    <section class="projects-controls">
+    <section class="projects-controls scroll-reveal">
         <div class="controls-wrapper">
             <!-- Search Bar -->
             <div class="search-container">
@@ -47,7 +49,7 @@
     </section>
 
     <!-- Projects Grid -->
-    <section class="projects-grid">
+    <section class="projects-grid scroll-reveal">
         @if (isLoading)
         {
             <!-- Loading Skeletons -->
@@ -269,5 +271,13 @@
     private void NavigateToProject(Guid projectId)
     {
         Navigation.NavigateTo($"/projects/{projectId}");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (paginatedProjects.Count > 0)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
     }
 }

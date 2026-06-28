@@ -271,6 +271,18 @@ img {
     animation: fadeIn 0.6s ease-out;
 }
 
+/* Scroll Reveal - anima quando o elemento entra na viewport */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-reveal--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* ====================================
    8. RESPONSIVE
    ==================================== */
@@ -375,6 +387,10 @@ select:focus {
     }
     body::before {
         display: none;
+    }
+    .scroll-reveal {
+        opacity: 1 !important;
+        transform: none !important;
     }
 }
 
