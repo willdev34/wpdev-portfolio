@@ -1,0 +1,55 @@
+@* ====================================
+   Título: SeoHead.razor
+   Descrição: Componente reutilizável para injetar title, meta description
+   e OpenGraph tags dinamicamente em cada página
+   ==================================== *@
+
+<PageTitle>@Title</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="@Description" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="@Title" />
+    <meta property="og:description" content="@Description" />
+    <meta property="og:type" content="@OgType" />
+    <meta property="og:url" content="@FullUrl" />
+    @if (!string.IsNullOrEmpty(ImageUrl))
+    {
+        <meta property="og:image" content="@ImageUrl" />
+    }
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="@(string.IsNullOrEmpty(ImageUrl) ? "summary" : "summary_large_image")" />
+    <meta name="twitter:title" content="@Title" />
+    <meta name="twitter:description" content="@Description" />
+    @if (!string.IsNullOrEmpty(ImageUrl))
+    {
+        <meta name="twitter:image" content="@ImageUrl" />
+    }
+
+    <!-- Canonical -->
+    <link rel="canonical" href="@FullUrl" />
+</HeadContent>
+
+@code {
+    /// <summary>Título da página (sem sufixo). O sufixo " - WPDev" é adicionado automaticamente.</summary>
+    [Parameter] public string Title { get; set; } = "WPDev";
+
+    /// <summary>Descrição da página, usada em meta description, OG e Twitter Card.</summary>
+    [Parameter] public string Description { get; set; } =
+        "Portfólio de William, desenvolvedor Full Stack especializado em .NET, Blazor e arquitetura de software.";
+
+    /// <summary>URL da imagem de capa para compartilhamento (OG image). Opcional.</summary>
+    [Parameter] public string? ImageUrl { get; set; }
+
+    /// <summary>Tipo OG: website, article, profile. Default: website.</summary>
+    [Parameter] public string OgType { get; set; } = "website";
+
+    /// <summary>Caminho relativo da página atual (ex: "/projects/meu-projeto"). Usado para montar a URL canônica.</summary>
+    [Parameter] public string Path { get; set; } = "";
+
+    private const string BaseUrl = "https://wpdev-portfolio.onrender.com";
+
+    private string FullUrl => $"{BaseUrl}{Path}";
+}

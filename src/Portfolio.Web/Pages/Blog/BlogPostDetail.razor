@@ -11,7 +11,11 @@
 @inject BlogPostService BlogPostService
 @inject NavigationManager Navigation
 
-<PageTitle>@(post?.Title ?? "Post") - WPDev</PageTitle>
+<SeoHead Title="@($"{post?.Title ?? "Post"} - WPDev")"
+         Description="@(post?.Excerpt ?? "Artigo técnico sobre desenvolvimento de software por William.")"
+         ImageUrl="@post?.FeaturedImageUrl"
+         OgType="article"
+         Path="@($"/blog/{post?.Id}")" />
 
 @if (isLoading)
 {

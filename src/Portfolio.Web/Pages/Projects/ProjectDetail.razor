@@ -6,11 +6,16 @@
 @page "/projects/{Id:guid}"
 @using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Projects
+@using Portfolio.Web.Shared
 @using Portfolio.Web.Components
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
 
-<PageTitle>@(project?.Title ?? "Projeto") - WPDev</PageTitle>
+<SeoHead Title="@($"{project?.Title ?? "Projeto"} - WPDev")"
+         Description="@(project?.ShortDescription ?? project?.Description ?? "Detalhes do projeto desenvolvido por William, especialista em .NET e Blazor.")"
+         ImageUrl="@project?.ImageUrl"
+         OgType="article"
+         Path="@($"/projects/{project?.Id}")" />
 
 @if (isLoading)
 {
