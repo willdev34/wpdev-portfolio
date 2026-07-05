@@ -1,0 +1,54 @@
+# Título: ci.yml
+# Descrição: Workflow de CI - valida build do backend e frontend em todo PR para main
+
+name: CI - Build e Validação
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-backend:
+    name: Build Backend (.NET 8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar dependências
+        run: dotnet restore Portfolio.sln
+
+      - name: Build
+        run: dotnet build Portfolio.sln --no-restore --configuration Release
+
+  build-frontend:
+    name: Build Frontend (Blazor WASM)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar dependências
+        run: dotnet restore src/Portfolio.Web/Portfolio.Web.csproj
+
+      - name: Build Release
+        run: dotnet build src/Portfolio.Web/Portfolio.Web.csproj --no-restore --configuration Release
+
+      - name: Publish (valida output final)
+        run: dotnet publish src/Portfolio.Web/Portfolio.Web.csproj --no-build --configuration Release --output ./publish/web
