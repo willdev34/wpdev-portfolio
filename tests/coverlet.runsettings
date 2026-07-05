@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>
+            [Portfolio.Application.DTOs*]*,
+            [Portfolio.Application.Mappings*]*,
+            [Portfolio.Domain.Entities*]*,
+            [Portfolio.Domain.ValueObjects*]*,
+            [Portfolio.Domain.Enums*]*,
+            [Portfolio.Domain.Exceptions*]*,
+            [Portfolio.Infrastructure*]*,
+            [Portfolio.Api*]*,
+            [Portfolio.Web*]*,
+            [Portfolio.Worker*]*
+          </Exclude>
+          <ExcludeByAttribute>GeneratedCode,CompilerGenerated</ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
