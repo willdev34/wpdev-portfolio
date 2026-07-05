@@ -1,0 +1,10 @@
+{
+  "exclude": [
+    "[Portfolio.Application.DTOs*]*",
+    "[Portfolio.Application.Mappings*]*",
+    "[Portfolio.Domain*]*",
+    "[Portfolio.Application.Validators*]*",
+    "[Portfolio.Application.Commands.GalleryImages*]*",
+    "[Portfolio.Application.Queries.GalleryImages*]*"
+  ]
+}
