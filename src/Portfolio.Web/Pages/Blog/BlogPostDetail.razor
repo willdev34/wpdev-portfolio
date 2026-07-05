@@ -11,6 +11,7 @@
 @using Portfolio.Web.Helpers
 @inject BlogPostService BlogPostService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <SeoHead Title="@($"{post?.Title ?? "Post"} - WPDev")"
          Description="@(post?.Excerpt ?? "Artigo técnico sobre desenvolvimento de software por William.")"
@@ -80,7 +81,7 @@ else
     </section>
 
     <!-- CONTENT -->
-    <section class="post-content">
+    <section class="post-content scroll-reveal">
         <div class="container-narrow">
 
             @if (!string.IsNullOrEmpty(post.Excerpt))
@@ -115,6 +116,13 @@ else
 }
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (post != null)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+    }
     [Parameter]
     public Guid Id { get; set; }
 

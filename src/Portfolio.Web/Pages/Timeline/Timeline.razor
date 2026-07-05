@@ -3,6 +3,7 @@
 @using Portfolio.Web.DTOs.Timeline
 @using Portfolio.Web.Helpers
 @inject TimelineService TimelineService
+@inject IJSRuntime JS
 
 <SeoHead Title="Timeline - WPDev"
          Description="Trajetória profissional de William: formação, experiências e marcos da carreira como desenvolvedor Full Stack."
@@ -21,7 +22,7 @@
     </section>
 
     <!-- Timeline Section -->
-    <section class="timeline-section">
+    <section class="timeline-section scroll-reveal">
 
         @if (isLoading)
         {
@@ -98,6 +99,14 @@
 </div>
 
 @code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (events.Count > 0)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+    }
     private List<TimelineEventDto> events = new();
     private bool isLoading = true;
 

@@ -11,6 +11,7 @@
 @using Portfolio.Web.Helpers
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <SeoHead Title="@($"{project?.Title ?? "Projeto"} - WPDev")"
          Description="@(project?.ShortDescription ?? project?.Description ?? "Detalhes do projeto desenvolvido por William, especialista em .NET e Blazor.")"
@@ -71,7 +72,7 @@ else
     </section>
 
     <!-- CONTENT -->
-    <section class="project-content">
+    <section class="project-content scroll-reveal">
         <div class="container-narrow">
             <div class="content-grid">
 
@@ -152,6 +153,13 @@ else
 }
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (project != null)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+    }
     [Parameter]
     public Guid Id { get; set; }
 

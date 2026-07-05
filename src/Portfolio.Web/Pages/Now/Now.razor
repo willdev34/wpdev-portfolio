@@ -9,6 +9,7 @@
 @using Portfolio.Web.DTOs.Now
 @using Portfolio.Web.Components
 @inject NowService NowService
+@inject IJSRuntime JS
 
 <SeoHead Title="O que estou fazendo agora - WPDev"
          Description="Acompanhe o que William está estudando, desenvolvendo e priorizando no momento, no estilo nowpage."
@@ -37,7 +38,7 @@
 </div>
 
 <!-- NOW CONTENT -->
-<section class="now-content">
+<section class="now-content scroll-reveal">
     <div class="container">
         <div class="now-grid">
 
@@ -175,6 +176,13 @@
 </section>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (nowSection != null)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+    }
     private NowSectionDto? nowSection;
     private bool isLoading = true;
 

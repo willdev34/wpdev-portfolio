@@ -9,6 +9,7 @@
 @using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Contact
 @inject ContactService ContactService
+@inject IJSRuntime JS
 
 <SeoHead Title="Contato - WPDev"
          Description="Entre em contato com William para propostas de trabalho, freelances ou parcerias em desenvolvimento de software."
@@ -36,7 +37,7 @@
 </div>
 
 <!-- CONTEÚDO -->
-<section class="contact-content">
+<section class="contact-content scroll-reveal">
     <div class="container">
         <div class="contact-grid">
 
@@ -186,6 +187,13 @@
 </section>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+    }
     private SendContactMessageDto formData = new();
     private bool isSending = false;
     private bool messageSent = false;
