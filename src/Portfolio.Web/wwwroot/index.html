@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WPDev - Portfolio</title>
+    <meta name="description" content="Portfólio de William, desenvolvedor Full Stack especializado em .NET, Blazor WebAssembly e arquitetura de software. Projetos, blog técnico e timeline de carreira." />
     <base href="/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
@@ -208,6 +209,15 @@
             });
 
             elements.forEach(el => observer.observe(el));
+        };
+
+        window.loadHeroVideo = function (sourceId, videoUrl) {
+            const source = document.getElementById(sourceId);
+            if (source) {
+                const video = source.parentElement;
+                source.src = videoUrl;
+                video.load();
+            }
         };
     </script>
 </body>
