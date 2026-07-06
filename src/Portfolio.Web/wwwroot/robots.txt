@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wpdev-portfolio-web.onrender.com/sitemap.xml
