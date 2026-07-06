@@ -1,6 +1,8 @@
 name: CI - Build e Validação
 
 on:
+  schedule:
+    - cron: '0 8 */5 * *'  # Roda a cada 5 dias às 8h UTC
   push:
     branches:
       - develop
@@ -79,3 +81,12 @@ jobs:
 
       - name: Publish
         run: dotnet publish src/Portfolio.Web/Portfolio.Web.csproj --no-build --configuration Release --output ./publish/web
+
+  keep-alive:
+      name: Keep-alive API e Supabase
+      runs-on: ubuntu-latest
+      if: github.event_name == 'schedule'
+      steps:
+        - name: Ping API
+          run: |
+            curl -f https://wpdev-portfolio-api.onrender.com/api/health || echo "API não respondeu"
