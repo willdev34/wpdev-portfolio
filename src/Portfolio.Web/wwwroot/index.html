@@ -209,6 +209,15 @@
 
             elements.forEach(el => observer.observe(el));
         };
+
+        window.loadHeroVideo = function (sourceId, videoUrl) {
+            const source = document.getElementById(sourceId);
+            if (source) {
+                const video = source.parentElement;
+                source.src = videoUrl;
+                video.load();
+            }
+        };
     </script>
 </body>
 
