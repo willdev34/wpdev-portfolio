@@ -217,11 +217,13 @@
 
         window.loadHeroVideo = function (sourceId, videoUrl) {
             const source = document.getElementById(sourceId);
-            if (source) {
-                const video = source.parentElement;
-                source.src = videoUrl;
-                video.load();
-            }
+            if (!source) return;
+            const video = source.parentElement;
+            source.src = videoUrl;
+            video.load();
+            video.addEventListener('canplaythrough', function () {
+                video.classList.add('video-ready');
+            }, { once: true });
         };
     </script>
 </body>
