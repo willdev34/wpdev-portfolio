@@ -74,7 +74,12 @@
                             @if (!string.IsNullOrEmpty(evt.IconUrl))
                             {
                                 <div class="card-icon">
-                                    <img src="@CloudinaryUrlHelper.Optimize(evt.IconUrl, CloudinaryUrlHelper.IconWidth)" alt="@evt.Title" loading="lazy" decoding="async" />
+                                    <img src="@CloudinaryUrlHelper.Optimize(evt.IconUrl, CloudinaryUrlHelper.IconWidth)" 
+                                         alt="@evt.Title" 
+                                         loading="lazy" 
+                                         decoding="async"
+                                         width="80"
+                                         height="80" />
                                 </div>
                             }
                             <div class="card-content">

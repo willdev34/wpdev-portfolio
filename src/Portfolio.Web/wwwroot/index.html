@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WPDev - Portfolio</title>
+    <meta name="description" content="Portfólio de William, desenvolvedor Full Stack especializado em .NET, Blazor WebAssembly e arquitetura de software. Projetos, blog técnico e timeline de carreira." />
     <base href="/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
@@ -16,7 +17,11 @@
     <!-- Google Fonts: Poppins + Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="/images/hero-poster.webp" as="image" fetchpriority="high" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+    </noscript>
 
     <style>
         /* ================================
@@ -208,6 +213,17 @@
             });
 
             elements.forEach(el => observer.observe(el));
+        };
+
+        window.loadHeroVideo = function (sourceId, videoUrl) {
+            const source = document.getElementById(sourceId);
+            if (!source) return;
+            const video = source.parentElement;
+            source.src = videoUrl;
+            video.load();
+            video.addEventListener('canplaythrough', function () {
+                video.classList.add('video-ready');
+            }, { once: true });
         };
     </script>
 </body>
