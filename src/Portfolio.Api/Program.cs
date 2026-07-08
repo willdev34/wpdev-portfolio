@@ -189,7 +189,9 @@ using (var scope = app.Services.CreateScope())
     var adminEmail = builder.Configuration["Admin:Email"] ?? "admin@wpdev.com";
     var adminPassword = builder.Configuration["Admin:Password"] ?? "Admin@2024!";
 
-    if (await userManager.FindByEmailAsync(adminEmail) is null)
+    var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
+
+    if (existingAdmin is null)
     {
         var admin = new AppUser
         {
@@ -199,6 +201,16 @@ using (var scope = app.Services.CreateScope())
             EmailConfirmed = true
         };
         await userManager.CreateAsync(admin, adminPassword);
+    }
+    else if (builder.Configuration.GetValue<bool>("Admin:ForceResetPassword"))
+    {
+        // Reset controlado da senha, ativado só via variável de ambiente
+        // Admin__ForceResetPassword=true. Desativar depois de confirmar o login.
+        var removeResult = await userManager.RemovePasswordAsync(existingAdmin);
+        if (removeResult.Succeeded)
+        {
+            await userManager.AddPasswordAsync(existingAdmin, adminPassword);
+        }
     }
 }
 
