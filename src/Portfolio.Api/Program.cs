@@ -186,8 +186,10 @@ using (var scope = app.Services.CreateScope())
 
     // Seed do usuário admin
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-    var adminEmail = builder.Configuration["Admin:Email"] ?? "admin@wpdev.com";
-    var adminPassword = builder.Configuration["Admin:Password"] ?? "Admin@2024!";
+    var adminEmail = builder.Configuration["Admin:Email"]
+        ?? throw new InvalidOperationException("Admin:Email não configurado.");
+    var adminPassword = builder.Configuration["Admin:Password"]
+        ?? throw new InvalidOperationException("Admin:Password não configurado.");
 
     var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
 
