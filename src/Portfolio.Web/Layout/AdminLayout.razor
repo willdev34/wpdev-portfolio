@@ -9,34 +9,56 @@
 @inject NavigationManager Navigation
 
 <div class="admin-shell">
-    <aside class="admin-sidebar">
+
+    <!-- TOPBAR: só aparece em telas <= 768px -->
+    <header class="admin-topbar">
+        <a href="/admin" class="admin-topbar__brand">
+            <img src="/images/wpdev-logo-header.webp" alt="WPDev" class="admin-logo" />
+        </a>
+
+        <button class="admin-nav-toggle" @onclick="ToggleSidebar"
+                aria-label="@(sidebarOpen ? "Fechar menu" : "Abrir menu")"
+                aria-expanded="@sidebarOpen">
+            <span class="hb-line hb-line--top @(sidebarOpen ? "open" : "")"></span>
+            <span class="hb-line hb-line--mid @(sidebarOpen ? "open" : "")"></span>
+            <span class="hb-line hb-line--bot @(sidebarOpen ? "open" : "")"></span>
+        </button>
+    </header>
+
+    <!-- OVERLAY: fecha o menu ao clicar fora (só ativo no mobile) -->
+    <div class="admin-overlay @(sidebarOpen ? "admin-overlay--open" : "")"
+         @onclick="CloseSidebar"
+         aria-hidden="true">
+    </div>
+
+    <aside class="admin-sidebar @(sidebarOpen ? "admin-sidebar--open" : "")">
         <div class="admin-brand">
-            <span class="brand-text">WP<span class="brand-accent">Dev</span></span>
+            <img src="/images/wpdev-logo-header.webp" alt="WPDev" class="admin-logo" />
             <span class="brand-label">Admin</span>
         </div>
 
         <nav class="admin-nav">
-            <a class="admin-nav__item" href="/admin">
+            <a class="admin-nav__item" href="/admin" @onclick="CloseSidebar">
                 <span class="nav-icon">▦</span>
                 Dashboard
             </a>
-            <a class="admin-nav__item" href="/admin/projects">
+            <a class="admin-nav__item" href="/admin/projects" @onclick="CloseSidebar">
                 <span class="nav-icon">◈</span>
                 Projetos
             </a>
-            <a class="admin-nav__item" href="/admin/blog">
+            <a class="admin-nav__item" href="/admin/blog" @onclick="CloseSidebar">
                 <span class="nav-icon">✦</span>
                 Blog
             </a>
-            <a class="admin-nav__item" href="/admin/timeline">
+            <a class="admin-nav__item" href="/admin/timeline" @onclick="CloseSidebar">
                 <span class="nav-icon">◎</span>
                 Timeline
             </a>
-            <a class="admin-nav__item" href="/admin/now">
+            <a class="admin-nav__item" href="/admin/now" @onclick="CloseSidebar">
                 <span class="nav-icon">◉</span>
                 Now
             </a>
-            <a class="admin-nav__item" href="/admin/messages">
+            <a class="admin-nav__item" href="/admin/messages" @onclick="CloseSidebar">
                 <span class="nav-icon">◻</span>
                 Mensagens
             </a>
@@ -62,6 +84,18 @@
 </div>
 
 @code {
+    private bool sidebarOpen = false;
+
+    private void ToggleSidebar()
+    {
+        sidebarOpen = !sidebarOpen;
+    }
+
+    private void CloseSidebar()
+    {
+        sidebarOpen = false;
+    }
+
     private async Task Logout()
     {
         await AuthProvider.RemoveTokenAsync();
