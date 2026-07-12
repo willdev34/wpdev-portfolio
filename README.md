@@ -1,358 +1,153 @@
-# 🎴 WPDev Portfolio
+# WPDev Portfolio
 
-> Portfólio profissional minimalista e editorial, desenvolvido com .NET 8, Blazor WebAssembly e Clean Architecture.
+**[🇧🇷 Ler em Português](./README.pt-br.md)**
 
-![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat&logo=dotnet)
-![Blazor](https://img.shields.io/badge/Blazor-WebAssembly-512BD4?style=flat&logo=blazor)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=flat&logo=postgresql)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker)
+A professional portfolio for a Senior Full Stack Developer, built with an editorial, minimalist visual identity. Live projects, a magazine-style blog, an interactive timeline, and a full admin panel, all backed by a REST API built with Clean Architecture.
 
----
-
-## 🌟 Visão do Produto
-
-Site de portfólio pessoal com **estética editorial premium**, inspirado em estúdios contemporâneos como [diplo.studio](https://www.diplo.studio), apresentando:
-
-- **Home minimalista** com hero forte e tipografia impactante
-- **Projetos em destaque** com imagens amplas e layout editorial
-- **Cases detalhados** com narrativa visual e storytelling
-- **Timeline interativa** com animações suaves de scroll
-- **Mini-blog** com posts em Markdown e leitura fluida
-- **Seção "O que estou fazendo agora"** dinâmica e atualizável
-- **Galeria de imagens** com lightbox contemporâneo
-- **Formulário de contato** minimalista e direto
-- **Área Admin** completa para gerenciamento de conteúdo
-
-Todo o design segue rigorosamente o **Manual da Marca WPDev**, com cores, tipografia e princípios visuais estabelecidos.
+**Live:** [wpdev-portfolio-web.onrender.com](https://wpdev-portfolio-web.onrender.com)
+**API:** [wpdev-portfolio-api.onrender.com](https://wpdev-portfolio-api.onrender.com) · [Swagger](https://wpdev-portfolio-api.onrender.com/swagger)
 
 ---
 
-## 🏗️ Arquitetura
+## Stack
 
-O projeto segue **Clean Architecture** com separação clara entre camadas:
+| Layer | Technology |
+|---|---|
+| API | .NET 8, ASP.NET Core Web API |
+| Frontend | Blazor WebAssembly |
+| Database | PostgreSQL (Docker locally, Supabase in production) |
+| Architecture | Clean Architecture, CQRS via MediatR |
+| Validation / Mapping | FluentValidation, AutoMapper |
+| Auth | ASP.NET Core Identity + JWT |
+| Media | Cloudinary |
+| Logging | Serilog |
+| Testing | xUnit, Moq, coverlet |
+| CI/CD | GitHub Actions |
+| Hosting | Render (API + Web), Supabase (database) |
+
+## Architecture
+
+The solution follows Clean Architecture with four layers plus a background worker:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Portfolio.Web                        │
-│              (Blazor WebAssembly UI)                    │
-└─────────────────┬───────────────────────────────────────┘
-                  │ HTTP / REST (JWT)
-┌─────────────────▼───────────────────────────────────────┐
-│                   Portfolio.Api                         │
-│            (ASP.NET Core Web API)                       │
-└─────────────────┬───────────────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────────────┐
-│               Portfolio.Application                     │
-│         (CQRS/MediatR, DTOs, Validators)               │
-└─────────────────┬───────────────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────────────┐
-│              Portfolio.Infrastructure                   │
-│         (EF Core, Repositories, Services)              │
-└─────────────────┬───────────────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────────────┐
-│                  Portfolio.Domain                       │
-│            (Entities, Interfaces)                       │
-└─────────────────────────────────────────────────────────┘
+src/
+├── Portfolio.Domain          # Entities, no external dependencies
+├── Portfolio.Application     # CQRS (commands/queries via MediatR), DTOs, validators
+├── Portfolio.Infrastructure  # EF Core, repositories, external services (Cloudinary, etc.)
+├── Portfolio.Api             # REST API, controllers, authentication
+├── Portfolio.Web             # Blazor WebAssembly frontend
+└── Portfolio.Worker          # Background service (scaffolded, not yet wired to a feature)
+
+tests/
+├── Portfolio.UnitTests        # Application and Domain layer tests
+└── Portfolio.IntegrationTests # WebApplicationFactory + Testcontainers (in progress)
 ```
 
-### Fluxo de dados:
-**Blazor WASM** → **API (REST + JWT)** → **PostgreSQL** / **Azure Blob** → **Worker (tarefas assíncronas)**
+Dependencies point inward: `Api` and `Web` depend on `Application` and `Infrastructure`; `Application` depends only on `Domain`. `Infrastructure` implements interfaces defined in `Application`.
 
----
+## Features
 
-## 🚀 Stack Tecnológica
+**Public site**
+- Editorial home page with a strong hero section
+- Project listing with large thumbnails and a detailed case-study page per project
+- Interactive timeline
+- Magazine-style mini-blog
+- "What I'm doing now" section
+- Photo gallery
+- Minimalist contact form
 
-### Backend
-- **.NET 8** — Framework principal
-- **ASP.NET Core Web API** — REST API
-- **Entity Framework Core** — ORM para transações
-- **Dapper** — Queries otimizadas (opcional)
-- **MediatR** — Padrão CQRS
-- **FluentValidation** — Validação de entrada
-- **AutoMapper** — Mapeamento objeto-objeto
-- **JWT Bearer** — Autenticação
+**Admin panel**
+- JWT-authenticated area with full CRUD for Projects, Blog Posts, Timeline events, the Now section, and contact messages
+- Image upload via Cloudinary
+- Responsive layout with an animated off-canvas menu on tablet and mobile
 
-### Frontend
-- **Blazor WebAssembly** — SPA framework
-- **Tailwind CSS** — Estilização (manual da marca WPDev)
-- **Animações CSS** — Transform + opacity para efeitos sutis
+## API
 
-### Infraestrutura
-- **PostgreSQL 15** — Banco de dados principal
-- **Redis** — Cache (opcional)
-- **Docker Compose** — Orquestração local
-- **Azure Blob Storage** — Armazenamento de mídia
-- **MailDev** — Testes de email (desenvolvimento)
-- **GitHub Actions** — CI/CD
+8 controllers, REST endpoints for authentication, projects, blog posts, timeline events, the now section, gallery images, contact messages, and a health check. Full endpoint documentation is available via Swagger at `/swagger` when running the API.
 
----
+## Getting started
 
-## 📋 Pré-requisitos
-
+### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- [Node.js](https://nodejs.org/) (para ferramentas frontend)
-- [Git](https://git-scm.com/)
+- [Docker](https://www.docker.com/) (for local PostgreSQL, pgAdmin, Redis, and MailDev)
 
----
+### 1. Clone and start local infrastructure
 
-## 🎯 Como Executar
-
-### 1. Clone o repositório
 ```bash
 git clone https://github.com/willdev34/wpdev-portfolio.git
 cd wpdev-portfolio
-```
-
-### 2. Suba os containers Docker
-```bash
 docker-compose up -d
 ```
 
-### 3. Restaure as dependências
+This starts:
+
+| Service | Port | Purpose |
+|---|---|---|
+| PostgreSQL | `5432` | Application database |
+| pgAdmin | `5050` | Database admin UI |
+| Redis | `6379` | Provisioned for future caching, not yet used by the application |
+| MailDev | `1025` (SMTP) / `1080` (UI) | Captures outgoing emails locally for testing |
+
+### 2. Configure local secrets
+
+The API needs a `src/Portfolio.Api/appsettings.Development.json` file, which is git-ignored and never committed. Create it with your own local values:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=portfolio_dev;Username=wpdev;Password=Dev2024"
+  },
+  "Jwt": {
+    "Secret": "REPLACE_WITH_A_LOCAL_RANDOM_SECRET_AT_LEAST_32_CHARS"
+  },
+  "Admin": {
+    "Email": "admin@wpdev.com",
+    "Password": "REPLACE_WITH_A_LOCAL_PASSWORD"
+  }
+}
+```
+
+The application throws a startup exception if any of these are missing, by design, so a misconfigured environment fails fast instead of falling back to a weak default.
+
+### 3. Run the API and the frontend
+
 ```bash
-dotnet restore
+dotnet run --project src/Portfolio.Api    # http://localhost:5277 (Swagger opens automatically)
+dotnet run --project src/Portfolio.Web    # http://localhost:5237
 ```
 
-### 4. Execute o build
+## Testing
+
 ```bash
-dotnet build
+dotnet test
 ```
 
-### 5. Execute a aplicação
+Unit tests cover the Application and Domain layers with xUnit and Moq. Coverage is measured with coverlet and enforced in CI: pull requests are blocked if line/statement coverage drops below 80%. Integration tests (`Portfolio.IntegrationTests`) use `WebApplicationFactory` and Testcontainers for PostgreSQL, and are actively being expanded.
 
-**API:**
-```bash
-cd src/Portfolio.Api
-dotnet run
-```
+## CI/CD
 
-**Blazor WASM (em outro terminal):**
-```bash
-cd src/Portfolio.Web
-dotnet run
-```
+GitHub Actions runs on every push and pull request:
 
-Acesse:
-- **API**: http://localhost:5277
-- **Swagger**: http://localhost:5277/swagger
-- **Frontend**: http://localhost:5237
+1. **build-backend** — restores, builds, and runs unit tests for the .NET solution
+2. **quality-gate** — enforces the 80% coverage threshold, blocking the PR if not met
+3. **build-frontend** — builds the Blazor WebAssembly frontend
 
----
+The `main` branch is protected: it only accepts changes through pull requests that pass all checks. Deploys to Render trigger automatically on merge to `main`.
 
-## 🔑 Credenciais de Desenvolvimento
+## Monitoring
 
-### PostgreSQL
-- **Host**: `localhost:5432`
-- **Database**: `portfolio_dev`
-- **User**: `wpdev`
-- **Password**: `Dev@2024!`
+- `GET /api/health` checks database connectivity
+- [UptimeRobot](https://uptimerobot.com/) pings both the API and the frontend every 5 minutes
+- A scheduled GitHub Actions job keeps the Supabase database active on its free tier
 
-### pgAdmin
-- **URL**: http://localhost:5050
-- **Email**: `admin@wpdev.com`
-- **Password**: `Admin@2024!`
+## Security
 
-### MailDev
-- **URL**: http://localhost:1080
+Secrets (JWT signing key, database connection string, admin credentials) are provided via environment variables in production and via a git-ignored `appsettings.Development.json` locally. No secret values are committed to this repository.
 
----
+## License
 
-## 📁 Estrutura do Projeto
+© 2026 Will — WPDev. All rights reserved. This is a personal portfolio project; source code is public for demonstration purposes and is not licensed for reuse.
 
-```
-wpdev-portfolio/
-├── src/
-│   ├── Portfolio.Domain/          # Entidades, enums, interfaces
-│   ├── Portfolio.Application/     # DTOs, CQRS, validações, mappings
-│   ├── Portfolio.Infrastructure/  # EF Core, repositórios, serviços
-│   ├── Portfolio.Api/             # Controllers, autenticação, endpoints
-│   ├── Portfolio.Web/             # Blazor WASM UI
-│   └── Portfolio.Worker/          # Background jobs (email, thumbnails)
-├── tests/
-│   ├── Portfolio.UnitTests/       # Testes unitários
-│   └── Portfolio.IntegrationTests/# Testes de integração
-├── tools/
-│   └── DatabaseSetup/             # Scripts de setup do banco
-├── docs/                          # Documentação adicional
-├── deployments/
-│   └── docker/                    # Dockerfiles
-├── docker-compose.yml             # Orquestração local
-├── Portfolio.sln                  # Solution .NET
-└── README.md
-```
+## Contact
 
----
-
-## 🎨 Design — Manual da Marca WPDev
-
-### Cores Principais
-| Cor | Hex | Uso |
-|-----|-----|-----|
-| **WPDev Azul-Primário** | `#6C9EA3` | Acento, links, botões |
-| **WPDev Dark** | `#0D1C24` | Fundos escuros, hero |
-| **Neutro Claro** | `#F4F7F7` | Fundos claros, blog |
-| **Cinza Médio** | `#A3A9AB` | Textos secundários, metadados |
-
-### Tipografia
-- **Primária**: **Inter** — UI e corpo de texto
-- **Secundária**: **Poppins** — Títulos e destaques
-
-### Princípios de Design
-- Minimalista e editorial
-- Tipografia grande com respiro visual
-- Imagens full-bleed (largura total)
-- Animações sutis e cinematográficas
-- Navegação limpa inspirada em diplo.studio
-
----
-
-## 🗺️ Roadmap
-
-### Sprint 0 — Infraestrutura ✅
-- [x] Estrutura da solução .NET
-- [x] Docker Compose configurado
-- [x] PostgreSQL + pgAdmin
-- [x] Identity básico
-
-### Sprint 1 — Domain & Database ✅
-- [x] Entidades do domínio
-- [x] Configuração EF Core
-- [x] Schema do banco
-- [x] Migrations iniciais
-
-### Sprint 2 — Application Layer 🔄
-- [x] DTOs especializados
-- [x] AutoMapper profiles
-- [ ] Repository Pattern
-- [ ] CQRS com MediatR
-- [ ] Validações com FluentValidation
-
-### Sprint 3 — API Endpoints
-- [ ] Projects CRUD
-- [ ] Blog posts
-- [ ] Timeline events
-- [ ] Gallery images
-- [ ] Contact messages
-
-### Sprint 4 — Blazor UI Base
-- [ ] Shell e layout principal
-- [ ] Home editorial
-- [ ] Navegação minimalista
-
-### Sprint 5 — Projetos
-- [ ] Listagem de projetos
-- [ ] Página de case (detalhes)
-- [ ] Filtros e busca
-
-### Sprint 6 — Blog & Timeline
-- [ ] Listagem de posts
-- [ ] Leitura de post (Markdown)
-- [ ] Timeline interativa
-
-### Sprint 7 — Galeria & Contato
-- [ ] Gallery com lightbox
-- [ ] Upload de imagens
-- [ ] Formulário de contato
-
-### Sprint 8 — Autenticação & Admin
-- [ ] Login com JWT
-- [ ] Área admin protegida
-- [ ] CRUD completo
-
-### Sprint 9 — Performance & SEO
-- [ ] Otimização de imagens (WebP)
-- [ ] Meta tags e OpenGraph
-- [ ] Lighthouse score 90+
-
-### Sprint 10 — Deploy & Documentação
-- [ ] CI/CD GitHub Actions
-- [ ] Deploy Azure
-- [ ] Documentação completa
-
----
-
-## 🧪 Testes
-
-### Executar testes unitários
-```bash
-dotnet test tests/Portfolio.UnitTests/
-```
-
-### Executar testes de integração
-```bash
-dotnet test tests/Portfolio.IntegrationTests/
-```
-
-### Cobertura de código
-```bash
-dotnet test --collect:"XPlat Code Coverage"
-```
-
----
-
-## 🚢 Deploy
-
-### Docker Build
-```bash
-docker build -t wpdev-portfolio-api -f src/Portfolio.Api/Dockerfile .
-docker build -t wpdev-portfolio-web -f src/Portfolio.Web/Dockerfile .
-```
-
-### Azure Deploy (exemplo)
-```bash
-az webapp create --resource-group wpdev-rg --plan wpdev-plan --name wpdev-api
-az webapp deployment source config --name wpdev-api --resource-group wpdev-rg \
-  --repo-url https://github.com/willdev34/wpdev-portfolio --branch main
-```
-
----
-
-## 📊 Diagrama Arquitetural
-
-```mermaid
-flowchart LR
-    subgraph WEB
-        A[Blazor WASM] -->|REST / JWT| B(Portfolio.Api)
-    end
-    
-    subgraph BACKEND
-        B --> C[(PostgreSQL)]
-        B --> D[Blob Storage]
-        B --> E[Message Bus]
-        E --> F[Portfolio.Worker]
-    end
-    
-    subgraph EXTERNAL
-        G[GitHub OAuth] --> B
-        H[Email Service] --> F
-    end
-    
-    style A fill:#fef3c7,stroke:#f59e0b
-    style B fill:#eef2ff,stroke:#6366f1
-    style F fill:#ecfccb,stroke:#84cc16
-```
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
-
----
-
-## 📞 Contato
-
-**William (Willzin)**
-- GitHub: [@willdev34](https://github.com/willdev34)
-- LinkedIn: [willdevfull](https://www.linkedin.com/in/willdevfull/)
-
----
-
-<p align="center">
-  <strong>Desenvolvido com 💙 usando .NET 8 e Clean Architecture</strong><br>
-  <em>Onde ideias viram produto.</em>
-</p>
+Built by Will, WPDev — Senior Full Stack Developer based in Brazil, working with clients in Rio de Janeiro, Fortaleza, and internationally.

@@ -284,8 +284,8 @@
         ApplyFilters();
     }
 
-    private void NavigateToPost(Guid postId)
+    private async Task NavigateToPost(Guid postId)
     {
-        Navigation.NavigateTo($"/blog/{postId}");
+        await JS.InvokeVoidAsync("eval", $"window.location.href='/blog/{postId}'");
     }
 }
