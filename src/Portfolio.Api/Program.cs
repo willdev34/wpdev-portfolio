@@ -111,6 +111,12 @@ builder.Services.AddScoped<Portfolio.Application.Interfaces.INowSectionRepositor
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 // ====================================
+// REGISTRO DO EMAIL SERVICE
+// ====================================
+builder.Services.AddScoped<Portfolio.Application.Interfaces.IEmailService,
+                           Portfolio.Infrastructure.Services.EmailService>();
+
+// ====================================
 // CONFIGURAÇÃO DO MEDIATR (CQRS)
 // ====================================
 builder.Services.AddMediatR(cfg =>

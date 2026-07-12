@@ -22,16 +22,19 @@ public class CreateContactMessageCommandHandler : IRequestHandler<CreateContactM
 {
     private readonly IContactMessageRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IEmailService _emailService;
 
     // ====================================
     // CONSTRUTOR - Injeção de Dependência
     // ====================================
     public CreateContactMessageCommandHandler(
         IContactMessageRepository repository,
-        IMapper mapper)
+        IMapper mapper,
+        IEmailService emailService)
     {
         _repository = repository;
         _mapper = mapper;
+        _emailService = emailService;
     }
 
     // ====================================
@@ -62,9 +65,14 @@ public class CreateContactMessageCommandHandler : IRequestHandler<CreateContactM
         await _repository.SaveChangesAsync();
 
         // ====================================
-        // 4. CONVERTER ENTITY → DTO E RETORNAR
+        // 4. CONVERTER ENTITY → DTO
         // ====================================
         var contactMessageDto = _mapper.Map<ContactMessageDto>(createdMessage);
+
+        // ====================================
+        // 5. NOTIFICAR POR EMAIL (nao bloqueia em caso de falha)
+        // ====================================
+        await _emailService.SendContactNotificationAsync(createdMessage, cancellationToken);
 
         return contactMessageDto;
     }

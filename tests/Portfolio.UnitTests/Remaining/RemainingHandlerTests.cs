@@ -349,13 +349,15 @@ public class CreateContactMessageCommandHandlerTests
 {
     private readonly Mock<IContactMessageRepository> _repositoryMock;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IEmailService> _emailServiceMock;
     private readonly CreateContactMessageCommandHandler _handler;
 
     public CreateContactMessageCommandHandlerTests()
     {
         _repositoryMock = new Mock<IContactMessageRepository>();
         _mapperMock = new Mock<IMapper>();
-        _handler = new CreateContactMessageCommandHandler(_repositoryMock.Object, _mapperMock.Object);
+        _emailServiceMock = new Mock<IEmailService>();
+        _handler = new CreateContactMessageCommandHandler(_repositoryMock.Object, _mapperMock.Object, _emailServiceMock.Object);
     }
 
     [Fact]
