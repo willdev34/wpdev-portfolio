@@ -268,9 +268,9 @@
         ApplyFilters();
     }
 
-    private void NavigateToProject(Guid projectId)
+    private async Task NavigateToProject(Guid projectId)
     {
-        Navigation.NavigateTo($"/projects/{projectId}");
+        await JS.InvokeVoidAsync("eval", $"window.location.href='/projects/{projectId}'");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

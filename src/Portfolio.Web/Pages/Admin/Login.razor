@@ -72,7 +72,7 @@
         // Se já estiver autenticado, redireciona para o dashboard
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
-            Navigation.NavigateTo("/admin");
+            await JS.InvokeVoidAsync("eval", "window.location.href='/admin'");
     }
 
     private async Task HandleLogin()
