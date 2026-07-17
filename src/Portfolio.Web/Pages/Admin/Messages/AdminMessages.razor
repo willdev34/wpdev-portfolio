@@ -194,6 +194,16 @@ else
     private async Task OpenDetail(ContactMessageCardDto msg)
     {
         selectedMessage = await MessageService.GetByIdAsync(msg.Id);
+
+        if (msg.Status == "New")
+        {
+            await ToggleRead(msg, true);
+
+            if (selectedMessage is not null)
+            {
+                selectedMessage.Status = "Read";
+            }
+        }
     }
 
     private void CloseDetail()
