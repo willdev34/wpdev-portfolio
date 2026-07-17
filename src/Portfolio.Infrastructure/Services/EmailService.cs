@@ -72,7 +72,10 @@ public class EmailService : IEmailService
                     """
             };
 
-            using var smtp = new SmtpClient();
+            using var smtp = new SmtpClient
+            {
+                Timeout = 8000 // 8 segundos no maximo por operacao (connect, auth, send)
+            };
             var secureOption = port == 465 ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTlsWhenAvailable;
 
             await smtp.ConnectAsync(host, port, secureOption, cancellationToken);
