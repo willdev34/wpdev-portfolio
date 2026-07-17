@@ -117,6 +117,9 @@
     // STATE MANAGEMENT
     // ============================================
     
+    [SupplyParameterFromQuery(Name = "tech")]
+    public string? TechFilter { get; set; }
+
     // Data
     private List<ProjectCardDto> allProjects = new();
     private List<ProjectCardDto> filteredProjects = new();
@@ -125,12 +128,7 @@
     // Search & Filters
     private string searchQuery = string.Empty;
     private HashSet<string> selectedTechnologies = new();
-    private List<string> availableTechnologies = new()
-    {
-        "C#", ".NET", "Blazor", "React", "Angular", 
-        "Vue.js", "TypeScript", "JavaScript", "Python",
-        "Docker", "Azure", "AWS", "PostgreSQL", "MongoDB"
-    };
+    private List<string> availableTechnologies = new();
     
     // Pagination
     private int currentPage = 1;
@@ -162,7 +160,26 @@
         {
             // Buscar todos os projetos da API
             allProjects = await ProjectService.GetAllAsync();
-            
+
+            // Tecnologias disponiveis, calculadas a partir dos projetos reais
+            availableTechnologies = allProjects
+                .SelectMany(p => p.Technologies)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(t => t)
+                .ToList();
+
+            // Pre-seleciona a tecnologia vinda pela URL, se houver (ex: /projects?tech=Blazor)
+            if (!string.IsNullOrWhiteSpace(TechFilter))
+            {
+                var match = availableTechnologies
+                    .FirstOrDefault(t => t.Equals(TechFilter, StringComparison.OrdinalIgnoreCase));
+
+                if (match is not null)
+                {
+                    selectedTechnologies.Add(match);
+                }
+            }
+
             // Aplicar filtros
             ApplyFilters();
         }
@@ -209,6 +226,9 @@
                 )
             );
         }
+
+        // Mais recentes primeiro (pelo ano real do projeto, nao pela data de cadastro)
+        query = query.OrderByDescending(p => p.Year).ThenByDescending(p => p.CreatedAt);
 
         // Atualizar lista filtrada
         filteredProjects = query.ToList();
