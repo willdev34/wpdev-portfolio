@@ -33,6 +33,7 @@ public class ProjectCardDto
     // ==========================================
     public int Year { get; set; }
     public bool IsFeatured { get; set; }
+    public DateTime CreatedAt { get; set; }
     
     // ==========================================
     // ATRIBUTOS ESTILO CARTA (para o visual)

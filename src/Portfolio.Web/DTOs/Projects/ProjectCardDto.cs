@@ -14,6 +14,7 @@ public class ProjectCardDto
     public List<string> Technologies { get; set; } = new();
     public int Year { get; set; }
     public bool IsFeatured { get; set; }
+    public DateTime CreatedAt { get; set; }
     public string? DemoUrl { get; set; }
     public string? RepositoryUrl { get; set; }
 }
