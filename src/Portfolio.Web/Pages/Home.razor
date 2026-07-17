@@ -132,7 +132,7 @@
                         <div class="featured-tech-row">
                             @foreach (var tech in projects[0].Technologies.Take(3))
                             {
-                                <span class="featured-tech">@tech</span>
+                                <a href="/projects?tech=@Uri.EscapeDataString(tech)" class="featured-tech" @onclick:stopPropagation="true">@tech</a>
                             }
                         </div>
                         <h3 class="featured-title">@projects[0].Title</h3>
@@ -159,7 +159,7 @@
                                 <div class="featured-tech-row">
                                     @foreach (var tech in project.Technologies.Take(2))
                                     {
-                                        <span class="featured-tech">@tech</span>
+                                        <a href="/projects?tech=@Uri.EscapeDataString(tech)" class="featured-tech" @onclick:stopPropagation="true">@tech</a>
                                     }
                                 </div>
                                 <h3 class="featured-title featured-title--small">@project.Title</h3>

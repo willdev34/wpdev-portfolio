@@ -110,7 +110,7 @@ else
                             <div class="tech-list">
                                 @foreach (var tech in project.Technologies)
                                 {
-                                    <span class="tech-chip">@tech</span>
+                                    <a href="/projects?tech=@Uri.EscapeDataString(tech)" class="tech-chip">@tech</a>
                                 }
                             </div>
                         </div>

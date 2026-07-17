@@ -99,7 +99,11 @@ public class ProjectService
     public async Task<List<ProjectCardDto>> GetFeaturedAsync()
     {
         var allProjects = await GetAllAsync();
-        return allProjects.Where(p => p.IsFeatured).ToList();
+        return allProjects
+            .Where(p => p.IsFeatured)
+            .OrderByDescending(p => p.Year)
+            .ThenByDescending(p => p.CreatedAt)
+            .ToList();
     }
 
     // ====================================
