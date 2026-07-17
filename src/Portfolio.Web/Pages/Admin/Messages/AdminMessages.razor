@@ -66,20 +66,19 @@ else
             <tbody>
                 @foreach (var msg in messages)
                 {
-                    <tr class="@(msg.Status == "New" ? "row-unread" : "")">
+                    <tr class="row-clickable @(msg.Status == "New" ? "row-unread" : "")"
+                        @onclick="() => OpenDetail(msg)">
                         <td>
                             <span class="status-dot @GetStatusClass(msg.Status)" title="@msg.Status"></span>
                         </td>
                         <td class="col-name">@msg.Name</td>
                         <td class="col-email">@msg.Email</td>
-                        <td class="col-subject">
-                            <button class="link-btn" @onclick="() => OpenDetail(msg)">@msg.Subject</button>
-                        </td>
+                        <td class="col-subject">@msg.Subject</td>
                         <td>
                             <span class="type-pill">@msg.Type</span>
                         </td>
                         <td class="col-date">@msg.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td class="col-actions">
+                        <td class="col-actions" @onclick:stopPropagation="true">
                             @if (msg.Status == "New")
                             {
                                 <button class="btn-admin btn-sm btn-secondary"
@@ -335,8 +334,16 @@ else
         transition: background 0.15s;
     }
 
+    .row-clickable {
+        cursor: pointer;
+    }
+
     .admin-table tbody tr:hover {
         background: var(--color-light);
+    }
+
+    .col-actions {
+        cursor: default;
     }
 
     .admin-table tbody tr.row-unread td {
