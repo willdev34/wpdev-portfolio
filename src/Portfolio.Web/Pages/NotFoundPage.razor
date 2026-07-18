@@ -1,0 +1,43 @@
+@* ====================================
+   Título: NotFoundPage.razor
+   Descrição: Página 404 exibida quando nenhuma rota corresponde
+   ==================================== *@
+
+@inject IJSRuntime JS
+
+<PageTitle>Página não encontrada - WPDev</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex" />
+</HeadContent>
+
+<section class="notfound">
+    <div class="notfound__content">
+        <span class="notfound__eyebrow">ERRO 404</span>
+
+       <div class="notfound__code-wrap">
+            <h1 class="notfound__code" id="matrix404Text">404</h1>
+        </div>
+
+        <p class="notfound__message">
+            Essa página não existe, foi movida, ou o link que você seguiu está desatualizado.
+        </p>
+        <div class="notfound__actions">
+            <a href="/" class="home-btn home-btn--primary">
+                Voltar para o início
+            </a>
+            <a href="/projects" class="home-btn home-btn--ghost">
+                Ver projetos
+            </a>
+        </div>
+    </div>
+</section>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initMatrix404");
+        }
+    }
+}
