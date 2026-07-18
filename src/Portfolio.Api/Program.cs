@@ -128,6 +128,9 @@ builder.Services.AddMediatR(cfg =>
 // ====================================
 builder.Services.AddValidatorsFromAssembly(
     typeof(Portfolio.Application.Commands.Projects.CreateProject.CreateProjectCommandValidator).Assembly);
+builder.Services.AddTransient(
+    typeof(MediatR.IPipelineBehavior<,>),
+    typeof(Portfolio.Application.Behaviors.ValidationBehavior<,>));
 
 // ====================================
 // CONFIGURAÇÃO DOS CONTROLLERS
@@ -183,6 +186,38 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // ====================================
+// TRATAMENTO GLOBAL DE ERROS
+// ====================================
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var feature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        var exception = feature?.Error;
+
+        if (exception is FluentValidation.ValidationException validationException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/json";
+
+            var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+
+            await context.Response.WriteAsJsonAsync(new { message = "Dados invalidos.", errors });
+            return;
+        }
+
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(exception, "[GlobalExceptionHandler] Erro nao tratado.");
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { message = "Ocorreu um erro interno. Tente novamente mais tarde." });
+    });
+});
+
+// ====================================
 // APLICAR MIGRATIONS E SEED ADMIN
 // ====================================
 using (var scope = app.Services.CreateScope())
@@ -235,3 +270,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
