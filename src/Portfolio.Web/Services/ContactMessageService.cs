@@ -145,4 +145,10 @@ public class ContactMessageService
             return false;
         }
     }
+
+    public async Task<int> GetUnreadCountAsync()
+    {
+        var messages = await GetAllAsync();
+        return messages.Count(m => m.Status == "New");
+    }
 }
