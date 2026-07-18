@@ -21,6 +21,11 @@ COPY src/ src/
 # Build e publish
 RUN dotnet publish src/Portfolio.Web/Portfolio.Web.csproj -c Release -o /app/publish
 
+# Gerar sitemap.xml com os projetos e posts reais da API
+RUN apt-get update && apt-get install -y --no-install-recommends curl jq && rm -rf /var/lib/apt/lists/*
+COPY src/Portfolio.Web/generate-sitemap.sh /tmp/generate-sitemap.sh
+RUN chmod +x /tmp/generate-sitemap.sh && /tmp/generate-sitemap.sh
+
 # STAGE 2: Nginx para servir arquivos estáticos
 FROM nginx:alpine AS runtime
 
