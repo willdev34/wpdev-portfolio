@@ -7,6 +7,7 @@
 @using Portfolio.Web.Auth
 @inject JwtAuthStateProvider AuthProvider
 @inject NavigationManager Navigation
+@inject ContactMessageService MessageService
 
 <div class="admin-shell">
 
@@ -61,6 +62,10 @@
             <a class="admin-nav__item" href="/admin/messages" @onclick="CloseSidebar">
                 <span class="nav-icon">◻</span>
                 Mensagens
+                @if (unreadCount > 0)
+                {
+                    <span class="nav-badge">@unreadCount</span>
+                }
             </a>
         </nav>
 
@@ -85,6 +90,12 @@
 
 @code {
     private bool sidebarOpen = false;
+    private int unreadCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        unreadCount = await MessageService.GetUnreadCountAsync();
+    }
 
     private void ToggleSidebar()
     {
