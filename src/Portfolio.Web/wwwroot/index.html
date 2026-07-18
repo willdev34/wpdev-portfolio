@@ -225,6 +225,56 @@
                 video.classList.add('video-ready');
             }, { once: true });
         };
+
+        window.initMatrix404 = function () {
+            const el = document.getElementById('matrix404Text');
+            if (!el) return;
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReducedMotion) return; // Mantem o fallback estatico
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            let drops = [];
+            const fontSize = 16;
+            const chars = '0100001110101'.split('');
+
+            function resize() {
+                const rect = el.getBoundingClientRect();
+                canvas.width = Math.max(rect.width, 1);
+                canvas.height = Math.max(rect.height, 1);
+                ctx.fillStyle = '#0D1C24';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const columns = Math.floor(canvas.width / fontSize);
+                drops = new Array(columns).fill(1);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function draw() {
+                ctx.fillStyle = 'rgba(13, 28, 36, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#6C9EA3';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+
+                el.style.backgroundImage = `url(${canvas.toDataURL()})`;
+                el.classList.add('notfound__code--animated');
+            }
+
+            setInterval(draw, 120);
+        };
     </script>
 </body>
 
