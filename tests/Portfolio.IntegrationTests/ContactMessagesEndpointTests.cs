@@ -4,6 +4,7 @@ using Portfolio.Application.DTOs.ContactMessages;
 
 namespace Portfolio.IntegrationTests;
 
+[Collection("Integration Tests")]
 public class ContactMessagesEndpointTests : IntegrationTestBase
 {
     public ContactMessagesEndpointTests(CustomWebApplicationFactory factory) : base(factory) { }

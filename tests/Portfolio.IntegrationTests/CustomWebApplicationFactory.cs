@@ -1,14 +1,11 @@
 // ====================================
 // Título: CustomWebApplicationFactory.cs
 // Descrição: Sobe a API real (Program.cs) contra um PostgreSQL real,
-//            descartavel, via Testcontainers. Cada classe de teste que
-//            usar essa factory compartilha o mesmo container e banco.
+//            descartavel, via Testcontainers.
 // ====================================
 
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portfolio.Infrastructure.Data;
 using Testcontainers.PostgreSql;
@@ -24,27 +21,19 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         .WithPassword("test")
         .Build();
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.ConfigureAppConfiguration((_, config) =>
-        {
-            var testConfig = new Dictionary<string, string?>
-            {
-                ["ConnectionStrings:DefaultConnection"] = _dbContainer.GetConnectionString(),
-                ["Jwt:Secret"] = "IntegrationTests-Secret-Key-Not-Used-In-Prod-32Chars",
-                ["Jwt:Issuer"] = "wpdev-portfolio-api-tests",
-                ["Jwt:Audience"] = "wpdev-portfolio-web-tests",
-                ["Admin:Email"] = "admin.tests@wpdev.local",
-                ["Admin:Password"] = "IntegrationTests@2026!"
-            };
-
-            config.AddInMemoryCollection(testConfig);
-        });
-    }
-
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
+
+        // Variaveis de ambiente reais: o Program.cs le a configuracao direto,
+        // antes do Build(), entao ConfigureAppConfiguration chegaria tarde demais.
+        // Variaveis de ambiente sao lidas logo na criacao do WebApplicationBuilder.
+        Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", _dbContainer.GetConnectionString());
+        Environment.SetEnvironmentVariable("Jwt__Secret", "IntegrationTests-Secret-Key-Not-Used-In-Prod-32Chars");
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "wpdev-portfolio-api-tests");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "wpdev-portfolio-web-tests");
+        Environment.SetEnvironmentVariable("Admin__Email", "admin.tests@wpdev.local");
+        Environment.SetEnvironmentVariable("Admin__Password", "IntegrationTests@2026!");
 
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
