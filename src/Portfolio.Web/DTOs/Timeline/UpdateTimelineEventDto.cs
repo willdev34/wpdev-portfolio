@@ -13,4 +13,5 @@ public class UpdateTimelineEventDto
     public string LinkUrl { get; set; } = string.Empty;
     public string LinkText { get; set; } = string.Empty;
     public int Order { get; set; }
+    public bool IsVisible { get; set; } = true;
 }
