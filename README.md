@@ -140,9 +140,19 @@ The `main` branch is protected: it only accepts changes through pull requests th
 - [UptimeRobot](https://uptimerobot.com/) pings both the API and the frontend every 5 minutes
 - A scheduled GitHub Actions job keeps the Supabase database active on its free tier
 
-## Security
+## 🔒 Security
 
 Secrets (JWT signing key, database connection string, admin credentials) are provided via environment variables in production and via a git-ignored `appsettings.Development.json` locally. No secret values are committed to this repository.
+
+### Row Level Security (RLS) on Supabase
+
+All tables in the `public` schema have RLS enabled as of July 2026, including business tables (`Projects`, `BlogPosts`, `ContactMessages`, `GalleryImages`, `NowSections`, `TimelineEvents`) and ASP.NET Identity tables (`AspNetUsers`, `AspNetRoles`, etc).
+
+Supabase automatically exposes a REST API (PostgREST) for any public table, accessible through the `anon key`. Without RLS, this API allows direct read/write access, bypassing the application's JWT authentication entirely.
+
+The application connects to PostgreSQL using Supabase's default role (via `ConnectionStrings__DefaultConnection`), which has RLS bypass privilege. Because of this, RLS was enabled on every table without creating any policies: the backend keeps working normally, while Supabase's public REST API now denies access by default.
+
+Reference: [Supabase Advisor](https://supabase.com/docs/guides/database/database-advisors)
 
 ## License
 
