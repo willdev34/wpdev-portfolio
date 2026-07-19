@@ -61,6 +61,9 @@ jobs:
           name: coverage-report
           path: tests/Portfolio.UnitTests/coverage/coverage.xml
 
+      - name: Rodar testes de integracao
+        run: dotnet test tests/Portfolio.IntegrationTests/Portfolio.IntegrationTests.csproj
+
   build-frontend:
     name: Build Frontend (Blazor WASM)
     runs-on: ubuntu-latest

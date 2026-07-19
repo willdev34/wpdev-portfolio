@@ -4,6 +4,7 @@
 // ====================================
 
 using FluentValidation;
+using Portfolio.Domain.Entities;
 
 namespace Portfolio.Application.Commands.Projects.CreateProject;
 
@@ -78,7 +79,8 @@ public class CreateProjectCommandValidator : AbstractValidator<CreateProjectComm
         // VALIDAÇÃO DO ENUM STATUS
         // ====================================
         RuleFor(x => x.ProjectData.Status)
-            .IsInEnum().WithMessage("Status inválido");
+            .Must(status => Enum.IsDefined(typeof(ProjectStatus), status))
+            .WithMessage("Status inválido");
     }
 
     // ====================================
