@@ -2,6 +2,7 @@ using System.Net;
 
 namespace Portfolio.IntegrationTests;
 
+[Collection("Integration Tests")]
 public class HealthEndpointTests : IntegrationTestBase
 {
     public HealthEndpointTests(CustomWebApplicationFactory factory) : base(factory) { }

@@ -6,7 +6,7 @@
 
 namespace Portfolio.IntegrationTests;
 
-public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFactory>
+public abstract class IntegrationTestBase
 {
     protected readonly HttpClient Client;
 

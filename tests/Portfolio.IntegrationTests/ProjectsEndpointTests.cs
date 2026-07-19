@@ -4,6 +4,7 @@ using Portfolio.Application.DTOs.Projects;
 
 namespace Portfolio.IntegrationTests;
 
+[Collection("Integration Tests")]
 public class ProjectsEndpointTests : IntegrationTestBase
 {
     public ProjectsEndpointTests(CustomWebApplicationFactory factory) : base(factory) { }
