@@ -70,7 +70,12 @@
 
                 <div class="field field--checkbox">
                     <input type="checkbox" id="isCurrent" @bind="_form.IsCurrent" />
-                    <label for="isCurrent">Posição atual</label>
+                    <label for="isCurrent">Atual (em andamento)</label>
+                </div>
+
+                <div class="field field--checkbox">
+                    <input type="checkbox" id="isVisible" @bind="_form.IsVisible" />
+                    <label for="isVisible">Visível na timeline</label>
                 </div>
             </div>
 
@@ -170,7 +175,8 @@
                 IconUrl = evt.IconUrl,
                 LinkUrl = evt.LinkUrl,
                 LinkText = evt.LinkText,
-                Order = evt.Order
+                Order = evt.Order,
+                IsVisible = evt.IsVisible
             };
         }
 
@@ -209,7 +215,8 @@
                 IconUrl = _form.IconUrl,
                 LinkUrl = _form.LinkUrl,
                 LinkText = _form.LinkText,
-                Order = _form.Order
+                Order = _form.Order,
+                IsVisible = _form.IsVisible
             };
 
             var (success, error) = await TimelineService.UpdateAsync(updateDto);
