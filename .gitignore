@@ -30,6 +30,7 @@ x86/
 [Tt]est[Rr]esult*/
 *.trx
 *.coverage
+**/coverage/
 
 # Blazor
 **/wwwroot/dist/
