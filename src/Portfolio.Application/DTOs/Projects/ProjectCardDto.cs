@@ -2,7 +2,7 @@ namespace Portfolio.Application.DTOs.Projects;
 
 /// <summary>
 /// DTO simplificado do Project - usado para listagens e grid de cards
-/// Contém apenas os dados essenciais para exibir o card estilo Yu-Gi-Oh!
+/// Contém apenas os dados essenciais para exibição editorial
 /// Reduz tráfego de rede ao listar muitos projetos
 /// </summary>
 public class ProjectCardDto
@@ -34,13 +34,6 @@ public class ProjectCardDto
     public int Year { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
-    
-    // ==========================================
-    // ATRIBUTOS ESTILO CARTA (para o visual)
-    // ==========================================
-    public string Rarity { get; set; } = string.Empty;
-    public int AttackPoints { get; set; }
-    public int DefensePoints { get; set; }
     
     // ==========================================
     // LINKS (apenas para navegação rápida)
