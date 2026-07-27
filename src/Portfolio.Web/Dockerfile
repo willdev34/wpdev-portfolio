@@ -6,7 +6,6 @@
 # STAGE 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-
 # Copiar arquivos de projeto
 COPY src/Portfolio.Domain/Portfolio.Domain.csproj src/Portfolio.Domain/
 COPY src/Portfolio.Application/Portfolio.Application.csproj src/Portfolio.Application/
