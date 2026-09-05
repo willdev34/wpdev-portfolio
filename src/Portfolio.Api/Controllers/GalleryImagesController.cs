@@ -20,6 +20,7 @@ namespace Portfolio.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Microsoft.AspNetCore.Authorization.Authorize]
 public class GalleryImagesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -42,6 +43,7 @@ public class GalleryImagesController : ControllerBase
     /// <returns>Lista de GalleryImageCardDto</returns>
     /// <response code="200">Retorna a lista de imagens</response>
     [HttpGet]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<GalleryImageCardDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<GalleryImageCardDto>>> GetAll()
     {
@@ -66,6 +68,7 @@ public class GalleryImagesController : ControllerBase
     /// <response code="200">Retorna a imagem encontrada</response>
     /// <response code="404">Imagem não encontrada</response>
     [HttpGet("{id}")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(GalleryImageDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GalleryImageDto>> GetById(Guid id)
