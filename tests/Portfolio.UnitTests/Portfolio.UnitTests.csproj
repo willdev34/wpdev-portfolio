@@ -14,13 +14,16 @@
     <ExcludeByFile>**/DTOs/**,**/Mappings/**,**/Validators/**,**/GalleryImages/**</ExcludeByFile>
     <Exclude>[Portfolio.Domain*]*</Exclude>
   </PropertyGroup>
-  <ItemGroup>
+    <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="6.0.0" />
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <!-- Overrides de versao para corrigir CVEs transitivas antigas (GHSA-7jgj-8wvc-jh57, GHSA-cmhx-cq75-c4mj) -->
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
