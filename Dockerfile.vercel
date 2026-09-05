@@ -1,0 +1,33 @@
+# ====================================
+# Dockerfile.vercel - Portfolio.Api
+# Copia do Dockerfile original. Mantido em arquivo separado porque o
+# Vercel usa o diretorio do entrypoint como contexto de build, nao o
+# campo "root" do vercel.json. Enquanto o Render estiver ativo, nao
+# mexer no Dockerfile original em src/Portfolio.Api/.
+# ====================================
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/Portfolio.Domain/Portfolio.Domain.csproj src/Portfolio.Domain/
+COPY src/Portfolio.Application/Portfolio.Application.csproj src/Portfolio.Application/
+COPY src/Portfolio.Infrastructure/Portfolio.Infrastructure.csproj src/Portfolio.Infrastructure/
+COPY src/Portfolio.Api/Portfolio.Api.csproj src/Portfolio.Api/
+
+RUN dotnet restore src/Portfolio.Api/Portfolio.Api.csproj
+
+COPY src/ src/
+
+RUN dotnet publish src/Portfolio.Api/Portfolio.Api.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:8080
+
+ENTRYPOINT ["dotnet", "Portfolio.Api.dll"]
