@@ -3,7 +3,7 @@
   "services": {
     "api": {
       "root": ".",
-      "entrypoint": "src/Portfolio.Api/Dockerfile",
+      "entrypoint": "Dockerfile.vercel",
       "runtime": "container"
     }
   },
