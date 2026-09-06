@@ -5,9 +5,16 @@
       "root": ".",
       "entrypoint": "Dockerfile.vercel",
       "runtime": "container"
+    },
+    "web": {
+      "root": ".",
+      "entrypoint": "Dockerfile.web.vercel",
+      "runtime": "container"
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": { "service": "api" } }
+    { "source": "/api/(.*)", "destination": { "service": "api" } },
+    { "source": "/swagger(.*)", "destination": { "service": "api" } },
+    { "source": "/(.*)", "destination": { "service": "web" } }
   ]
 }

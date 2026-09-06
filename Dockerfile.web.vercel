@@ -1,0 +1,36 @@
+# ====================================
+# Dockerfile.web.vercel - Portfolio.Web (Blazor WASM)
+# Copia adaptada do Dockerfile original em src/Portfolio.Web/.
+# Usa nginx.vercel.conf (porta 8080) porque o projeto Vercel já usa
+# PORT=8080 para a API, e essa variável vale pro projeto inteiro.
+# Dockerfile original intocado, continua servindo o Render.
+# ====================================
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/Portfolio.Domain/Portfolio.Domain.csproj src/Portfolio.Domain/
+COPY src/Portfolio.Application/Portfolio.Application.csproj src/Portfolio.Application/
+COPY src/Portfolio.Web/Portfolio.Web.csproj src/Portfolio.Web/
+
+RUN dotnet restore src/Portfolio.Web/Portfolio.Web.csproj
+
+COPY src/ src/
+
+RUN dotnet publish src/Portfolio.Web/Portfolio.Web.csproj -c Release -o /app/publish
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl jq && rm -rf /var/lib/apt/lists/*
+COPY src/Portfolio.Web/generate-sitemap.sh /tmp/generate-sitemap.sh
+RUN chmod +x /tmp/generate-sitemap.sh && \
+    /tmp/generate-sitemap.sh "https://wpdev-portfolio-api.vercel.app" "https://wpdev-portfolio-api.vercel.app"
+
+FROM nginx:alpine AS runtime
+
+COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
+COPY src/Portfolio.Web/nginx.vercel.conf /etc/nginx/nginx.conf
+COPY src/Portfolio.Web/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+EXPOSE 8080
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
