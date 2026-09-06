@@ -61,14 +61,9 @@ public class AuthEndpointTests : IntegrationTestBase
     [Fact]
     public async Task Me_WithValidToken_ReturnsOkWithEmail()
     {
-        var loginRequest = new LoginRequestDto { Email = AdminEmail, Password = AdminPassword };
-        var loginResponse = await Client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
+        await AuthenticateClientAsync();
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/auth/me");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.Token);
-
-        var response = await Client.SendAsync(request);
+        var response = await Client.GetAsync("/api/auth/me");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
