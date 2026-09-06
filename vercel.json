@@ -8,7 +8,7 @@
     },
     "web": {
       "root": ".",
-      "entrypoint": "Dockerfile.web.vercel",
+      "entrypoint": "Containerfile.vercel",
       "runtime": "container"
     }
   },
