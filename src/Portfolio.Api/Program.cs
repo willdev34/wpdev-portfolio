@@ -221,13 +221,25 @@ app.UseExceptionHandler(errorApp =>
 
 // ====================================
 // APLICAR MIGRATIONS E SEED ADMIN
+// Roda sempre em Development (conveniencia local, Postgres via Docker).
+// Em producao so roda se Startup__ApplyMigrationsOnBoot=true estiver
+// setado explicitamente no Vercel, porque essa checagem bloqueava o
+// pipeline HTTP inteiro antes de aceitar qualquer request, adicionando
+// ~5s em toda primeira chamada apos o container escalar a zero
+// (Sprint 13, investigacao de delay).
+// Uso: quando precisar aplicar uma migration nova ou forcar reset de
+// senha do admin em producao, liga o flag, redeploy, confirma no log,
+// desliga de novo.
 // ====================================
-using (var scope = app.Services.CreateScope())
+var shouldRunStartupMigration = app.Environment.IsDevelopment()
+    || builder.Configuration.GetValue<bool>("Startup:ApplyMigrationsOnBoot");
+
+if (shouldRunStartupMigration)
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
     db.Database.Migrate();
 
-    // Seed do usuário admin
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     var adminEmail = builder.Configuration["Admin:Email"]
         ?? throw new InvalidOperationException("Admin:Email não configurado.");
@@ -249,8 +261,6 @@ using (var scope = app.Services.CreateScope())
     }
     else if (builder.Configuration.GetValue<bool>("Admin:ForceResetPassword"))
     {
-        // Reset controlado da senha, ativado só via variável de ambiente
-        // Admin__ForceResetPassword=true. Desativar depois de confirmar o login.
         var removeResult = await userManager.RemovePasswordAsync(existingAdmin);
         if (removeResult.Succeeded)
         {
