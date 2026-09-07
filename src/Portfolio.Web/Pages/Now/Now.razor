@@ -78,7 +78,7 @@
                     <!-- Foco / Conteúdo principal -->
                     <div class="now-block">
                         <p class="now-block-label">Foco Atual</p>
-                        <p class="now-block-text now-block-text--large">@nowSection.Content</p>
+                        <p class="now-block-text">@nowSection.Content</p>
                     </div>
 
                     <!-- Projetos atuais -->
@@ -88,7 +88,7 @@
                             <p class="now-block-label">Projetos em Andamento</p>
                             @foreach (var project in nowSection.CurrentProjects)
                             {
-                                <p class="now-block-text now-block-text--large">
+                                <p class="now-block-text">
                                     @if (!string.IsNullOrEmpty(project.Url))
                                     {
                                         <a href="@project.Url"
