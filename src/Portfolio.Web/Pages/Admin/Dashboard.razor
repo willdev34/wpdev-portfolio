@@ -17,38 +17,48 @@
     </div>
 
     <div class="dashboard__grid">
-        <a class="dash-card" href="/admin/projects">
-            <span class="dash-card__icon">◈</span>
-            <span class="dash-card__label">Projetos</span>
-            <span class="dash-card__arrow">→</span>
+        <a class="dash-card" href="/admin/projects" style="background-image: url('/images/admin/dash-projects.webp')">
+            <div class="dash-card__overlay"></div>
+            <div class="dash-card__content">
+                <span class="dash-card__label">Projetos</span>
+                <span class="dash-card__arrow">→</span>
+            </div>
         </a>
 
-        <a class="dash-card" href="/admin/blog">
-            <span class="dash-card__icon">✦</span>
-            <span class="dash-card__label">Blog</span>
-            <span class="dash-card__arrow">→</span>
+        <a class="dash-card" href="/admin/blog" style="background-image: url('/images/admin/dash-blog.webp')">
+            <div class="dash-card__overlay"></div>
+            <div class="dash-card__content">
+                <span class="dash-card__label">Blog</span>
+                <span class="dash-card__arrow">→</span>
+            </div>
         </a>
 
-        <a class="dash-card" href="/admin/timeline">
-            <span class="dash-card__icon">◎</span>
-            <span class="dash-card__label">Timeline</span>
-            <span class="dash-card__arrow">→</span>
+        <a class="dash-card" href="/admin/timeline" style="background-image: url('/images/admin/dash-timeline.webp')">
+            <div class="dash-card__overlay"></div>
+            <div class="dash-card__content">
+                <span class="dash-card__label">Timeline</span>
+                <span class="dash-card__arrow">→</span>
+            </div>
         </a>
 
-        <a class="dash-card" href="/admin/now">
-            <span class="dash-card__icon">◉</span>
-            <span class="dash-card__label">Now</span>
-            <span class="dash-card__arrow">→</span>
+        <a class="dash-card" href="/admin/now" style="background-image: url('/images/admin/dash-now.webp')">
+            <div class="dash-card__overlay"></div>
+            <div class="dash-card__content">
+                <span class="dash-card__label">Now</span>
+                <span class="dash-card__arrow">→</span>
+            </div>
         </a>
 
-        <a class="dash-card" href="/admin/messages">
-            <span class="dash-card__icon">◻</span>
-            <span class="dash-card__label">Mensagens</span>
+        <a class="dash-card" href="/admin/messages" style="background-image: url('/images/admin/dash-messages.webp')">
+            <div class="dash-card__overlay"></div>
             @if (unreadCount > 0)
             {
                 <span class="dash-card__badge">@unreadCount</span>
             }
-            <span class="dash-card__arrow">→</span>
+            <div class="dash-card__content">
+                <span class="dash-card__label">Mensagens</span>
+                <span class="dash-card__arrow">→</span>
+            </div>
         </a>
     </div>
 </div>
@@ -88,56 +98,82 @@
 
     .dashboard__grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
     }
 
     .dash-card {
+        position: relative;
         display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 20px 24px;
-        background-color: #fff;
-        border: 1px solid #e8ecec;
-        border-radius: 10px;
+        align-items: flex-end;
+        min-height: 220px;
+        border-radius: 14px;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
         text-decoration: none;
-        color: #0D1C24;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: all 0.15s ease;
+        color: #fff;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .dash-card:hover {
-        border-color: #6C9EA3;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(108,158,163,0.15);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(13, 28, 36, 0.25);
     }
 
-    .dash-card__icon {
-        font-size: 1.1rem;
-        color: #6C9EA3;
+    .dash-card__overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(13,28,36,0.15) 0%, rgba(13,28,36,0.85) 100%);
+        transition: background 0.2s ease;
+    }
+
+    .dash-card:hover .dash-card__overlay {
+        background: linear-gradient(180deg, rgba(108,158,163,0.15) 0%, rgba(13,28,36,0.9) 100%);
+    }
+
+    .dash-card__content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 20px 24px;
     }
 
     .dash-card__label {
-        flex: 1;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
     }
 
     .dash-card__arrow {
-        color: #A3A9AB;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
+        opacity: 0.85;
+        transition: transform 0.2s ease;
+    }
+
+    .dash-card:hover .dash-card__arrow {
+        transform: translateX(4px);
     }
 
     .dash-card__badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 2;
         background-color: #e5484d;
         color: #fff;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        min-width: 20px;
-        height: 20px;
+        min-width: 22px;
+        height: 22px;
         border-radius: 999px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0 6px;
+        padding: 0 7px;
     }
 </style>
