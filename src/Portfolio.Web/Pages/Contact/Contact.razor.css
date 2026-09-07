@@ -333,6 +333,9 @@
 }
 
 .sidebar-social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-family: 'Inter', sans-serif;
     font-size: 0.9375rem;
     font-weight: 500;

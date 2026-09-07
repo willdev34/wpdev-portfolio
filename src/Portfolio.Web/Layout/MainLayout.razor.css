@@ -330,6 +330,29 @@
     margin: 0;
 }
 
+.footer-social {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.footer-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(244, 247, 247, 0.08);
+    color: #F4F7F7;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.footer-social-link:hover {
+    background-color: #6C9EA3;
+    color: #0D1C24;
+}
+
 .footer-right p {
     font-family: 'Inter', sans-serif;
     font-size: 0.8125rem;
