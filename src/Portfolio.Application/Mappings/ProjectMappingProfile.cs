@@ -29,7 +29,8 @@ public class ProjectMappingProfile : Profile
         // MAPEAMENTO: Project → ProjectCardDto
         // ==========================================
         // Usado para listagens (grid de cards/blocos editoriais)
-        CreateMap<Project, ProjectCardDto>();
+        CreateMap<Project, ProjectCardDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         // ==========================================
         // MAPEAMENTO: CreateProjectDto → Project

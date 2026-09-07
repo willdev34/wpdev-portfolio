@@ -87,6 +87,7 @@
                         Title="@project.Title"
                         Description="@project.ShortDescription"
                         ImageUrl="@project.ImageUrl"
+                        Badge="@FormatBadge(project)"
                         OnClick="() => NavigateToProject(project.Id)">
                         <HeaderContent>
                             @foreach (var tech in project.Technologies)
@@ -292,6 +293,21 @@
     {
         await JS.InvokeVoidAsync("eval", $"window.location.href='/projects/{projectId}'");
     }
+
+    private static string FormatBadge(ProjectCardDto project)
+    {
+        var statusLabel = project.Status switch
+        {
+            "Completed" => "Concluído",
+            "InProgress" => "Em andamento",
+            "Planning" => "Planejamento",
+            "Archived" => "Arquivado",
+            _ => project.Status
+        };
+
+        return $"{project.Year} · {statusLabel}";
+    }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

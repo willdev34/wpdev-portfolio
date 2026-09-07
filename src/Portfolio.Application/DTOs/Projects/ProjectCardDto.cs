@@ -33,6 +33,7 @@ public class ProjectCardDto
     // ==========================================
     public int Year { get; set; }
     public bool IsFeatured { get; set; }
+    public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     
     // ==========================================
