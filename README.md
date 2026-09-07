@@ -179,4 +179,4 @@ Reference: [Supabase Advisor](https://supabase.com/docs/guides/database/database
 
 ## Contact
 
-Built by Will, WPDev — Senior Full Stack Developer based in Brazil, working with clients in Rio de Janeiro, Fortaleza, and internationally.
+Built by Will, WPDev — Senior Full Stack Developer, serving clients across Brazil.

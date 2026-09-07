@@ -179,4 +179,4 @@ Referência: [Supabase Advisor](https://supabase.com/docs/guides/database/databa
 
 ## Contato
 
-Desenvolvido por Will, WPDev — Desenvolvedor Full Stack Sênior no Brasil, atendendo clientes no Rio de Janeiro, Fortaleza e internacionalmente.
+Desenvolvido por Will, WPDev — Desenvolvedor Full Stack Sênior, atendendo clientes a nível Brasil.
