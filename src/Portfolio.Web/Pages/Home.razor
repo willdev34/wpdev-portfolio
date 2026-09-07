@@ -148,7 +148,7 @@
                             <div class="featured-thumb featured-thumb--small">
                                 @if (!string.IsNullOrEmpty(project.ImageUrl))
                                 {
-                                    <img src="@CloudinaryUrlHelper.Optimize(project.ImageUrl, CloudinaryUrlHelper.ThumbnailWidth)" alt="@project.Title" loading="lazy" decoding="async" />
+                                    <img src="@CloudinaryUrlHelper.Optimize(project.ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@project.Title" loading="lazy" decoding="async" />
                                 }
                                 else
                                 {
