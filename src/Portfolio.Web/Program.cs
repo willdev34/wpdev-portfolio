@@ -1,6 +1,7 @@
 // ====================================
 // Título: Program.cs - Blazor WASM Entry Point
 // Descrição: Configuração inicial do Blazor WebAssembly com autenticação
+//            e preload de dados da home
 // ====================================
 
 using Microsoft.AspNetCore.Components.Authorization;
@@ -45,10 +46,10 @@ builder.Services.AddScoped<JwtAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(
     sp => sp.GetRequiredService<JwtAuthStateProvider>());
 
-
 // ====================================
 // REGISTRO DOS SERVIÇOS
 // ====================================
+builder.Services.AddSingleton<HomeDataCache>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<BlogPostService>();
@@ -58,5 +59,19 @@ builder.Services.AddScoped<ContactService>();
 builder.Services.AddScoped<NowService>();
 builder.Services.AddScoped<ContactMessageService>();
 
+// ====================================
+// BUILD + PRELOAD + RUN
+// ====================================
+// Constrói o host, dispara o fetch dos dados da home em paralelo
+// e só depois inicia o app. Quando Home.razor montar, os dados
+// já estarão prontos (ou quase).
+var host = builder.Build();
 
-await builder.Build().RunAsync();
+using (var scope = host.Services.CreateScope())
+{
+    var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
+    var cache = host.Services.GetRequiredService<HomeDataCache>();
+    cache.StartPreload(projectService);
+}
+
+await host.RunAsync();

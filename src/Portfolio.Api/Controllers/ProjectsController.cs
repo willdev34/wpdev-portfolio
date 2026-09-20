@@ -4,13 +4,15 @@
 // ====================================
 
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.Commands.Projects.CreateProject;
-using Portfolio.Application.DTOs.Projects;
-using Portfolio.Application.Queries.Projects.GetAllProjects;
-using Portfolio.Application.Queries.Projects.GetProjectById;
 using Portfolio.Application.Commands.Projects.UpdateProject;
 using Portfolio.Application.Commands.Projects.DeleteProject;
+using Portfolio.Application.DTOs.Projects;
+using Portfolio.Application.Queries.Projects.GetAllProjects;
+using Portfolio.Application.Queries.Projects.GetFeaturedProjects;
+using Portfolio.Application.Queries.Projects.GetProjectById;
 
 namespace Portfolio.Api.Controllers;
 
@@ -20,7 +22,7 @@ namespace Portfolio.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Microsoft.AspNetCore.Authorization.Authorize]
+[Authorize]
 public class ProjectsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -42,17 +44,32 @@ public class ProjectsController : ControllerBase
     /// <returns>Lista de ProjectCardDto</returns>
     /// <response code="200">Retorna a lista de projetos</response>
     [HttpGet]
-    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<ProjectCardDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ProjectCardDto>>> GetAll()
     {
-        // Cria a query
         var query = new GetAllProjectsQuery();
-        
-        // Envia para o MediatR processar
         var projects = await _mediator.Send(query);
-        
-        // Retorna HTTP 200 OK com a lista
+        return Ok(projects);
+    }
+
+    // ====================================
+    // GET: api/projects/featured
+    // ====================================
+    /// <summary>
+    /// Busca apenas projetos em destaque (IsFeatured = true)
+    /// Resultado cacheado por 5 minutos no browser
+    /// </summary>
+    /// <returns>Lista de ProjectCardDto em destaque</returns>
+    /// <response code="200">Retorna os projetos em destaque</response>
+    [HttpGet("featured")]
+    [AllowAnonymous]
+    [ResponseCache(Duration = 300)]
+    [ProducesResponseType(typeof(IEnumerable<ProjectCardDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<ProjectCardDto>>> GetFeatured()
+    {
+        var query = new GetFeaturedProjectsQuery();
+        var projects = await _mediator.Send(query);
         return Ok(projects);
     }
 
@@ -67,24 +84,19 @@ public class ProjectsController : ControllerBase
     /// <response code="200">Retorna o projeto encontrado</response>
     /// <response code="404">Projeto não encontrado</response>
     [HttpGet("{id}")]
-    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(ProjectDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProjectDto>> GetById(Guid id)
     {
-        // Cria a query
         var query = new GetProjectByIdQuery(id);
-        
-        // Envia para o MediatR processar
         var project = await _mediator.Send(query);
-        
-        // Se não encontrou, retorna 404
+
         if (project == null)
         {
             return NotFound(new { message = $"Projeto com ID {id} não encontrado" });
         }
-        
-        // Retorna HTTP 200 OK com o projeto
+
         return Ok(project);
     }
 
@@ -103,24 +115,17 @@ public class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProjectDto>> Create([FromBody] CreateProjectDto createDto)
     {
-        // Valida se o DTO veio preenchido
         if (createDto == null)
         {
             return BadRequest(new { message = "Dados do projeto são obrigatórios" });
         }
 
-        // Cria o command
         var command = new CreateProjectCommand(createDto);
-        
-        // Envia para o MediatR processar
-        // O Validator será executado automaticamente aqui
         var createdProject = await _mediator.Send(command);
-        
-        // Retorna HTTP 201 Created com o projeto criado
-        // O header Location apontará para GET /api/projects/{id}
+
         return CreatedAtAction(
-            nameof(GetById), 
-            new { id = createdProject.Id }, 
+            nameof(GetById),
+            new { id = createdProject.Id },
             createdProject
         );
     }
@@ -143,7 +148,6 @@ public class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProjectDto updateDto)
     {
-        // Valida se o ID da URL bate com o ID do body
         if (id != updateDto.Id)
         {
             return BadRequest(new { message = "O ID da URL não corresponde ao ID do body" });
@@ -151,13 +155,8 @@ public class ProjectsController : ControllerBase
 
         try
         {
-            // Cria o command
             var command = new UpdateProjectCommand(updateDto);
-            
-            // Envia para o MediatR processar
             await _mediator.Send(command);
-            
-            // Retorna HTTP 204 No Content (sucesso, sem corpo)
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -183,13 +182,8 @@ public class ProjectsController : ControllerBase
     {
         try
         {
-            // Cria o command
             var command = new DeleteProjectCommand(id);
-            
-            // Envia para o MediatR processar
             await _mediator.Send(command);
-            
-            // Retorna HTTP 204 No Content (sucesso)
             return NoContent();
         }
         catch (KeyNotFoundException ex)

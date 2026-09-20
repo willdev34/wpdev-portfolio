@@ -8,6 +8,7 @@ using Portfolio.Application.Commands.Projects.CreateProject;
 using Portfolio.Application.DTOs.Projects;
 using Portfolio.Application.Interfaces;
 using Portfolio.Application.Queries.Projects.GetAllProjects;
+using Portfolio.Application.Queries.Projects.GetFeaturedProjects;
 using Portfolio.Domain.Entities;
 
 namespace Portfolio.UnitTests.Projects;
@@ -84,6 +85,82 @@ public class GetAllProjectsQueryHandlerTests
 
         // Assert
         _repositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
+    }
+}
+
+public class GetFeaturedProjectsQueryHandlerTests
+{
+    private readonly Mock<IProjectRepository> _repositoryMock;
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly GetFeaturedProjectsQueryHandler _handler;
+
+    public GetFeaturedProjectsQueryHandlerTests()
+    {
+        _repositoryMock = new Mock<IProjectRepository>();
+        _mapperMock = new Mock<IMapper>();
+        _handler = new GetFeaturedProjectsQueryHandler(_repositoryMock.Object, _mapperMock.Object);
+    }
+
+    [Fact]
+    public async Task Handle_DeveRetornarApenasProjetosFeatured_QuandoExistirem()
+    {
+        // Arrange
+        var projetos = new List<Project>
+        {
+            new() { Id = Guid.NewGuid(), Title = "DrenaMais", IsFeatured = true },
+            new() { Id = Guid.NewGuid(), Title = "IOGAR", IsFeatured = true }
+        };
+
+        var dtos = new List<ProjectCardDto>
+        {
+            new() { Id = projetos[0].Id, Title = "DrenaMais", IsFeatured = true },
+            new() { Id = projetos[1].Id, Title = "IOGAR", IsFeatured = true }
+        };
+
+        _repositoryMock.Setup(r => r.GetFeaturedAsync()).ReturnsAsync(projetos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<ProjectCardDto>>(projetos)).Returns(dtos);
+
+        // Act
+        var resultado = await _handler.Handle(new GetFeaturedProjectsQuery(), CancellationToken.None);
+
+        // Assert
+        resultado.Should().NotBeNull();
+        resultado.Should().HaveCount(2);
+        resultado.Should().OnlyContain(p => p.IsFeatured);
+    }
+
+    [Fact]
+    public async Task Handle_DeveRetornarListaVazia_QuandoNaoExistiremProjetosFeatured()
+    {
+        // Arrange
+        _repositoryMock.Setup(r => r.GetFeaturedAsync()).ReturnsAsync(new List<Project>());
+        _mapperMock
+            .Setup(m => m.Map<IEnumerable<ProjectCardDto>>(It.IsAny<IEnumerable<Project>>()))
+            .Returns(new List<ProjectCardDto>());
+
+        // Act
+        var resultado = await _handler.Handle(new GetFeaturedProjectsQuery(), CancellationToken.None);
+
+        // Assert
+        resultado.Should().NotBeNull();
+        resultado.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_DeveChamarGetFeaturedAsync_UmaVez_ENaoGetAllAsync()
+    {
+        // Arrange
+        _repositoryMock.Setup(r => r.GetFeaturedAsync()).ReturnsAsync(new List<Project>());
+        _mapperMock
+            .Setup(m => m.Map<IEnumerable<ProjectCardDto>>(It.IsAny<IEnumerable<Project>>()))
+            .Returns(new List<ProjectCardDto>());
+
+        // Act
+        await _handler.Handle(new GetFeaturedProjectsQuery(), CancellationToken.None);
+
+        // Assert
+        _repositoryMock.Verify(r => r.GetFeaturedAsync(), Times.Once);
+        _repositoryMock.Verify(r => r.GetAllAsync(), Times.Never);
     }
 }
 

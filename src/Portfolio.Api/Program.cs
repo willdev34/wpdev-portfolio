@@ -138,6 +138,12 @@ builder.Services.AddTransient(
 builder.Services.AddControllers();
 
 // ====================================
+// CACHE E RESPONSE CACHING
+// ====================================
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
+
+// ====================================
 // CONFIGURAÇÃO DO CORS
 // ====================================
 builder.Services.AddCors(options =>
@@ -147,7 +153,6 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
             "http://localhost:5237",
             "https://localhost:7257",
-            "https://wpdev-portfolio-web.onrender.com",
             "https://wpdevbr.com",
             "https://www.wpdevbr.com"
         )
@@ -221,15 +226,6 @@ app.UseExceptionHandler(errorApp =>
 
 // ====================================
 // APLICAR MIGRATIONS E SEED ADMIN
-// Roda sempre em Development (conveniencia local, Postgres via Docker).
-// Em producao so roda se Startup__ApplyMigrationsOnBoot=true estiver
-// setado explicitamente no Vercel, porque essa checagem bloqueava o
-// pipeline HTTP inteiro antes de aceitar qualquer request, adicionando
-// ~5s em toda primeira chamada apos o container escalar a zero
-// (Sprint 13, investigacao de delay).
-// Uso: quando precisar aplicar uma migration nova ou forcar reset de
-// senha do admin em producao, liga o flag, redeploy, confirma no log,
-// desliga de novo.
 // ====================================
 var shouldRunStartupMigration = app.Environment.IsDevelopment()
     || builder.Configuration.GetValue<bool>("Startup:ApplyMigrationsOnBoot");
@@ -269,13 +265,17 @@ if (shouldRunStartupMigration)
     }
 }
 
+// ====================================
+// PIPELINE DE MIDDLEWARE (ordem importa)
+// ====================================
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowBlazor");
+app.UseResponseCaching();
 
-// Ordem importa: Authentication antes de Authorization
+// Authentication antes de Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 

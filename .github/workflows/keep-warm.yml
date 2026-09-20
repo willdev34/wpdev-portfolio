@@ -1,0 +1,28 @@
+# ====================================
+# Título: keep-warm.yml
+# Descrição: Mantém o container da API (Vercel) e o compute
+#            do Neon acordados, pingando o endpoint featured
+#            a cada 5 minutos. Evita cold start em produção.
+# ====================================
+
+name: Keep API Warm
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}  # permite rodar manualmente pelo GitHub
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/projects/featured
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+            https://www.wpdevbr.com/api/projects/featured)
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 300 ]; then
+            echo "API acordada com sucesso."
+          else
+            echo "Aviso: resposta inesperada ($STATUS)."
+          fi
