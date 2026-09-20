@@ -67,11 +67,8 @@ builder.Services.AddScoped<ContactMessageService>();
 // já estarão prontos (ou quase).
 var host = builder.Build();
 
-using (var scope = host.Services.CreateScope())
-{
-    var projectService = scope.ServiceProvider.GetRequiredService<ProjectService>();
-    var cache = host.Services.GetRequiredService<HomeDataCache>();
-    cache.StartPreload(projectService);
-}
+var projectService = host.Services.GetRequiredService<ProjectService>();
+var cache = host.Services.GetRequiredService<HomeDataCache>();
+cache.StartPreload(projectService);
 
 await host.RunAsync();
