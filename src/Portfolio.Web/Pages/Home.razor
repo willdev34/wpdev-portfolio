@@ -299,8 +299,23 @@
             await JS.InvokeVoidAsync("loadHeroVideo",
                 "hero-video-source",
                 "https://res.cloudinary.com/do0uq7w4n/video/upload/q_auto,f_auto/v1782685612/hero-code-optimized_oun8qf.mp4");
+
+            // Roda o scroll-reveal no primeiro render, garantindo que
+            // seções estáticas (Skills, CTA) fiquem visíveis mesmo
+            // se os projetos ainda não chegaram.
+            await JS.InvokeVoidAsync("setupScrollReveal");
         }
 
+        // Quando os projetos chegam, novos elementos entram no DOM.
+        // Roda o scroll-reveal de novo pra observá-los.
+        // No firstRender, já roda o scroll-reveal pra seções estáticas
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+
+        // Quando os projetos chegam, novos elementos entram no DOM,
+        // roda de novo pra observá-los
         if (!_scrollRevealInitialized && projects != null && projects.Count > 0)
         {
             _scrollRevealInitialized = true;
