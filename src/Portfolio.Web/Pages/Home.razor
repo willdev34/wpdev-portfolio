@@ -10,7 +10,7 @@
 @using Portfolio.Web.DTOs.Projects
 @using Portfolio.Web.Components
 @using Portfolio.Web.Helpers
-@inject ProjectService ProjectService
+@inject HomeDataCache DataCache
 @inject IJSRuntime JS
 
 <SeoHead Title="WPDev - Portfólio de William, Desenvolvedor Full Stack"
@@ -279,18 +279,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadProjects();
-    }
-
-    private async Task LoadProjects()
-    {
-        isLoading = true;
-        projects = await ProjectService.GetFeaturedAsync();
+        // Consome do cache que já começou no boot do WASM (Program.cs).
+        // Se os dados já chegaram, retorna na hora. Se não, aguarda
+        // o resto do tempo aqui, mas em paralelo com o boot do Blazor.
+        projects = await DataCache.GetFeaturedAsync();
         isLoading = false;
     }
 
     private bool _scrollRevealInitialized = false;
     private bool _videoLoaded = false;
+    private bool _splashHidden = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -307,6 +305,16 @@
         {
             _scrollRevealInitialized = true;
             await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+
+        // A splash (logo WPDev) só some quando isLoading virar false,
+        // ou seja, quando os dados featured já chegaram. Hero e
+        // projetos aparecem juntos, sem o usuário ver a transição
+        // no meio do carregamento.
+        if (!isLoading && !_splashHidden)
+        {
+            _splashHidden = true;
+            await JS.InvokeVoidAsync("wpdevHideSplash");
         }
     }
 }

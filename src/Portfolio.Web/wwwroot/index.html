@@ -88,6 +88,24 @@
         .loading-progress-text {
             display: none !important;
         }
+
+        /* ================================
+        SPLASH OVERLAY - fica POR CIMA do #app
+        e só é removida via JS (wpdevHideSplash),
+        quando o conteúdo abaixo já está pronto.
+        ================================ */
+        #wpdev-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        #wpdev-splash.wpdev-splash--hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -98,12 +116,13 @@
             <circle r="40%" cx="50%" cy="50%" />
         </svg>
         <div class="loading-progress-text" style="display:none"></div>
+    </div>
 
-        <!-- Loader com fundo próprio, não contamina o #app -->
-        <div class="wpdev-loader-screen">
-            <img src="/images/wpdev-logo.webp" alt="WPDev" class="wpdev-loader-brand-img" />
-            <div class="wpdev-loader-bar"></div>
-        </div>
+    <!-- Splash fora do #app: o Blazor renderiza por baixo sem removê-la.
+         Só some quando wpdevHideSplash() é chamado (ver Home.razor/App.razor). -->
+    <div id="wpdev-splash" class="wpdev-loader-screen">
+        <img src="/images/wpdev-logo.webp" alt="WPDev" class="wpdev-loader-brand-img" />
+        <div class="wpdev-loader-bar"></div>
     </div>
 
     <div id="blazor-error-ui" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; padding: 0.6rem 1.25rem 0.7rem 1.25rem; background: #fff3cd; color: #856404; box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2); z-index: 1000;">
@@ -115,6 +134,34 @@
     <script src="_framework/blazor.webassembly.js"></script>
 
     <script>
+        // ================================
+        // SPLASH SCREEN CONTROL
+        // Home.razor chama isso assim que os dados featured chegam.
+        // App.razor chama imediatamente em qualquer rota != "/".
+        // Timeout de segurança evita a splash travada pra sempre
+        // se algo inesperado acontecer.
+        // ================================
+        (function () {
+            var hidden = false;
+
+            window.wpdevHideSplash = function () {
+                if (hidden) return;
+                hidden = true;
+                var splash = document.getElementById('wpdev-splash');
+                if (!splash) return;
+                splash.classList.add('wpdev-splash--hidden');
+                setTimeout(function () {
+                    splash.remove();
+                }, 400); // espera a transição de opacity terminar
+            };
+
+            // Safety-net: nunca deixa a splash presa por mais de 12s,
+            // mesmo se o preload falhar de um jeito inesperado.
+            setTimeout(function () {
+                window.wpdevHideSplash();
+            }, 12000);
+        })();
+
         window.cloudinaryUploadBytes = async function (base64Data, fileName, contentType, cloudName, uploadPreset) {
             try {
                 const byteCharacters = atob(base64Data);

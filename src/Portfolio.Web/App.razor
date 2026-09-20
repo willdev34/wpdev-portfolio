@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
@@ -24,3 +26,22 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+    // A splash (wpdev-splash) fica visível por padrão até ser escondida
+    // via JS. Na Home, quem esconde é o próprio Home.razor, só depois
+    // que os dados featured chegarem. Em qualquer outra rota não existe
+    // esse preload, então escondemos assim que o Blazor termina o
+    // primeiro render, senão a splash ficaria presa pra sempre.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var isHome = new Uri(Nav.Uri).AbsolutePath.TrimEnd('/') == "";
+            if (!isHome)
+            {
+                await JS.InvokeVoidAsync("wpdevHideSplash");
+            }
+        }
+    }
+}
