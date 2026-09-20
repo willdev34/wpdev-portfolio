@@ -21,6 +21,48 @@ public class ProjectsEndpointTests : IntegrationTestBase
     }
 
     [Fact]
+    public async Task Get_FeaturedProjects_ReturnsOk()
+    {
+        var response = await Client.GetAsync("/api/projects/featured");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var projects = await response.Content.ReadFromJsonAsync<List<ProjectCardDto>>();
+        projects.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Get_FeaturedProjects_ReturnsOnlyFeaturedOnes()
+    {
+        await AuthenticateClientAsync();
+
+        var featuredDto = BuildValidCreateDto();
+        featuredDto.IsFeatured = true;
+        await Client.PostAsJsonAsync("/api/projects", featuredDto);
+
+        var notFeaturedDto = BuildValidCreateDto();
+        notFeaturedDto.IsFeatured = false;
+        await Client.PostAsJsonAsync("/api/projects", notFeaturedDto);
+
+        var response = await Client.GetAsync("/api/projects/featured");
+        var projects = await response.Content.ReadFromJsonAsync<List<ProjectCardDto>>();
+
+        projects.Should().NotBeNull();
+        projects.Should().Contain(p => p.Title == featuredDto.Title);
+        projects.Should().NotContain(p => p.Title == notFeaturedDto.Title);
+        projects.Should().OnlyContain(p => p.IsFeatured);
+    }
+
+    [Fact]
+    public async Task Get_FeaturedProjects_DoesNotRequireAuthentication()
+    {
+        // Sem AuthenticateClientAsync() de propósito
+        var response = await Client.GetAsync("/api/projects/featured");
+
+        response.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
     public async Task Get_ProjectById_ReturnsNotFound_WhenIdDoesNotExist()
     {
         var response = await Client.GetAsync($"/api/projects/{Guid.NewGuid()}");

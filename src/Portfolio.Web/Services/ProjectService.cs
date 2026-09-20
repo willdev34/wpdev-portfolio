@@ -98,12 +98,25 @@ public class ProjectService
     // ====================================
     public async Task<List<ProjectCardDto>> GetFeaturedAsync()
     {
-        var allProjects = await GetAllAsync();
-        return allProjects
-            .Where(p => p.IsFeatured)
-            .OrderByDescending(p => p.Year)
-            .ThenByDescending(p => p.CreatedAt)
-            .ToList();
+        try
+        {
+            var response = await _httpClient.GetAsync("api/projects/featured");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[ProjectService] GetFeaturedAsync retornou {(int)response.StatusCode}");
+                return new List<ProjectCardDto>();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var projects = JsonSerializer.Deserialize(json, ProjectJsonContext.Default.ListProjectCardDto);
+            return projects ?? new List<ProjectCardDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ProjectService] Erro em GetFeaturedAsync: {ex.Message}");
+            return new List<ProjectCardDto>();
+        }
     }
 
     // ====================================
