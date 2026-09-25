@@ -12,6 +12,7 @@ using Portfolio.Application.DTOs.BlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetAllBlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetBlogPostById;
 using Portfolio.Application.Queries.BlogPosts.GetBlogPostBySlug;
+using Portfolio.Application.Queries.BlogPosts.GetPublicBlogPosts;
 
 namespace Portfolio.Api.Controllers;
 
@@ -35,24 +36,49 @@ public class BlogPostsController : ControllerBase
     }
 
     // ====================================
+    // GET: api/blogposts/public
+    // ====================================
+    /// <summary>
+    /// Busca posts PUBLICADOS para exibição pública
+    /// Filtra apenas posts com IsPublished = true
+    /// </summary>
+    /// <returns>Lista de BlogPostCardDto publicados</returns>
+    /// <response code="200">Retorna a lista de posts publicados</response>
+    [HttpGet("public")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+    [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetPublic()
+    {
+        // Cria a query para posts públicos (IsPublished = true)
+        var query = new GetPublicBlogPostsQuery();
+
+        // Envia para o MediatR processar
+        var posts = await _mediator.Send(query);
+
+        // Retorna HTTP 200 OK com a lista (apenas publicados)
+        return Ok(posts);
+    }
+
+    // ====================================
     // GET: api/blogposts
     // ====================================
     /// <summary>
-    /// Busca TODOS os posts (publicados e rascunhos)
+    /// Busca TODOS os posts (publicados e rascunhos) - ADMIN ONLY
     /// </summary>
     /// <returns>Lista de BlogPostCardDto</returns>
     /// <response code="200">Retorna a lista de posts</response>
+    /// <response code="401">Não autorizado</response>
     [HttpGet]
-    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetAll()
     {
-        // Cria a query
+        // Cria a query (retorna TODOS, incluindo rascunhos)
         var query = new GetAllBlogPostsQuery();
-        
+
         // Envia para o MediatR processar
         var posts = await _mediator.Send(query);
-        
+
         // Retorna HTTP 200 OK com a lista
         return Ok(posts);
     }

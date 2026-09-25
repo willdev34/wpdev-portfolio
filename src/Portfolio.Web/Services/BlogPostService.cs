@@ -63,7 +63,23 @@ public class BlogPostService
 
     public async Task<List<BlogPostCardDto>> GetPublishedAsync()
     {
-        return await GetAllAsync();
+        try
+        {
+            var response = await _httpClient.GetAsync("api/blogposts/public");
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[BlogPostService] GetPublishedAsync falhou. Status: {(int)response.StatusCode}");
+                return new List<BlogPostCardDto>();
+            }
+            var json = await response.Content.ReadAsStringAsync();
+            var posts = JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.ListBlogPostCardDto);
+            return posts ?? new List<BlogPostCardDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] GetPublishedAsync - Erro: {ex.Message}");
+            return new List<BlogPostCardDto>();
+        }
     }
 
     // ====================================
