@@ -61,6 +61,31 @@ public class BlogPostService
         }
     }
 
+    // ====================================
+    // GET BY ID (Admin - sem filtro de visibilidade, usado na tela de edição)
+    // ====================================
+    public async Task<BlogPostDto?> GetByIdAdminAsync(Guid id)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/blogposts/admin/{id}");
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[BlogPostService] GetByIdAdminAsync({id}) falhou. Status: {(int)response.StatusCode}");
+                return null;
+            }
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.BlogPostDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] GetByIdAdminAsync({id}) - Erro: {ex.Message}");
+            return null;
+        }
+    }
+
     public async Task<List<BlogPostCardDto>> GetPublishedAsync()
     {
         try
