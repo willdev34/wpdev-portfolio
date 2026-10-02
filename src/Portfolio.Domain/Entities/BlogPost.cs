@@ -27,4 +27,9 @@ public class BlogPost
 
     // Relacionamento (futuramente com User)
     public Guid? AuthorId { get; set; }
+
+    // Regra de visibilidade publica: Published, ou Scheduled com ScheduledAt ja vencido
+    public bool IsPublic =>
+        Status == BlogPostStatus.Published ||
+        (Status == BlogPostStatus.Scheduled && ScheduledAt <= DateTime.UtcNow);
 }
