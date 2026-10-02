@@ -6,6 +6,7 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Interfaces;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 using Portfolio.Infrastructure.Data;
 
 namespace Portfolio.Infrastructure.Repositories;
@@ -58,14 +59,19 @@ public class BlogPostRepository : IBlogPostRepository
     }
 
     /// <summary>
-    /// Busca apenas posts PUBLICADOS
-    /// Ordenados por data de publicação (mais recentes primeiro)
+    /// Busca posts PUBLICOS: Status == Published, ou Status == Scheduled com
+    /// ScheduledAt ja vencido (ScheduledAt menor ou igual a agora)
+    /// Ordenados por PublishedAt decrescente, usando CreatedAt como desempate
     /// </summary>
     public async Task<IEnumerable<BlogPost>> GetPublishedAsync()
     {
+        var now = DateTime.UtcNow;
+
         return await _context.BlogPosts
-            .Where(p => p.IsPublished && p.PublishedAt != null)
+            .Where(p => p.Status == BlogPostStatus.Published ||
+                        (p.Status == BlogPostStatus.Scheduled && p.ScheduledAt <= now))
             .OrderByDescending(p => p.PublishedAt)
+            .ThenByDescending(p => p.CreatedAt)
             .ToListAsync();
     }
 

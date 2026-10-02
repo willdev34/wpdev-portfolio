@@ -40,10 +40,10 @@ public interface IBlogPostRepository
     Task<BlogPost?> GetBySlugAsync(string slug);
     
     /// <summary>
-    /// Busca apenas posts PUBLICADOS (IsPublished = true)
-    /// Ordenados por data de publicação (mais recentes primeiro)
+    /// Busca posts PUBLICOS: Status == Published, ou Status == Scheduled com
+    /// ScheduledAt ja vencido. Ordenados por PublishedAt decrescente (CreatedAt como desempate)
     /// </summary>
-    /// <returns>Lista de posts publicados</returns>
+    /// <returns>Lista de posts publicos</returns>
     Task<IEnumerable<BlogPost>> GetPublishedAsync();
     
     /// <summary>
