@@ -65,13 +65,13 @@ public class BlogPostsController : ControllerBase
     /// <summary>
     /// Busca TODOS os posts (publicados e rascunhos) - ADMIN ONLY
     /// </summary>
-    /// <returns>Lista de BlogPostCardDto</returns>
+    /// <returns>Lista de BlogPostAdminCardDto (inclui Status e ScheduledAt)</returns>
     /// <response code="200">Retorna a lista de posts</response>
     /// <response code="401">Não autorizado</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<BlogPostAdminCardDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<BlogPostAdminCardDto>>> GetAll()
     {
         // Cria a query (retorna TODOS, incluindo rascunhos)
         var query = new GetAllBlogPostsQuery();

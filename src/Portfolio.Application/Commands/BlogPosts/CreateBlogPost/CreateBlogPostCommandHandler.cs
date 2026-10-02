@@ -8,6 +8,7 @@ using MediatR;
 using Portfolio.Application.DTOs.BlogPosts;
 using Portfolio.Application.Interfaces;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.Application.Commands.BlogPosts.CreateBlogPost;
 
@@ -61,12 +62,38 @@ public class CreateBlogPostCommandHandler : IRequestHandler<CreateBlogPostComman
         var blogPost = _mapper.Map<BlogPost>(request.PostData);
 
         // ====================================
+        // 2.1 SINCRONIZAR Status COM IsPublished / PublishedAt / ScheduledAt
+        // ====================================
+        // Compatibilidade: o formulário atual do admin ainda não envia Status,
+        // então derivamos de IsPublished quando Status vier nulo
+        var status = request.PostData.Status
+            ?? (request.PostData.IsPublished ? BlogPostStatus.Published : BlogPostStatus.Draft);
+
+        blogPost.Status = status;
+
+        switch (status)
+        {
+            case BlogPostStatus.Published:
+                blogPost.IsPublished = true;
+                blogPost.PublishedAt ??= DateTime.UtcNow;
+                blogPost.ScheduledAt = null;
+                break;
+            case BlogPostStatus.Scheduled:
+                blogPost.IsPublished = false;
+                blogPost.ScheduledAt = request.PostData.ScheduledAt;
+                blogPost.PublishedAt = request.PostData.ScheduledAt;
+                break;
+            case BlogPostStatus.Draft:
+            default:
+                blogPost.IsPublished = false;
+                blogPost.ScheduledAt = null;
+                break;
+        }
+
+        // ====================================
         // 3. SALVAR NO BANCO
         // ====================================
-        // O Repository cuida de:
-        // - Gerar o ID
-        // - Setar CreatedAt
-        // - Setar PublishedAt se IsPublished = true
+        // O Repository cuida de gerar o ID e setar CreatedAt
         var createdPost = await _repository.AddAsync(blogPost);
         
         // Salva as mudanças no banco

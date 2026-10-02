@@ -1,59 +1,50 @@
 // ====================================
-// Título: BlogPostDto.cs
-// Descrição: DTO completo do BlogPost - usado para exibir detalhes de um post
+// Título: BlogPostAdminCardDto.cs
+// Descrição: DTO resumido do BlogPost para a listagem do ADMIN
 // ====================================
 
 namespace Portfolio.Application.DTOs.BlogPosts;
 
 /// <summary>
-/// DTO completo do BlogPost - usado para exibir detalhes completos de um post do blog
-/// Contém TODOS os dados, incluindo o conteúdo Markdown completo
-/// Usado no endpoint GET /api/blogposts/{id}
+/// DTO simplificado do BlogPost para a listagem do ADMIN (GET /api/blogposts)
+/// Igual ao BlogPostCardDto, mas inclui Status e ScheduledAt
+/// Esses dois campos NUNCA devem ir para o DTO público (BlogPostCardDto)
 /// </summary>
-public class BlogPostDto
+public class BlogPostAdminCardDto
 {
     // ==========================================
     // IDENTIFICAÇÃO
     // ==========================================
     public Guid Id { get; set; }
-    
+
     // ==========================================
-    // INFORMAÇÕES PRINCIPAIS
+    // INFORMAÇÕES PRINCIPAIS (resumidas)
     // ==========================================
     public string Title { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public string Excerpt { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    
+
     // ==========================================
     // MÍDIA
     // ==========================================
     public string? FeaturedImageUrl { get; set; }
-    
+
     // ==========================================
-    // METADADOS
+    // METADADOS BÁSICOS
     // ==========================================
     public List<string> Tags { get; set; } = new();
     public bool IsFeatured { get; set; }
-    public bool IsPublished { get; set; }
     public DateTime? PublishedAt { get; set; }
     public int ReadTimeMinutes { get; set; }
+
+    // ==========================================
+    // ESTATÍSTICAS
+    // ==========================================
     public int ViewCount { get; set; }
 
     // ==========================================
-    // STATUS (nova fonte de verdade)
+    // STATUS (apenas no admin)
     // ==========================================
     public string Status { get; set; } = string.Empty;
     public DateTime? ScheduledAt { get; set; }
-
-    // ==========================================
-    // AUDITORIA
-    // ==========================================
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    
-    // ==========================================
-    // RELACIONAMENTO (futuramente com User)
-    // ==========================================
-    public Guid? AuthorId { get; set; }
 }

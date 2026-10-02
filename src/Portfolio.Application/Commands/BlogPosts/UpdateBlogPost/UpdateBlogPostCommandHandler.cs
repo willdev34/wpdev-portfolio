@@ -6,6 +6,7 @@
 using AutoMapper;
 using MediatR;
 using Portfolio.Application.Interfaces;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.Application.Commands.BlogPosts.UpdateBlogPost;
 
@@ -70,6 +71,35 @@ public class UpdateBlogPostCommandHandler : IRequestHandler<UpdateBlogPostComman
         // 3. CONVERTER DTO → ENTITY
         // ====================================
         var updatedPost = _mapper.Map(request.PostData, existingPost);
+
+        // ====================================
+        // 3.1 SINCRONIZAR Status COM IsPublished / PublishedAt / ScheduledAt
+        // ====================================
+        // Compatibilidade: o formulário atual do admin ainda não envia Status,
+        // então derivamos de IsPublished quando Status vier nulo
+        var status = request.PostData.Status
+            ?? (request.PostData.IsPublished ? BlogPostStatus.Published : BlogPostStatus.Draft);
+
+        updatedPost.Status = status;
+
+        switch (status)
+        {
+            case BlogPostStatus.Published:
+                updatedPost.IsPublished = true;
+                updatedPost.PublishedAt ??= DateTime.UtcNow;
+                updatedPost.ScheduledAt = null;
+                break;
+            case BlogPostStatus.Scheduled:
+                updatedPost.IsPublished = false;
+                updatedPost.ScheduledAt = request.PostData.ScheduledAt;
+                updatedPost.PublishedAt = request.PostData.ScheduledAt;
+                break;
+            case BlogPostStatus.Draft:
+            default:
+                updatedPost.IsPublished = false;
+                updatedPost.ScheduledAt = null;
+                break;
+        }
 
         // ====================================
         // 4. ATUALIZAR NO BANCO

@@ -100,47 +100,33 @@ public class BlogPostRepository : IBlogPostRepository
     /// <summary>
     /// Adiciona um novo post ao contexto
     /// IMPORTANTE: Não salva automaticamente, precisa chamar SaveChangesAsync()
+    /// IsPublished, PublishedAt, Status e ScheduledAt já vêm sincronizados pelo handler
     /// </summary>
     public async Task<BlogPost> AddAsync(BlogPost blogPost)
     {
         // Gera um novo ID
         blogPost.Id = Guid.NewGuid();
-        
+
         // Seta a data de criação
         blogPost.CreatedAt = DateTime.UtcNow;
-        
-        // Se foi marcado como publicado, seta a data de publicação
-        if (blogPost.IsPublished && blogPost.PublishedAt == null)
-        {
-            blogPost.PublishedAt = DateTime.UtcNow;
-        }
 
         await _context.BlogPosts.AddAsync(blogPost);
-        
+
         return blogPost;
     }
 
     /// <summary>
     /// Atualiza um post existente
     /// IMPORTANTE: Não salva automaticamente, precisa chamar SaveChangesAsync()
+    /// IsPublished, PublishedAt, Status e ScheduledAt já vêm sincronizados pelo handler
     /// </summary>
     public async Task UpdateAsync(BlogPost blogPost)
     {
         // Seta a data de atualização
         blogPost.UpdatedAt = DateTime.UtcNow;
-        
-        // Se mudou de rascunho para publicado, seta a data de publicação
-        var existingPost = await _context.BlogPosts
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == blogPost.Id);
-        
-        if (existingPost != null && !existingPost.IsPublished && blogPost.IsPublished)
-        {
-            blogPost.PublishedAt = DateTime.UtcNow;
-        }
 
         _context.BlogPosts.Update(blogPost);
-        
+
         await Task.CompletedTask; // Para manter assinatura async
     }
 

@@ -21,15 +21,23 @@ public class BlogPostMappingProfile : Profile
         // MAPEAMENTO: BlogPost → BlogPostDto
         // ==========================================
         // Usado quando buscamos do banco e retornamos na API
-        // Conversão direta - todos os campos têm o mesmo nome
-        CreateMap<BlogPost, BlogPostDto>();
+        // Status (enum) é convertido para string
+        CreateMap<BlogPost, BlogPostDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         // ==========================================
         // MAPEAMENTO: BlogPost → BlogPostCardDto
         // ==========================================
-        // Usado para listagens (grid de cards editoriais)
-        // Conversão direta - AutoMapper mapeia por nome
+        // Usado para listagens públicas (grid de cards editoriais)
+        // NÃO inclui Status nem ScheduledAt - DTO público
         CreateMap<BlogPost, BlogPostCardDto>();
+
+        // ==========================================
+        // MAPEAMENTO: BlogPost → BlogPostAdminCardDto
+        // ==========================================
+        // Usado na listagem do ADMIN. Status (enum) é convertido para string
+        CreateMap<BlogPost, BlogPostAdminCardDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         // ==========================================
         // MAPEAMENTO: CreateBlogPostDto → BlogPost
@@ -40,8 +48,9 @@ public class BlogPostMappingProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // CreatedAt será setado no handler
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.ViewCount, opt => opt.MapFrom(src => 0)) // Novo post sempre começa com 0 views
-            .ForMember(dest => dest.PublishedAt, opt => opt.MapFrom(src => 
-                src.IsPublished ? DateTime.UtcNow : (DateTime?)null)) // Se publicado, seta a data atual
+            .ForMember(dest => dest.Status, opt => opt.Ignore()) // Status é sincronizado no handler
+            .ForMember(dest => dest.PublishedAt, opt => opt.Ignore()) // PublishedAt é sincronizado no handler
+            .ForMember(dest => dest.ScheduledAt, opt => opt.Ignore()) // ScheduledAt é sincronizado no handler
             .ForMember(dest => dest.AuthorId, opt => opt.Ignore()); // Será setado futuramente quando tivermos autenticação
 
         // ==========================================
@@ -52,7 +61,9 @@ public class BlogPostMappingProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Não altera data de criação
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore()) // UpdatedAt será setado no handler
             .ForMember(dest => dest.ViewCount, opt => opt.Ignore()) // ViewCount não deve ser alterado manualmente
-            .ForMember(dest => dest.PublishedAt, opt => opt.Ignore()) // PublishedAt será gerenciado pelo handler
+            .ForMember(dest => dest.Status, opt => opt.Ignore()) // Status é sincronizado no handler
+            .ForMember(dest => dest.PublishedAt, opt => opt.Ignore()) // PublishedAt é sincronizado no handler
+            .ForMember(dest => dest.ScheduledAt, opt => opt.Ignore()) // ScheduledAt é sincronizado no handler
             .ForMember(dest => dest.AuthorId, opt => opt.Ignore()); // Não altera autor
     }
 }

@@ -5,6 +5,8 @@ namespace Portfolio.Web.Json;
 
 [JsonSerializable(typeof(List<BlogPostCardDto>))]
 [JsonSerializable(typeof(BlogPostCardDto))]
+[JsonSerializable(typeof(List<BlogPostAdminCardDto>))]
+[JsonSerializable(typeof(BlogPostAdminCardDto))]
 [JsonSerializable(typeof(BlogPostDto))]
 [JsonSerializable(typeof(CreateBlogPostDto))]
 [JsonSerializable(typeof(UpdateBlogPostDto))]

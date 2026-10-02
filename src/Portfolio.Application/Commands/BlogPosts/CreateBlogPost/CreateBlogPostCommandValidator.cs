@@ -4,6 +4,7 @@
 // ====================================
 
 using FluentValidation;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.Application.Commands.BlogPosts.CreateBlogPost;
 
@@ -74,6 +75,21 @@ public class CreateBlogPostCommandValidator : AbstractValidator<CreateBlogPostCo
         RuleFor(x => x.PostData.ReadTimeMinutes)
             .GreaterThan(0).WithMessage("O tempo de leitura deve ser maior que 0")
             .LessThanOrEqualTo(300).WithMessage("O tempo de leitura deve ser no máximo 300 minutos (5 horas)");
+
+        // ====================================
+        // VALIDAÇÃO DO STATUS
+        // ====================================
+        RuleFor(x => x.PostData.Status)
+            .IsInEnum().WithMessage("O status informado é inválido")
+            .When(x => x.PostData.Status.HasValue);
+
+        // ====================================
+        // VALIDAÇÃO DO AGENDAMENTO (Status = Scheduled)
+        // ====================================
+        RuleFor(x => x.PostData.ScheduledAt)
+            .NotEmpty().WithMessage("A data de agendamento é obrigatória quando o status é Scheduled")
+            .GreaterThan(DateTime.UtcNow).WithMessage("A data de agendamento deve ser no futuro")
+            .When(x => x.PostData.Status == BlogPostStatus.Scheduled);
     }
 
     // ====================================
