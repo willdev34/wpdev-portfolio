@@ -1,3 +1,5 @@
+using Portfolio.Domain.Enums;
+
 namespace Portfolio.Domain.Entities;
 
 public class BlogPost
@@ -14,11 +16,15 @@ public class BlogPost
     public DateTime? PublishedAt { get; set; }
     public int ReadTimeMinutes { get; set; }
     public int ViewCount { get; set; }
-    
+
+    // Status do post (nova fonte de verdade a partir daqui)
+    public BlogPostStatus Status { get; set; } = BlogPostStatus.Draft;
+    public DateTime? ScheduledAt { get; set; }
+
     // Auditoria
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    
+
     // Relacionamento (futuramente com User)
     public Guid? AuthorId { get; set; }
 }
