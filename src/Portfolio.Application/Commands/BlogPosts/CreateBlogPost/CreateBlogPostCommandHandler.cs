@@ -75,7 +75,12 @@ public class CreateBlogPostCommandHandler : IRequestHandler<CreateBlogPostComman
         {
             case BlogPostStatus.Published:
                 blogPost.IsPublished = true;
-                blogPost.PublishedAt ??= DateTime.UtcNow;
+                // Se nunca foi publicado ou a data e futura (ex: veio de Scheduled), usa agora.
+                // Se ja e uma data passada, preserva (historico de quem voltou de rascunho).
+                if (blogPost.PublishedAt == null || blogPost.PublishedAt > DateTime.UtcNow)
+                {
+                    blogPost.PublishedAt = DateTime.UtcNow;
+                }
                 blogPost.ScheduledAt = null;
                 break;
             case BlogPostStatus.Scheduled:
