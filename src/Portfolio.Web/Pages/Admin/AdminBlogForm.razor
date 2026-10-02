@@ -151,7 +151,7 @@
     {
         if (_isEdit)
         {
-            var post = await BlogPostService.GetByIdAsync(Id!.Value);
+            var post = await BlogPostService.GetByIdAdminAsync(Id!.Value);
 
             if (post is null)
             {
