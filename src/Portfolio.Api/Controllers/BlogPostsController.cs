@@ -13,6 +13,7 @@ using Portfolio.Application.DTOs.BlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetAllBlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetBlogPostById;
 using Portfolio.Application.Queries.BlogPosts.GetBlogPostBySlug;
+using Portfolio.Application.Queries.BlogPosts.GetLatestBlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetPublicBlogPostById;
 using Portfolio.Application.Queries.BlogPosts.GetPublicBlogPosts;
 
@@ -58,6 +59,30 @@ public class BlogPostsController : ControllerBase
         var posts = await _mediator.Send(query);
 
         // Retorna HTTP 200 OK com a lista (apenas publicados)
+        return Ok(posts);
+    }
+
+    // ====================================
+    // GET: api/blogposts/latest?count=3
+    // ====================================
+    /// <summary>
+    /// Busca os N posts PUBLICOS mais recentes (prévia da Home)
+    /// Mesma regra publica: Published, ou Scheduled com ScheduledAt vencido
+    /// </summary>
+    /// <param name="count">Quantidade de posts, entre 1 e 12 (padrão 3)</param>
+    /// <returns>Lista de BlogPostCardDto</returns>
+    /// <response code="200">Retorna os posts mais recentes</response>
+    /// <response code="400">Count fora do intervalo de 1 a 12</response>
+    [HttpGet("latest")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+    [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "count" })]
+    [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetLatest([FromQuery] int count = 3)
+    {
+        // O Validator (count de 1 a 12) roda no ValidationBehavior e vira 400
+        var posts = await _mediator.Send(new GetLatestBlogPostsQuery(count));
+
         return Ok(posts);
     }
 

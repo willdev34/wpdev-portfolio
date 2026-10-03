@@ -45,7 +45,16 @@ public interface IBlogPostRepository
     /// </summary>
     /// <returns>Lista de posts publicos</returns>
     Task<IEnumerable<BlogPost>> GetPublishedAsync();
-    
+
+    /// <summary>
+    /// Busca os N posts PUBLICOS mais recentes (mesma regra de GetPublishedAsync),
+    /// ordenados por (PublishedAt ?? CreatedAt) decrescente, CreatedAt como desempate.
+    /// Aplica o limite no banco, sem carregar todos os posts
+    /// </summary>
+    /// <param name="count">Quantidade maxima de posts</param>
+    /// <returns>Lista com no maximo count posts publicos</returns>
+    Task<IEnumerable<BlogPost>> GetLatestPublishedAsync(int count);
+
     /// <summary>
     /// Busca posts em DESTAQUE (IsFeatured = true)
     /// </summary>
