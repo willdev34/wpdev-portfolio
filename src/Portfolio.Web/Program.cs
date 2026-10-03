@@ -68,7 +68,8 @@ builder.Services.AddScoped<ContactMessageService>();
 var host = builder.Build();
 
 var projectService = host.Services.GetRequiredService<ProjectService>();
+var blogPostService = host.Services.GetRequiredService<BlogPostService>();
 var cache = host.Services.GetRequiredService<HomeDataCache>();
-cache.StartPreload(projectService);
+cache.StartPreload(projectService, blogPostService);
 
 await host.RunAsync();

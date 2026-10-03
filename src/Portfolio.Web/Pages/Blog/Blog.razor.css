@@ -103,60 +103,6 @@
 }
 
 /* ====================================
-   BLOG CARD CUSTOMIZADO
-   ==================================== */
-
-.blog-meta-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 4px;
-}
-
-.blog-date {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8125rem;
-    color: #666;
-    text-transform: capitalize;
-}
-
-.blog-reading {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8125rem;
-    color: #6C9EA3;
-    font-weight: 500;
-}
-
-.blog-reading::before {
-    content: "•";
-    margin-right: 6px;
-    color: #ccc;
-}
-
-.blog-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 4px;
-}
-
-.tag-pill {
-    display: inline-block;
-    padding: 4px 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #6C9EA3;
-    background-color: rgba(108, 158, 163, 0.1);
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.tag-pill:hover {
-    background-color: rgba(108, 158, 163, 0.2);
-}
-
-/* ====================================
    EMPTY STATE
    ==================================== */
 

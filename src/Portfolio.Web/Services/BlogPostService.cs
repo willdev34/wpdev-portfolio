@@ -111,6 +111,31 @@ public class BlogPostService
     }
 
     // ====================================
+    // GET LATEST (publico - previa da Home)
+    // Qualquer falha devolve lista vazia: a Home nao pode quebrar por causa disso
+    // ====================================
+    public async Task<List<BlogPostCardDto>> GetLatestAsync(int count = 3)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/blogposts/latest?count={count}");
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[BlogPostService] GetLatestAsync falhou. Status: {(int)response.StatusCode}");
+                return new List<BlogPostCardDto>();
+            }
+            var json = await response.Content.ReadAsStringAsync();
+            var posts = JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.ListBlogPostCardDto);
+            return posts ?? new List<BlogPostCardDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] GetLatestAsync - Erro: {ex.Message}");
+            return new List<BlogPostCardDto>();
+        }
+    }
+
+    // ====================================
     // CREATE (Admin)
     // ====================================
     public async Task<(bool Success, string? Error)> CreateAsync(CreateBlogPostDto dto)

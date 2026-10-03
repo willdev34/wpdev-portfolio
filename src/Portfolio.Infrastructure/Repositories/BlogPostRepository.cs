@@ -76,6 +76,23 @@ public class BlogPostRepository : IBlogPostRepository
     }
 
     /// <summary>
+    /// Busca os N posts publicos mais recentes (mesma regra de GetPublishedAsync).
+    /// Ordena por (PublishedAt ?? CreatedAt) desc, com CreatedAt desc como desempate
+    /// </summary>
+    public async Task<IEnumerable<BlogPost>> GetLatestPublishedAsync(int count)
+    {
+        var now = DateTime.UtcNow;
+
+        return await _context.BlogPosts
+            .Where(p => p.Status == BlogPostStatus.Published ||
+                        (p.Status == BlogPostStatus.Scheduled && p.ScheduledAt <= now))
+            .OrderByDescending(p => p.PublishedAt ?? p.CreatedAt)
+            .ThenByDescending(p => p.CreatedAt)
+            .Take(count)
+            .ToListAsync();
+    }
+
+    /// <summary>
     /// Busca posts em destaque
     /// Ordenados por data de publicação (mais recentes primeiro)
     /// </summary>

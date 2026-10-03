@@ -8,8 +8,10 @@
 @page "/"
 @using Portfolio.Web.Services
 @using Portfolio.Web.DTOs.Projects
+@using Portfolio.Web.DTOs.BlogPosts
 @using Portfolio.Web.Components
 @using Portfolio.Web.Helpers
+@implements IDisposable
 @inject HomeDataCache DataCache
 @inject IJSRuntime JS
 
@@ -188,6 +190,38 @@
 </section>
 
 <!-- ================================
+     ÚLTIMOS POSTS
+     Fora da espera da splash: entra quando os posts chegam.
+     Oculta se não houver posts (ou se a busca falhar).
+     ================================ -->
+@if (latestPosts.Count > 0)
+{
+    <section class="home-section home-section--posts scroll-reveal">
+        <div class="container">
+
+            <div class="section-header">
+                <p class="section-eyebrow">Do blog</p>
+                <h2 class="section-title">Últimos posts</h2>
+            </div>
+
+            <div class="latest-posts-grid">
+                @foreach (var post in latestPosts)
+                {
+                    <BlogPostCard Post="post" OnClick="() => OpenPost(post.Id)" />
+                }
+            </div>
+
+            <div class="section-cta">
+                <a href="/blog" class="home-btn home-btn--ghost">
+                    Ver todos os posts →
+                </a>
+            </div>
+
+        </div>
+    </section>
+}
+
+<!-- ================================
      SKILLS / TECNOLOGIAS
      ================================ -->
 <section class="home-section home-section--dark scroll-reveal">
@@ -284,7 +318,46 @@
         // o resto do tempo aqui, mas em paralelo com o boot do Blazor.
         projects = await DataCache.GetFeaturedAsync();
         isLoading = false;
+
+        // Os últimos posts NÃO entram na espera da splash: carregam em segundo plano
+        // e a seção aparece quando chegarem (ou fica oculta se falhar).
+        _ = LoadPostsAsync();
     }
+
+    private List<BlogPostCardDto> latestPosts = new();
+    private bool _disposed = false;
+    private bool _postsRevealInitialized = false;
+
+    private async Task LoadPostsAsync()
+    {
+        try
+        {
+            var posts = await DataCache.GetLatestPostsAsync();
+
+            // O usuário pode ter navegado para outra página enquanto os posts carregavam
+            if (_disposed) return;
+
+            latestPosts = posts ?? new List<BlogPostCardDto>();
+            await InvokeAsync(() =>
+            {
+                if (!_disposed) StateHasChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            // Falha nos posts nunca pode impedir a Home de aparecer
+            Console.WriteLine($"[Home] Falha ao carregar os últimos posts: {ex.Message}");
+        }
+    }
+
+    // Regra do projeto: navegação por JS (NavigationManager.NavigateTo falha em silêncio
+    // em Release por causa da serialização por reflection do JSInterop)
+    private async Task OpenPost(Guid postId)
+    {
+        await JS.InvokeVoidAsync("eval", $"window.location.href='/blog/{postId}'");
+    }
+
+    public void Dispose() => _disposed = true;
 
     private bool _scrollRevealInitialized = false;
     private bool _videoLoaded = false;
@@ -319,6 +392,14 @@
         if (!_scrollRevealInitialized && projects != null && projects.Count > 0)
         {
             _scrollRevealInitialized = true;
+            await JS.InvokeVoidAsync("setupScrollReveal");
+        }
+
+        // Quando os posts chegam, a seção "Últimos posts" entra no DOM:
+        // roda de novo pra observá-la
+        if (!_postsRevealInitialized && latestPosts.Count > 0)
+        {
+            _postsRevealInitialized = true;
             await JS.InvokeVoidAsync("setupScrollReveal");
         }
 
