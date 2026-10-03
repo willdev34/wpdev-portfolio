@@ -400,8 +400,20 @@
     display: block;
 }
 
+/* A largura do slogan define a do logo: o bloco encolhe ao conteudo mais largo
+   e a imagem (width 0 + min-width 100%) nao conta para esse calculo.
+   !important porque o .brand-logo do app.css (header) tambem se aplica a esta imagem */
+.footer-left {
+    width: max-content;
+    max-width: 100%;
+}
+
 .brand-logo--footer {
-    height: 40px;
+    display: block;
+    width: 0 !important;
+    min-width: 100%;
+    height: auto !important;
+    max-width: 100% !important;
     opacity: 0.9;
     filter: brightness(0) invert(1);
 }
