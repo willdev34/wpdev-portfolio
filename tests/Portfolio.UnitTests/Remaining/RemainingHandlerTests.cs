@@ -25,6 +25,7 @@ using Portfolio.Application.Queries.ContactMessages.GetContactMessageById;
 using Portfolio.Application.Queries.NowSections.GetNowSectionById;
 using Portfolio.Application.Queries.Projects.GetProjectById;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.UnitTests.Remaining;
 
@@ -176,7 +177,14 @@ public class GetBlogPostBySlugQueryHandlerTests
     public async Task Handle_DeveRetornarPost_QuandoSlugExistir()
     {
         var slug = "clean-architecture-dotnet";
-        var post = new BlogPost { Id = Guid.NewGuid(), Title = "Clean Architecture", Slug = slug };
+        // Regra pública: só posts Published (ou Scheduled vencido) são retornados pelo slug
+        var post = new BlogPost
+        {
+            Id = Guid.NewGuid(),
+            Title = "Clean Architecture",
+            Slug = slug,
+            Status = BlogPostStatus.Published
+        };
         var dto = new BlogPostDto { Id = post.Id, Title = "Clean Architecture" };
 
         _repositoryMock.Setup(r => r.GetBySlugAsync(slug)).ReturnsAsync(post);
@@ -279,11 +287,13 @@ public class UpdateBlogPostCommandHandlerTests
         _repositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(post);
         _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<BlogPost>())).Returns(Task.CompletedTask);
         _repositoryMock.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
+        // O handler usa o retorno de Map(dto, existing); o AutoMapper real devolve o próprio existing
+        _mapperMock.Setup(m => m.Map(updateDto, post)).Returns(post);
 
         var resultado = await _handler.Handle(command, CancellationToken.None);
 
         resultado.Should().Be(Unit.Value);
-        _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<BlogPost>()), Times.Once);
+        _repositoryMock.Verify(r => r.UpdateAsync(post), Times.Once);
     }
 
     [Fact]
