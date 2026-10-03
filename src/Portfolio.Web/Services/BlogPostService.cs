@@ -182,4 +182,42 @@ public class BlogPostService
             return (false, ex.Message);
         }
     }
+
+    // ====================================
+    // BULK DELETE (Admin)
+    // A API aceita no maximo 100 ids por chamada, entao envia em lotes.
+    // Retorna quantos foram excluidos ate o ponto em que parou
+    // ====================================
+    private const int BulkDeleteBatchSize = 100;
+
+    public async Task<(bool Success, int DeletedCount, string? Error)> BulkDeleteAsync(IEnumerable<Guid> ids)
+    {
+        var deleted = 0;
+        try
+        {
+            foreach (var batch in ids.Distinct().Chunk(BulkDeleteBatchSize))
+            {
+                var dto = new BulkDeleteBlogPostsDto { Ids = batch.ToList() };
+                var json = JsonSerializer.Serialize(dto, BlogPostJsonContext.Default.BulkDeleteBlogPostsDto);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/blogposts/bulk-delete", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[BlogPostService] BulkDeleteAsync retornou {(int)response.StatusCode}: {error}");
+                    return (false, deleted, $"Erro {(int)response.StatusCode}: {error}");
+                }
+
+                var body = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize(body, BlogPostJsonContext.Default.BulkDeleteBlogPostsResultDto);
+                deleted += result?.DeletedCount ?? 0;
+            }
+            return (true, deleted, null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BlogPostService] Erro em BulkDeleteAsync: {ex.Message}");
+            return (false, deleted, ex.Message);
+        }
+    }
 }

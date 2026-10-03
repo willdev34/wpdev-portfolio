@@ -10,6 +10,8 @@ namespace Portfolio.Web.Json;
 [JsonSerializable(typeof(BlogPostDto))]
 [JsonSerializable(typeof(CreateBlogPostDto))]
 [JsonSerializable(typeof(UpdateBlogPostDto))]
+[JsonSerializable(typeof(BulkDeleteBlogPostsDto))]
+[JsonSerializable(typeof(BulkDeleteBlogPostsResultDto))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSourceGenerationOptions(
     PropertyNameCaseInsensitive = true,

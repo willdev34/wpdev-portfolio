@@ -23,6 +23,15 @@
         <a class="btn-primary" href="/admin/blog/new">+ Novo Post</a>
     </div>
 
+    @if (_selectedIds.Count > 0)
+    {
+        <div class="bulk-bar">
+            <span class="bulk-bar__count">@_selectedIds.Count selecionado(s)</span>
+            <button class="btn-cancel" @onclick="ClearSelection">Limpar</button>
+            <button class="btn-confirm-delete" @onclick="ConfirmBulkDelete">Excluir</button>
+        </div>
+    }
+
     @if (_isLoading)
     {
         <p class="admin-loading">Carregando...</p>
@@ -40,6 +49,11 @@
             <table class="admin-table">
                 <thead>
                     <tr>
+                        <th class="th-check">
+                            <input type="checkbox" aria-label="Selecionar todos"
+                                   checked="@AllSelected"
+                                   @onchange="ToggleAll" />
+                        </th>
                         <th>Título</th>
                         <th>Status</th>
                         <th>Tags</th>
@@ -57,7 +71,12 @@
                     {
                         var effectiveStatus = BlogStatusHelper.GetEffectiveStatus(post.Status, post.ScheduledAt, utcNow);
                         var isOverdueScheduled = BlogStatusHelper.IsOverdueScheduled(post.Status, post.ScheduledAt, utcNow);
-                        <tr>
+                        <tr class="@(_selectedIds.Contains(post.Id) ? "row-selected" : null)">
+                            <td class="td-check">
+                                <input type="checkbox" aria-label="Selecionar @post.Title"
+                                       checked="@_selectedIds.Contains(post.Id)"
+                                       @onchange="e => ToggleOne(post.Id, (bool)e.Value!)" />
+                            </td>
                             <td class="td-title">@post.Title</td>
                             <td>
                                 <span class="status-badge status-badge--@effectiveStatus.ToLower()">@StatusLabel(effectiveStatus)</span>
@@ -105,11 +124,28 @@
 {
     <div class="confirm-overlay">
         <div class="confirm-box">
-            <p>Excluir <strong>@_deleteTitle</strong>?</p>
+            @if (_isBulkDelete)
+            {
+                <p>Excluir <strong>@_selectedIds.Count</strong> post(s)?</p>
+                <ul class="confirm-box__list">
+                    @foreach (var title in BulkPreviewTitles)
+                    {
+                        <li>@title</li>
+                    }
+                    @if (_selectedIds.Count > BulkPreviewTitles.Count)
+                    {
+                        <li class="confirm-box__more">e mais @(_selectedIds.Count - BulkPreviewTitles.Count)</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Excluir <strong>@_deleteTitle</strong>?</p>
+            }
             <p class="confirm-box__sub">Esta ação não pode ser desfeita.</p>
             <div class="confirm-box__actions">
-                <button class="btn-cancel" @onclick="CancelDelete">Cancelar</button>
-                <button class="btn-confirm-delete" @onclick="ExecuteDelete">Excluir</button>
+                <button class="btn-cancel" @onclick="CancelDelete" disabled="@_isDeleting">Cancelar</button>
+                <button class="btn-confirm-delete" @onclick="ExecuteDelete" disabled="@_isDeleting">Excluir</button>
             </div>
         </div>
     </div>
@@ -121,6 +157,18 @@
     private bool _showConfirm = false;
     private Guid _deleteId;
     private string _deleteTitle = string.Empty;
+    private bool _isBulkDelete = false;
+    private bool _isDeleting = false;
+    private readonly HashSet<Guid> _selectedIds = new();
+
+    private const int BulkPreviewMax = 5;
+
+    // Todos os posts da lista atual estao selecionados
+    private bool AllSelected => _posts.Count > 0 && _posts.All(p => _selectedIds.Contains(p.Id));
+
+    // Titulos dos primeiros posts selecionados, na ordem da listagem
+    private List<string> BulkPreviewTitles =>
+        _posts.Where(p => _selectedIds.Contains(p.Id)).Take(BulkPreviewMax).Select(p => p.Title).ToList();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -136,19 +184,72 @@
     {
         _deleteId = id;
         _deleteTitle = title;
+        _isBulkDelete = false;
         _showConfirm = true;
     }
 
-    private void CancelDelete() => _showConfirm = false;
+    private void ConfirmBulkDelete()
+    {
+        if (_selectedIds.Count == 0) return;
+        _isBulkDelete = true;
+        _showConfirm = true;
+    }
+
+    private void CancelDelete()
+    {
+        if (_isDeleting) return;
+        _showConfirm = false;
+    }
+
+    private void ToggleOne(Guid id, bool isChecked)
+    {
+        if (isChecked) _selectedIds.Add(id);
+        else _selectedIds.Remove(id);
+    }
+
+    // Marca ou desmarca apenas os posts da lista atual
+    private void ToggleAll(ChangeEventArgs e)
+    {
+        var isChecked = (bool)e.Value!;
+        foreach (var post in _posts)
+        {
+            if (isChecked) _selectedIds.Add(post.Id);
+            else _selectedIds.Remove(post.Id);
+        }
+    }
+
+    private void ClearSelection() => _selectedIds.Clear();
 
     private async Task ExecuteDelete()
     {
-        var (success, error) = await BlogPostService.DeleteAsync(_deleteId);
-        _showConfirm = false;
-        if (success)
+        if (_isDeleting) return;
+        _isDeleting = true;
+        try
+        {
+            if (_isBulkDelete)
+            {
+                var (success, deleted, error) = await BlogPostService.BulkDeleteAsync(_selectedIds.ToList());
+                if (!success)
+                    Console.WriteLine($"[AdminBlog] Erro ao excluir em massa ({deleted} excluidos): {error}");
+            }
+            else
+            {
+                var (success, error) = await BlogPostService.DeleteAsync(_deleteId);
+                if (!success)
+                    Console.WriteLine($"[AdminBlog] Erro ao excluir: {error}");
+            }
+
+            _showConfirm = false;
+
+            // Recarrega a listagem (sem NavigateTo). A selecao e limpa sempre: posts que
+            // sumiram em outra aba ou que falharam nao devem continuar marcados
+            _selectedIds.Clear();
             _posts = await BlogPostService.GetAllAsync();
-        else
-            Console.WriteLine($"[AdminBlog] Erro ao excluir: {error}");
+        }
+        finally
+        {
+            _isDeleting = false;
+        }
     }
 
     private static string StatusLabel(string status) => status switch
