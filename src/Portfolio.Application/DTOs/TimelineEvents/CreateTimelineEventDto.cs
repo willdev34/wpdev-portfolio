@@ -38,5 +38,11 @@ public class CreateTimelineEventDto
     // ORDENAÇÃO E VISIBILIDADE
     // ====================================
     public int Order { get; set; }
-    public bool IsVisible { get; set; } = true;
+    public bool IsVisible { get; set; } = true;
+
+    /// <summary>
+    /// Habilidades do evento (até 5). Substitui por completo as habilidades atuais.
+    /// A ordem da lista vira o campo Order.
+    /// </summary>
+    public List<TimelineEventSkillInputDto> Skills { get; set; } = new();
 }

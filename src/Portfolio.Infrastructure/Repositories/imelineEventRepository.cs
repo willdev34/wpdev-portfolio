@@ -33,9 +33,10 @@ public class TimelineEventRepository : ITimelineEventRepository
     /// </summary>
     public async Task<IEnumerable<TimelineEvent>> GetAllAsync()
     {
-        return await _context.TimelineEvents
-            .Where(e => e.IsVisible)
-            .OrderBy(e => e.Order)
+        return await OrderChronologically(
+                _context.TimelineEvents
+                    .Include(e => e.Skills.OrderBy(s => s.Order))
+                    .Where(e => e.IsVisible))
             .ToListAsync();
     }
 
@@ -45,6 +46,7 @@ public class TimelineEventRepository : ITimelineEventRepository
     public async Task<TimelineEvent?> GetByIdAsync(Guid id)
     {
         return await _context.TimelineEvents
+            .Include(e => e.Skills.OrderBy(s => s.Order))
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
@@ -55,9 +57,10 @@ public class TimelineEventRepository : ITimelineEventRepository
     /// </summary>
     public async Task<IEnumerable<TimelineEvent>> GetVisibleAsync()
     {
-        return await _context.TimelineEvents
-            .Where(e => e.IsVisible)
-            .OrderBy(e => e.Order)
+        return await OrderChronologically(
+                _context.TimelineEvents
+                    .Include(e => e.Skills.OrderBy(s => s.Order))
+                    .Where(e => e.IsVisible))
             .ToListAsync();
     }
 
@@ -67,9 +70,10 @@ public class TimelineEventRepository : ITimelineEventRepository
     /// </summary>
     public async Task<IEnumerable<TimelineEvent>> GetByTypeAsync(TimelineEventType type)
     {
-        return await _context.TimelineEvents
-            .Where(e => e.IsVisible && e.Type == type)
-            .OrderBy(e => e.Order)
+        return await OrderChronologically(
+                _context.TimelineEvents
+                    .Include(e => e.Skills.OrderBy(s => s.Order))
+                    .Where(e => e.IsVisible && e.Type == type))
             .ToListAsync();
     }
 
@@ -79,10 +83,31 @@ public class TimelineEventRepository : ITimelineEventRepository
     /// </summary>
     public async Task<IEnumerable<TimelineEvent>> GetByYearAsync(int year)
     {
-        return await _context.TimelineEvents
-            .Where(e => e.IsVisible && e.Date.Year == year)
-            .OrderBy(e => e.Order)
+        return await OrderChronologically(
+                _context.TimelineEvents
+                    .Include(e => e.Skills.OrderBy(s => s.Order))
+                    .Where(e => e.IsVisible && e.Date.Year == year))
             .ToListAsync();
+    }
+
+    // ==========================================
+    // ORDENAÇÃO (único lugar)
+    // ==========================================
+
+    /// <summary>
+    /// Ordem cronológica da timeline, usada por TODAS as consultas (pública e admin):
+    /// 1. data inicial crescente
+    /// 2. data final crescente, com evento SEM data final (em andamento) depois dos que já terminaram
+    /// 3. CreatedAt crescente
+    /// O campo Order não participa mais da ordenação
+    /// </summary>
+    private static IQueryable<TimelineEvent> OrderChronologically(IQueryable<TimelineEvent> query)
+    {
+        return query
+            .OrderBy(e => e.Date)
+            .ThenBy(e => e.EndDate == null)
+            .ThenBy(e => e.EndDate)
+            .ThenBy(e => e.CreatedAt);
     }
 
     // ==========================================
@@ -130,6 +155,21 @@ public class TimelineEventRepository : ITimelineEventRepository
     /// Soft delete - marca o evento como invisível ao invés de deletar fisicamente
     /// DIFERENTE do BlogPost que usa hard delete
     /// </summary>
+    public async Task ReplaceSkillsAsync(TimelineEvent timelineEvent, IEnumerable<TimelineEventSkill> skills)
+    {
+        // Remove as habilidades atuais (carregadas pelo GetByIdAsync) e insere as novas.
+        // Add explícito: os Ids vêm vazios e o EF gera, então entram como Added (não como Modified)
+        _context.TimelineEventSkills.RemoveRange(timelineEvent.Skills.ToList());
+
+        foreach (var skill in skills)
+        {
+            skill.TimelineEventId = timelineEvent.Id;
+            _context.TimelineEventSkills.Add(skill);
+        }
+
+        await Task.CompletedTask; // Para manter assinatura async
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var timelineEvent = await _context.TimelineEvents.FindAsync(id);

@@ -40,5 +40,10 @@ public class TimelineEventCardDto
     // ==========================================
     // ORDENAÇÃO
     // ==========================================
-    public int Order { get; set; }
+    public int Order { get; set; }
+
+    /// <summary>
+    /// Habilidades do evento, na ordem do campo Order
+    /// </summary>
+    public List<TimelineEventSkillDto> Skills { get; set; } = new();
 }

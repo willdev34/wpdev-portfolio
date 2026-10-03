@@ -21,6 +21,7 @@ public class PortfolioDbContext : IdentityDbContext<AppUser>
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
     public DbSet<TimelineEvent> TimelineEvents => Set<TimelineEvent>();
+    public DbSet<TimelineEventSkill> TimelineEventSkills => Set<TimelineEventSkill>();
     public DbSet<GalleryImage> GalleryImages => Set<GalleryImage>();
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<NowSection> NowSections => Set<NowSection>();
@@ -106,7 +107,27 @@ public class PortfolioDbContext : IdentityDbContext<AppUser>
             entity.Property(e => e.LinkText).HasMaxLength(100);
 
             entity.HasIndex(e => e.Date);
+            // Order está em desuso (ordem automática), mas a coluna e o índice permanecem
             entity.HasIndex(e => e.Order);
+        });
+
+        modelBuilder.Entity<TimelineEventSkill>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(40);
+
+            entity.Property(e => e.Category)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
+            // Excluir (fisicamente) o evento remove as habilidades
+            entity.HasOne(e => e.TimelineEvent)
+                .WithMany(e => e.Skills)
+                .HasForeignKey(e => e.TimelineEventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.TimelineEventId, e.Order });
         });
     }
 

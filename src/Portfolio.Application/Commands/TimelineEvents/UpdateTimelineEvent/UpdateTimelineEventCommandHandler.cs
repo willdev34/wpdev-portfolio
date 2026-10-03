@@ -36,6 +36,15 @@ public class UpdateTimelineEventCommandHandler : IRequestHandler<UpdateTimelineE
         var updatedEvent = _mapper.Map(request.EventData, existingEvent);
 
         await _repository.UpdateAsync(updatedEvent);
+
+        // Skills nulo (campo omitido) mantém as habilidades atuais. Lista vazia limpa.
+        // Lista com itens substitui por completo, no mesmo SaveChanges do evento (uma transação)
+        if (request.EventData.Skills != null)
+        {
+            var skills = TimelineEventSkillRules.BuildSkills(request.EventData.Skills);
+            await _repository.ReplaceSkillsAsync(updatedEvent, skills);
+        }
+
         await _repository.SaveChangesAsync();
 
         return Unit.Value;

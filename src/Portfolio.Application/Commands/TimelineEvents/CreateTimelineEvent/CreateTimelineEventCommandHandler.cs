@@ -48,6 +48,9 @@ public class CreateTimelineEventCommandHandler : IRequestHandler<CreateTimelineE
         // ====================================
         var timelineEvent = _mapper.Map<TimelineEvent>(request.EventData);
 
+        // As habilidades não passam pelo AutoMapper: o handler monta (Trim, categoria, Order)
+        timelineEvent.Skills = TimelineEventSkillRules.BuildSkills(request.EventData.Skills);
+
         // ====================================
         // 2. SALVAR NO BANCO
         // ====================================

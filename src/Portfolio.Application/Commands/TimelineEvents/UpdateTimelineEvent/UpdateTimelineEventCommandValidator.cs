@@ -49,6 +49,9 @@ public class UpdateTimelineEventCommandValidator : AbstractValidator<UpdateTimel
 
         RuleFor(x => x.EventData.Order)
             .GreaterThanOrEqualTo(0).WithMessage("A ordem deve ser maior ou igual a 0");
+
+        // Habilidades: até 5, nome obrigatório (até 40), sem repetidos, categoria válida
+        TimelineEventSkillRules.Apply(this, x => x.EventData.Skills);
     }
 
     private bool BeAValidUrl(string? url)

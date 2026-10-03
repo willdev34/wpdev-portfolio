@@ -43,5 +43,13 @@ public class UpdateTimelineEventDto
     // ORDENAÇÃO E VISIBILIDADE
     // ====================================
     public int Order { get; set; }
-    public bool IsVisible { get; set; }
+    public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// Habilidades do evento (até 5):
+    /// - null (campo omitido): MANTÉM as habilidades atuais
+    /// - lista vazia: remove todas as habilidades
+    /// - lista com itens: substitui por completo (a posição na lista vira o campo Order)
+    /// </summary>
+    public List<TimelineEventSkillInputDto>? Skills { get; set; }
 }

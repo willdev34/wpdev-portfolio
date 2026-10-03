@@ -22,15 +22,21 @@ public class TimelineEventMappingProfile : Profile
         // ==========================================
         // Usado quando buscamos do banco e retornamos na API
         // Converte o enum Type para string
+        // Habilidades sempre na ordem do campo Order, independente da ordem em que o EF as carregou
+        CreateMap<TimelineEventSkill, TimelineEventSkillDto>()
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()));
+
         CreateMap<TimelineEvent, TimelineEventDto>()
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills.OrderBy(s => s.Order)));
 
         // ==========================================
         // MAPEAMENTO: TimelineEvent → TimelineEventCardDto
         // ==========================================
         // Usado para listagens (timeline)
         CreateMap<TimelineEvent, TimelineEventCardDto>()
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills.OrderBy(s => s.Order)));
 
         // ==========================================
         // MAPEAMENTO: CreateTimelineEventDto → TimelineEvent
@@ -40,7 +46,8 @@ public class TimelineEventMappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.Ignore()) // Id será gerado automaticamente
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // CreatedAt será setado no handler
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (TimelineEventType)src.Type));
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (TimelineEventType)src.Type))
+            .ForMember(dest => dest.Skills, opt => opt.Ignore()); // o handler cuida das habilidades à mão
 
         // ==========================================
         // MAPEAMENTO: UpdateTimelineEventDto → TimelineEvent
@@ -49,6 +56,7 @@ public class TimelineEventMappingProfile : Profile
         CreateMap<UpdateTimelineEventDto, TimelineEvent>()
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Não altera data de criação
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore()) // UpdatedAt será setado no handler
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (TimelineEventType)src.Type));
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => (TimelineEventType)src.Type))
+            .ForMember(dest => dest.Skills, opt => opt.Ignore()); // o handler cuida das habilidades à mão
     }
 }
