@@ -31,6 +31,7 @@
   <ItemGroup>
     <!-- Linka só o helper de fuso do Web, sem referenciar o Portfolio.Web (fora da medição de cobertura) -->
     <Compile Include="..\..\src\Portfolio.Web\Helpers\BrasiliaTimeHelper.cs" Link="Linked\BrasiliaTimeHelper.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\DTOs\BlogPosts\BlogPostDto.cs" Link="Linked\BlogPostDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Portfolio.Domain\Portfolio.Domain.csproj" />
