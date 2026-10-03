@@ -226,6 +226,7 @@
 
             if (post is null)
             {
+                Console.WriteLine($"[AdminBlogForm] Post {Id} não carregado, voltando para /admin/blog");
                 await JS.InvokeVoidAsync("eval", "window.location.href='/admin/blog'");
                 return;
             }

@@ -12,8 +12,8 @@ public class BlogPostDto
     public string Slug { get; set; } = string.Empty;
     public string Excerpt { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public string FeaturedImageUrl { get; set; } = string.Empty;
-    public DateTime PublishedAt { get; set; }
+    public string? FeaturedImageUrl { get; set; }
+    public DateTime? PublishedAt { get; set; } // nulo em rascunho (Draft)
     public int ReadTimeMinutes { get; set; }
     public List<string> Tags { get; set; } = new();
     public bool IsFeatured { get; set; }

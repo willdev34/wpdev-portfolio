@@ -84,7 +84,7 @@ public class BlogPostService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BlogPostService] GetByIdAdminAsync({id}) - Erro: {ex.Message}");
+            Console.WriteLine($"[BlogPostService] GetByIdAdminAsync({id}) - Erro: {ex.GetType().Name}: {ex.Message}");
             return null;
         }
     }
