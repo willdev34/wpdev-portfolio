@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.Commands.BlogPosts.CreateBlogPost;
 using Portfolio.Application.Commands.BlogPosts.UpdateBlogPost;
+using Portfolio.Application.Commands.BlogPosts.BulkDeleteBlogPosts;
 using Portfolio.Application.Commands.BlogPosts.DeleteBlogPost;
 using Portfolio.Application.DTOs.BlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetAllBlogPosts;
@@ -310,5 +311,33 @@ public class BlogPostsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
+    }
+
+    // ====================================
+    // POST: api/blogposts/bulk-delete
+    // ====================================
+    /// <summary>
+    /// Deleta vários posts FISICAMENTE (hard delete)
+    /// ATENÇÃO: Esta ação é irreversível! Ids duplicados são ignorados e
+    /// ids inexistentes não geram erro, apenas não contam
+    /// </summary>
+    /// <param name="dto">Lista de ids (1 a 100)</param>
+    /// <returns>Quantidade de posts excluídos</returns>
+    /// <response code="200">Retorna { "deletedCount": N }</response>
+    /// <response code="400">Lista vazia, acima de 100 ids ou com Guid vazio</response>
+    [HttpPost("bulk-delete")]
+    [ProducesResponseType(typeof(BulkDeleteBlogPostsResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<BulkDeleteBlogPostsResultDto>> BulkDelete([FromBody] BulkDeleteBlogPostsDto dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest(new { message = "Dados da exclusão são obrigatórios" });
+        }
+
+        // O Validator será executado automaticamente pelo ValidationBehavior
+        var deleted = await _mediator.Send(new BulkDeleteBlogPostsCommand(dto));
+
+        return Ok(new BulkDeleteBlogPostsResultDto { DeletedCount = deleted });
     }
 }
