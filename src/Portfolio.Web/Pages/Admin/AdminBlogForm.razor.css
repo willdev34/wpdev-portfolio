@@ -214,6 +214,16 @@
     gap: 8px;
 }
 
+.publish-auto-notice {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: rgba(108,158,163,0.12);
+    border: 1px solid rgba(108,158,163,0.3);
+    color: #4a8a8f;
+    font-size: 0.85rem;
+}
+
 .publish-options { display: flex; flex-direction: column; gap: 10px; }
 
 .publish-option {

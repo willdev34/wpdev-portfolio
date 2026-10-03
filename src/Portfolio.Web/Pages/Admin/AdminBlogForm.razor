@@ -91,6 +91,13 @@
                     </p>
                 }
 
+                @if (_autoPublishedAtLocal.HasValue)
+                {
+                    <p class="publish-auto-notice">
+                        Publicado automaticamente em @_autoPublishedAtLocal.Value.ToString("dd/MM/yyyy HH:mm") (horário de Brasília).
+                    </p>
+                }
+
                 <div class="publish-options">
                     <label class="publish-option @(_publishMode == PublishMode.Now ? "publish-option--active" : "")">
                         <input type="radio"
@@ -214,7 +221,10 @@
     // Texto cru do input datetime-local (horário de Brasília). String em vez de DateTime?
     // para o valor nunca ser descartado em silêncio pelo binder; a conversão é feita no SavePost
     private string _scheduledLocalText = string.Empty;
-    private string _originalStatus = string.Empty; // "Draft", "Scheduled" ou "Published" (vem da API)
+    // Status efetivo ao carregar: "Draft", "Scheduled" ou "Published".
+    // Scheduled com data vencida já está no site, então entra como "Published"
+    private string _originalStatus = string.Empty;
+    private DateTime? _autoPublishedAtLocal; // preenchido só para Scheduled vencido (horário de Brasília)
     private int? _savingStatus;
 
     // Post já publicado não mostra "Salvar Rascunho", para não despublicar sem querer
@@ -246,9 +256,17 @@
                 ReadTimeMinutes = post.ReadTimeMinutes
             };
 
-            _originalStatus = post.Status;
+            var utcNow = DateTime.UtcNow;
+            _originalStatus = BlogStatusHelper.GetEffectiveStatus(post.Status, post.ScheduledAt, utcNow);
 
-            if (post.Status == "Scheduled" && post.ScheduledAt.HasValue)
+            if (BlogStatusHelper.IsOverdueScheduled(post.Status, post.ScheduledAt, utcNow))
+            {
+                // Já publicado pela regra pública: abre com "Publicar agora" (Status 2 ao salvar),
+                // sem campo de data e sem "Salvar Rascunho" (via _isPublishedPost)
+                _publishMode = PublishMode.Now;
+                _autoPublishedAtLocal = BrasiliaTimeHelper.FromUtc(post.ScheduledAt!.Value);
+            }
+            else if (_originalStatus == BlogStatusHelper.Scheduled && post.ScheduledAt.HasValue)
             {
                 _publishMode = PublishMode.Schedule;
                 _scheduledLocalText = BrasiliaTimeHelper.ToInputValue(BrasiliaTimeHelper.FromUtc(post.ScheduledAt.Value));

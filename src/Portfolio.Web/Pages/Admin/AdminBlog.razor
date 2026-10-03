@@ -49,13 +49,19 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{
+                        // Uma leitura da hora por renderização: Scheduled vencido aparece como Publicado
+                        var utcNow = DateTime.UtcNow;
+                    }
                     @foreach (var post in _posts)
                     {
+                        var effectiveStatus = BlogStatusHelper.GetEffectiveStatus(post.Status, post.ScheduledAt, utcNow);
+                        var isOverdueScheduled = BlogStatusHelper.IsOverdueScheduled(post.Status, post.ScheduledAt, utcNow);
                         <tr>
                             <td class="td-title">@post.Title</td>
                             <td>
-                                <span class="status-badge status-badge--@post.Status.ToLower()">@StatusLabel(post.Status)</span>
-                                @if (post.Status == "Scheduled" && post.ScheduledAt.HasValue)
+                                <span class="status-badge status-badge--@effectiveStatus.ToLower()">@StatusLabel(effectiveStatus)</span>
+                                @if (effectiveStatus == BlogStatusHelper.Scheduled && post.ScheduledAt.HasValue)
                                 {
                                     <span class="status-date">
                                         @BrasiliaTimeHelper.FromUtc(post.ScheduledAt.Value).ToString("dd/MM/yyyy HH:mm")
@@ -70,7 +76,11 @@
                             </td>
                             <td>@post.ReadTimeMinutes min</td>
                             <td>
-                                @if (post.Status == "Published" && post.PublishedAt.HasValue)
+                                @if (isOverdueScheduled)
+                                {
+                                    @BrasiliaTimeHelper.FromUtc(post.ScheduledAt!.Value).ToString("dd/MM/yyyy")
+                                }
+                                else if (effectiveStatus == BlogStatusHelper.Published && post.PublishedAt.HasValue)
                                 {
                                     @BrasiliaTimeHelper.FromUtc(post.PublishedAt.Value).ToString("dd/MM/yyyy")
                                 }
