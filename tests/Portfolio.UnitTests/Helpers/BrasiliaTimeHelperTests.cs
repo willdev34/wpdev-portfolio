@@ -94,6 +94,48 @@ public class BrasiliaTimeHelperTests
         brasilia.Should().Be(new DateTime(2026, 12, 31, 22, 0, 0));
     }
 
+    [Theory]
+    [InlineData("2026-10-05T15:00")]
+    [InlineData("2026-10-05T15:00:00")]
+    [InlineData("2026-10-05T15:00:00.000")]
+    public void TryParseInput_DeveAceitar_QuandoFormatoDoDatetimeLocal(string valor)
+    {
+        // Act
+        var ok = BrasiliaTimeHelper.TryParseInput(valor, out var brasilia);
+
+        // Assert
+        ok.Should().BeTrue();
+        brasilia.Should().Be(new DateTime(2026, 10, 5, 15, 0, 0));
+        brasilia.Kind.Should().Be(DateTimeKind.Unspecified);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData("05/10/2026 15:00")]
+    public void TryParseInput_DeveRejeitar_QuandoVazioNuloOuFormatoDeExibicao(string? valor)
+    {
+        // Act
+        var ok = BrasiliaTimeHelper.TryParseInput(valor, out _);
+
+        // Assert
+        ok.Should().BeFalse();
+    }
+
+    [Fact]
+    public void TryParseInput_SeguidoDeToUtc_DeveTransformar15hEm18hUtc()
+    {
+        // Arrange
+        BrasiliaTimeHelper.TryParseInput("2026-10-05T15:00", out var brasilia).Should().BeTrue();
+
+        // Act
+        var utc = BrasiliaTimeHelper.ToUtc(brasilia);
+
+        // Assert
+        utc.Should().Be(new DateTime(2026, 10, 5, 18, 0, 0));
+        utc.Kind.Should().Be(DateTimeKind.Utc);
+    }
+
     [Fact]
     public void ToUtc_EFromUtc_DevemSerInversos()
     {
