@@ -93,6 +93,46 @@
     margin-right: 4px;
 }
 
+/* Badge de status do post */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-badge--draft {
+    background: #F4F7F7;
+    color: #0D1C24;
+    border: 1px solid #e8ecec;
+}
+
+.status-badge--scheduled {
+    background: rgba(108,158,163,0.12);
+    color: #4a8a8f;
+    border: 1px solid rgba(108,158,163,0.3);
+}
+
+.status-badge--published {
+    background: #0D1C24;
+    color: #F4F7F7;
+    border: 1px solid #0D1C24;
+}
+
+.status-date {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: #A3A9AB;
+    white-space: nowrap;
+}
+
+.td-empty { color: #A3A9AB; }
+
 .td-actions { display: flex; gap: 8px; align-items: center; }
 
 .btn-edit {

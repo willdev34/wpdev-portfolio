@@ -6,6 +6,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.Infrastructure.Data;
 
@@ -78,9 +79,18 @@ public class PortfolioDbContext : IdentityDbContext<AppUser>
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
                 );
 
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired()
+                .HasDefaultValue(BlogPostStatus.Draft);
+
+            entity.Property(e => e.ScheduledAt);
+
             entity.HasIndex(e => e.Slug).IsUnique();
             entity.HasIndex(e => e.IsPublished);
             entity.HasIndex(e => e.PublishedAt);
+            entity.HasIndex(e => new { e.Status, e.ScheduledAt });
         });
     }
 

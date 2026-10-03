@@ -185,8 +185,10 @@
 
         try
         {
-            allPosts = await BlogPostService.GetAllAsync();
-            Console.WriteLine($"Posts carregados: {allPosts.Count}");
+            // Carrega apenas posts PUBLICADOS (IsPublished = true)
+            // Evita vazamento de rascunhos no site público
+            allPosts = await BlogPostService.GetPublishedAsync();
+            Console.WriteLine($"Posts publicados carregados: {allPosts.Count}");
             foreach (var p in allPosts)
             {
                 Console.WriteLine($"Post: {p.Title} - Tags: {p.Tags.Count}");

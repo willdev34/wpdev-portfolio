@@ -6,6 +6,7 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Interfaces;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 using Portfolio.Infrastructure.Data;
 
 namespace Portfolio.Infrastructure.Repositories;
@@ -58,14 +59,19 @@ public class BlogPostRepository : IBlogPostRepository
     }
 
     /// <summary>
-    /// Busca apenas posts PUBLICADOS
-    /// Ordenados por data de publicação (mais recentes primeiro)
+    /// Busca posts PUBLICOS: Status == Published, ou Status == Scheduled com
+    /// ScheduledAt ja vencido (ScheduledAt menor ou igual a agora)
+    /// Ordenados por PublishedAt decrescente, usando CreatedAt como desempate
     /// </summary>
     public async Task<IEnumerable<BlogPost>> GetPublishedAsync()
     {
+        var now = DateTime.UtcNow;
+
         return await _context.BlogPosts
-            .Where(p => p.IsPublished && p.PublishedAt != null)
+            .Where(p => p.Status == BlogPostStatus.Published ||
+                        (p.Status == BlogPostStatus.Scheduled && p.ScheduledAt <= now))
             .OrderByDescending(p => p.PublishedAt)
+            .ThenByDescending(p => p.CreatedAt)
             .ToListAsync();
     }
 
@@ -100,47 +106,33 @@ public class BlogPostRepository : IBlogPostRepository
     /// <summary>
     /// Adiciona um novo post ao contexto
     /// IMPORTANTE: Não salva automaticamente, precisa chamar SaveChangesAsync()
+    /// IsPublished, PublishedAt, Status e ScheduledAt já vêm sincronizados pelo handler
     /// </summary>
     public async Task<BlogPost> AddAsync(BlogPost blogPost)
     {
         // Gera um novo ID
         blogPost.Id = Guid.NewGuid();
-        
+
         // Seta a data de criação
         blogPost.CreatedAt = DateTime.UtcNow;
-        
-        // Se foi marcado como publicado, seta a data de publicação
-        if (blogPost.IsPublished && blogPost.PublishedAt == null)
-        {
-            blogPost.PublishedAt = DateTime.UtcNow;
-        }
 
         await _context.BlogPosts.AddAsync(blogPost);
-        
+
         return blogPost;
     }
 
     /// <summary>
     /// Atualiza um post existente
     /// IMPORTANTE: Não salva automaticamente, precisa chamar SaveChangesAsync()
+    /// IsPublished, PublishedAt, Status e ScheduledAt já vêm sincronizados pelo handler
     /// </summary>
     public async Task UpdateAsync(BlogPost blogPost)
     {
         // Seta a data de atualização
         blogPost.UpdatedAt = DateTime.UtcNow;
-        
-        // Se mudou de rascunho para publicado, seta a data de publicação
-        var existingPost = await _context.BlogPosts
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == blogPost.Id);
-        
-        if (existingPost != null && !existingPost.IsPublished && blogPost.IsPublished)
-        {
-            blogPost.PublishedAt = DateTime.UtcNow;
-        }
 
         _context.BlogPosts.Update(blogPost);
-        
+
         await Task.CompletedTask; // Para manter assinatura async
     }
 

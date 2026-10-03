@@ -1,27 +1,17 @@
 // ====================================
-// Título: BlogPostDto.cs
-// Descrição: DTO completo de post do blog
+// Título: BlogPostAdminCardDto.cs
+// Descrição: DTO para card de post do blog na listagem do ADMIN (inclui Status e ScheduledAt)
 // ====================================
-
 namespace Portfolio.Web.DTOs.BlogPosts;
-
-public class BlogPostDto
+public class BlogPostAdminCardDto
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string Slug { get; set; } = string.Empty;
     public string Excerpt { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
     public string? FeaturedImageUrl { get; set; }
-    public DateTime? PublishedAt { get; set; } // nulo em rascunho (Draft)
+    public DateTime? PublishedAt { get; set; }
     public int ReadTimeMinutes { get; set; }
     public List<string> Tags { get; set; } = new();
-    public bool IsFeatured { get; set; }
-    public bool IsPublished { get; set; }
-    public int ViewCount { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-
     public string Status { get; set; } = string.Empty;
     public DateTime? ScheduledAt { get; set; }
 }

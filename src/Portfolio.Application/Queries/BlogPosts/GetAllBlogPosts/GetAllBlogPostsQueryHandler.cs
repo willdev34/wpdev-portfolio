@@ -14,9 +14,9 @@ namespace Portfolio.Application.Queries.BlogPosts.GetAllBlogPosts;
 /// Handler responsável por processar a query GetAllBlogPostsQuery
 /// 1. Busca os posts no banco (via Repository)
 /// 2. Converte de Entity para DTO (via AutoMapper)
-/// 3. Retorna a lista de BlogPostCardDto
+/// 3. Retorna a lista de BlogPostAdminCardDto (inclui Status e ScheduledAt, só para o admin)
 /// </summary>
-public class GetAllBlogPostsQueryHandler : IRequestHandler<GetAllBlogPostsQuery, IEnumerable<BlogPostCardDto>>
+public class GetAllBlogPostsQueryHandler : IRequestHandler<GetAllBlogPostsQuery, IEnumerable<BlogPostAdminCardDto>>
 {
     private readonly IBlogPostRepository _repository;
     private readonly IMapper _mapper;
@@ -38,15 +38,15 @@ public class GetAllBlogPostsQueryHandler : IRequestHandler<GetAllBlogPostsQuery,
     /// <summary>
     /// Método principal que executa a lógica da query
     /// </summary>
-    public async Task<IEnumerable<BlogPostCardDto>> Handle(
-        GetAllBlogPostsQuery request, 
+    public async Task<IEnumerable<BlogPostAdminCardDto>> Handle(
+        GetAllBlogPostsQuery request,
         CancellationToken cancellationToken)
     {
         // 1. Busca TODOS os posts do banco
         var blogPosts = await _repository.GetAllAsync();
 
-        // 2. Converte de BlogPost (Entity) para BlogPostCardDto
-        var blogPostCards = _mapper.Map<IEnumerable<BlogPostCardDto>>(blogPosts);
+        // 2. Converte de BlogPost (Entity) para BlogPostAdminCardDto
+        var blogPostCards = _mapper.Map<IEnumerable<BlogPostAdminCardDto>>(blogPosts);
 
         // 3. Retorna a lista de DTOs
         return blogPostCards;

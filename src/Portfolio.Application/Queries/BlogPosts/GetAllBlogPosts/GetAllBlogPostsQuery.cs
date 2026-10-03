@@ -10,10 +10,10 @@ namespace Portfolio.Application.Queries.BlogPosts.GetAllBlogPosts;
 
 /// <summary>
 /// Query para buscar TODOS os posts (publicados e rascunhos)
-/// Retorna uma lista de BlogPostCardDto (versão simplificada para grid)
-/// Usado no endpoint GET /api/blogposts
+/// Retorna uma lista de BlogPostAdminCardDto (versão simplificada para grid, com Status e ScheduledAt)
+/// Usado no endpoint GET /api/blogposts (ADMIN)
 /// </summary>
-public class GetAllBlogPostsQuery : IRequest<IEnumerable<BlogPostCardDto>>
+public class GetAllBlogPostsQuery : IRequest<IEnumerable<BlogPostAdminCardDto>>
 {
     // Esta query não precisa de parâmetros
     // Ela simplesmente retorna TODOS os posts

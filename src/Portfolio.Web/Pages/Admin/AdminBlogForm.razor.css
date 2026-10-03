@@ -184,6 +184,105 @@
 
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.btn-draft {
+    padding: 11px 24px;
+    border-radius: 6px;
+    border: 1px solid #6C9EA3;
+    background: #F4F7F7;
+    color: #0D1C24;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.btn-draft:hover:not(:disabled) { background: rgba(108,158,163,0.15); }
+
+.btn-draft:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Coluna direita: Publicação + Mídia e Tags */
+.form-column { display: flex; flex-direction: column; gap: 24px; }
+
+/* Card Publicação */
+.publish-current {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #A3A9AB;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.publish-auto-notice {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: rgba(108,158,163,0.12);
+    border: 1px solid rgba(108,158,163,0.3);
+    color: #4a8a8f;
+    font-size: 0.85rem;
+}
+
+.publish-options { display: flex; flex-direction: column; gap: 10px; }
+
+.publish-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid #e8ecec;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.publish-option:hover { border-color: #6C9EA3; }
+
+.publish-option--active {
+    border-color: #6C9EA3;
+    background: #F4F7F7;
+}
+
+.publish-option input { margin-top: 3px; accent-color: #6C9EA3; }
+
+.publish-option span { display: flex; flex-direction: column; gap: 2px; }
+
+.publish-option strong { font-size: 0.9rem; color: #0D1C24; }
+
+.publish-option small { font-size: 0.8rem; color: #A3A9AB; }
+
+/* Badge de status (mesmo padrão do AdminBlog) */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-badge--draft {
+    background: #F4F7F7;
+    color: #0D1C24;
+    border: 1px solid #e8ecec;
+}
+
+.status-badge--scheduled {
+    background: rgba(108,158,163,0.12);
+    color: #4a8a8f;
+    border: 1px solid rgba(108,158,163,0.3);
+}
+
+.status-badge--published {
+    background: #0D1C24;
+    color: #F4F7F7;
+    border: 1px solid #0D1C24;
+}
+
 @media (max-width: 900px) {
     .form-grid { grid-template-columns: 1fr; }
 }

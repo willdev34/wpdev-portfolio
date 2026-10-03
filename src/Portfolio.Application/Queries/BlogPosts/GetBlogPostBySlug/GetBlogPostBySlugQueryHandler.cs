@@ -13,9 +13,10 @@ namespace Portfolio.Application.Queries.BlogPosts.GetBlogPostBySlug;
 /// <summary>
 /// Handler responsável por processar a query GetBlogPostBySlugQuery
 /// 1. Busca o post no banco por Slug (via Repository)
-/// 2. Incrementa o contador de visualizações (ViewCount)
-/// 3. Converte de Entity para DTO (via AutoMapper)
-/// 4. Retorna o BlogPostDto ou null se não encontrado
+/// 2. Se nao existir ou nao for publico (Draft, ou Scheduled no futuro), retorna null
+/// 3. Incrementa o contador de visualizações (ViewCount)
+/// 4. Converte de Entity para DTO (via AutoMapper)
+/// 5. Retorna o BlogPostDto ou null se não encontrado/nao publico
 /// </summary>
 public class GetBlogPostBySlugQueryHandler : IRequestHandler<GetBlogPostBySlugQuery, BlogPostDto?>
 {
@@ -46,8 +47,9 @@ public class GetBlogPostBySlugQueryHandler : IRequestHandler<GetBlogPostBySlugQu
         // 1. Busca o post no banco por Slug
         var blogPost = await _repository.GetBySlugAsync(request.Slug);
 
-        // 2. Se não encontrou, retorna null
-        if (blogPost == null)
+        // 2. Se não encontrou OU não é público (Draft, ou Scheduled no futuro), retorna null
+        // Isso impede acesso direto a rascunhos e nao incrementa ViewCount nesses casos
+        if (blogPost == null || !blogPost.IsPublic)
         {
             return null;
         }

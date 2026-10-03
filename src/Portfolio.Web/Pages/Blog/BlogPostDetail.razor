@@ -67,7 +67,7 @@ else
         <div class="hero-content">
             <div class="container-narrow">
                 <div class="post-meta">
-                    <time>@post.PublishedAt.ToString("dd MMM yyyy")</time>
+                    <time>@post.PublishedAt?.ToString("dd MMM yyyy")</time>
                     <span class="meta-separator">•</span>
                     <span class="post-reading">@post.ReadTimeMinutes min de leitura</span>
                 </div>

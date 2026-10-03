@@ -12,6 +12,8 @@ using Portfolio.Application.DTOs.BlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetAllBlogPosts;
 using Portfolio.Application.Queries.BlogPosts.GetBlogPostById;
 using Portfolio.Application.Queries.BlogPosts.GetBlogPostBySlug;
+using Portfolio.Application.Queries.BlogPosts.GetPublicBlogPostById;
+using Portfolio.Application.Queries.BlogPosts.GetPublicBlogPosts;
 
 namespace Portfolio.Api.Controllers;
 
@@ -35,24 +37,49 @@ public class BlogPostsController : ControllerBase
     }
 
     // ====================================
+    // GET: api/blogposts/public
+    // ====================================
+    /// <summary>
+    /// Busca posts PUBLICADOS para exibição pública
+    /// Filtra apenas posts com IsPublished = true
+    /// </summary>
+    /// <returns>Lista de BlogPostCardDto publicados</returns>
+    /// <response code="200">Retorna a lista de posts publicados</response>
+    [HttpGet("public")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+    [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetPublic()
+    {
+        // Cria a query para posts públicos (IsPublished = true)
+        var query = new GetPublicBlogPostsQuery();
+
+        // Envia para o MediatR processar
+        var posts = await _mediator.Send(query);
+
+        // Retorna HTTP 200 OK com a lista (apenas publicados)
+        return Ok(posts);
+    }
+
+    // ====================================
     // GET: api/blogposts
     // ====================================
     /// <summary>
-    /// Busca TODOS os posts (publicados e rascunhos)
+    /// Busca TODOS os posts (publicados e rascunhos) - ADMIN ONLY
     /// </summary>
-    /// <returns>Lista de BlogPostCardDto</returns>
+    /// <returns>Lista de BlogPostAdminCardDto (inclui Status e ScheduledAt)</returns>
     /// <response code="200">Retorna a lista de posts</response>
+    /// <response code="401">Não autorizado</response>
     [HttpGet]
-    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<BlogPostCardDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<BlogPostCardDto>>> GetAll()
+    [ProducesResponseType(typeof(IEnumerable<BlogPostAdminCardDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<BlogPostAdminCardDto>>> GetAll()
     {
-        // Cria a query
+        // Cria a query (retorna TODOS, incluindo rascunhos)
         var query = new GetAllBlogPostsQuery();
-        
+
         // Envia para o MediatR processar
         var posts = await _mediator.Send(query);
-        
+
         // Retorna HTTP 200 OK com a lista
         return Ok(posts);
     }
@@ -61,30 +88,66 @@ public class BlogPostsController : ControllerBase
     // GET: api/blogposts/{id}
     // ====================================
     /// <summary>
-    /// Busca um post específico por ID
+    /// Busca um post específico por ID para exibição PÚBLICA
+    /// Aplica a mesma regra de visibilidade da listagem pública
+    /// (Published, ou Scheduled com ScheduledAt já vencido)
     /// </summary>
     /// <param name="id">ID do post</param>
     /// <returns>BlogPostDto completo</returns>
     /// <response code="200">Retorna o post encontrado</response>
-    /// <response code="404">Post não encontrado</response>
+    /// <response code="404">Post não encontrado ou não público</response>
     [HttpGet("{id}")]
     [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(BlogPostDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BlogPostDto>> GetById(Guid id)
     {
-        // Cria a query
-        var query = new GetBlogPostByIdQuery(id);
-        
+        // Cria a query pública (filtra por visibilidade)
+        var query = new GetPublicBlogPostByIdQuery(id);
+
         // Envia para o MediatR processar
         var post = await _mediator.Send(query);
-        
+
+        // Se não encontrou ou não é público, retorna 404
+        if (post == null)
+        {
+            return NotFound(new { message = $"Post com ID {id} não encontrado" });
+        }
+
+        // Retorna HTTP 200 OK com o post
+        return Ok(post);
+    }
+
+    // ====================================
+    // GET: api/blogposts/admin/{id}
+    // ====================================
+    /// <summary>
+    /// Busca um post específico por ID para o ADMIN (tela de edição)
+    /// Não aplica filtro de visibilidade: retorna Draft, Scheduled e Published
+    /// </summary>
+    /// <param name="id">ID do post</param>
+    /// <returns>BlogPostDto completo</returns>
+    /// <response code="200">Retorna o post encontrado</response>
+    /// <response code="401">Não autorizado</response>
+    /// <response code="404">Post não encontrado</response>
+    [HttpGet("admin/{id}")]
+    [ProducesResponseType(typeof(BlogPostDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<BlogPostDto>> GetByIdAdmin(Guid id)
+    {
+        // Cria a query sem filtro de visibilidade
+        var query = new GetBlogPostByIdQuery(id);
+
+        // Envia para o MediatR processar
+        var post = await _mediator.Send(query);
+
         // Se não encontrou, retorna 404
         if (post == null)
         {
             return NotFound(new { message = $"Post com ID {id} não encontrado" });
         }
-        
+
         // Retorna HTTP 200 OK com o post
         return Ok(post);
     }
@@ -155,10 +218,11 @@ public class BlogPostsController : ControllerBase
             var createdPost = await _mediator.Send(command);
             
             // Retorna HTTP 201 Created com o post criado
-            // O header Location apontará para GET /api/blogposts/{id}
+            // O header Location aponta para o endpoint admin (GetById é público e
+            // filtrado por visibilidade, daria 404 para um post recém-criado como Draft)
             return CreatedAtAction(
-                nameof(GetById), 
-                new { id = createdPost.Id }, 
+                nameof(GetByIdAdmin),
+                new { id = createdPost.Id },
                 createdPost
             );
         }

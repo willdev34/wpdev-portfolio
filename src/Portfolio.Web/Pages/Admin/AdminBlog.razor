@@ -10,6 +10,7 @@
 @inject IJSRuntime JS
 
 @using Portfolio.Web.DTOs.BlogPosts
+@using Portfolio.Web.Helpers
 
 <PageTitle>Blog - WPDev Admin</PageTitle>
 
@@ -40,6 +41,7 @@
                 <thead>
                     <tr>
                         <th>Título</th>
+                        <th>Status</th>
                         <th>Tags</th>
                         <th>Leitura</th>
                         <th>Publicado em</th>
@@ -47,10 +49,25 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{
+                        // Uma leitura da hora por renderização: Scheduled vencido aparece como Publicado
+                        var utcNow = DateTime.UtcNow;
+                    }
                     @foreach (var post in _posts)
                     {
+                        var effectiveStatus = BlogStatusHelper.GetEffectiveStatus(post.Status, post.ScheduledAt, utcNow);
+                        var isOverdueScheduled = BlogStatusHelper.IsOverdueScheduled(post.Status, post.ScheduledAt, utcNow);
                         <tr>
                             <td class="td-title">@post.Title</td>
+                            <td>
+                                <span class="status-badge status-badge--@effectiveStatus.ToLower()">@StatusLabel(effectiveStatus)</span>
+                                @if (effectiveStatus == BlogStatusHelper.Scheduled && post.ScheduledAt.HasValue)
+                                {
+                                    <span class="status-date">
+                                        @BrasiliaTimeHelper.FromUtc(post.ScheduledAt.Value).ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                }
+                            </td>
                             <td>
                                 @foreach (var tag in post.Tags.Take(2))
                                 {
@@ -58,7 +75,20 @@
                                 }
                             </td>
                             <td>@post.ReadTimeMinutes min</td>
-                            <td>@post.PublishedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (isOverdueScheduled)
+                                {
+                                    @BrasiliaTimeHelper.FromUtc(post.ScheduledAt!.Value).ToString("dd/MM/yyyy")
+                                }
+                                else if (effectiveStatus == BlogStatusHelper.Published && post.PublishedAt.HasValue)
+                                {
+                                    @BrasiliaTimeHelper.FromUtc(post.PublishedAt.Value).ToString("dd/MM/yyyy")
+                                }
+                                else
+                                {
+                                    <span class="td-empty">-</span>
+                                }
+                            </td>
                             <td class="td-actions">
                                 <a class="btn-edit" href="/admin/blog/edit/@post.Id">Editar</a>
                                 <button class="btn-delete" @onclick="() => ConfirmDelete(post.Id, post.Title)">Excluir</button>
@@ -86,7 +116,7 @@
 }
 
 @code {
-    private List<BlogPostCardDto> _posts = new();
+    private List<BlogPostAdminCardDto> _posts = new();
     private bool _isLoading = true;
     private bool _showConfirm = false;
     private Guid _deleteId;
@@ -120,4 +150,12 @@
         else
             Console.WriteLine($"[AdminBlog] Erro ao excluir: {error}");
     }
+
+    private static string StatusLabel(string status) => status switch
+    {
+        "Draft" => "Rascunho",
+        "Scheduled" => "Agendado",
+        "Published" => "Publicado",
+        _ => status
+    };
 }

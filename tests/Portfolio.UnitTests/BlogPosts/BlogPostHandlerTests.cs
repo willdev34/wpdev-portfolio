@@ -37,14 +37,15 @@ public class GetAllBlogPostsQueryHandlerTests
             new() { Id = Guid.NewGuid(), Title = "CQRS na prática" }
         };
 
-        var dtos = new List<BlogPostCardDto>
+        // Listagem do admin usa BlogPostAdminCardDto (inclui Status e ScheduledAt)
+        var dtos = new List<BlogPostAdminCardDto>
         {
             new() { Id = posts[0].Id, Title = "Clean Architecture em .NET" },
             new() { Id = posts[1].Id, Title = "CQRS na prática" }
         };
 
         _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(posts);
-        _mapperMock.Setup(m => m.Map<IEnumerable<BlogPostCardDto>>(posts)).Returns(dtos);
+        _mapperMock.Setup(m => m.Map<IEnumerable<BlogPostAdminCardDto>>(posts)).Returns(dtos);
 
         // Act
         var resultado = await _handler.Handle(new GetAllBlogPostsQuery(), CancellationToken.None);
@@ -61,8 +62,8 @@ public class GetAllBlogPostsQueryHandlerTests
         // Arrange
         _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<BlogPost>());
         _mapperMock
-            .Setup(m => m.Map<IEnumerable<BlogPostCardDto>>(It.IsAny<IEnumerable<BlogPost>>()))
-            .Returns(new List<BlogPostCardDto>());
+            .Setup(m => m.Map<IEnumerable<BlogPostAdminCardDto>>(It.IsAny<IEnumerable<BlogPost>>()))
+            .Returns(new List<BlogPostAdminCardDto>());
 
         // Act
         var resultado = await _handler.Handle(new GetAllBlogPostsQuery(), CancellationToken.None);
@@ -77,8 +78,8 @@ public class GetAllBlogPostsQueryHandlerTests
         // Arrange
         _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<BlogPost>());
         _mapperMock
-            .Setup(m => m.Map<IEnumerable<BlogPostCardDto>>(It.IsAny<IEnumerable<BlogPost>>()))
-            .Returns(new List<BlogPostCardDto>());
+            .Setup(m => m.Map<IEnumerable<BlogPostAdminCardDto>>(It.IsAny<IEnumerable<BlogPost>>()))
+            .Returns(new List<BlogPostAdminCardDto>());
 
         // Act
         await _handler.Handle(new GetAllBlogPostsQuery(), CancellationToken.None);

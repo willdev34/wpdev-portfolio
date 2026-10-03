@@ -17,4 +17,9 @@ public class UpdateBlogPostDto
     public bool IsFeatured { get; set; }
     public bool IsPublished { get; set; }
     public int ReadTimeMinutes { get; set; }
+
+    // 0=Draft, 1=Scheduled, 2=Published
+    // Se nulo, a API deriva de IsPublished
+    public int? Status { get; set; }
+    public DateTime? ScheduledAt { get; set; }
 }

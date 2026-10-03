@@ -16,8 +16,11 @@ public class BlogPostsEndpointTests : IntegrationTestBase
     public BlogPostsEndpointTests(CustomWebApplicationFactory factory) : base(factory) { }
 
     [Fact]
-    public async Task Get_AllBlogPosts_ReturnsOk()
+    public async Task Get_AllBlogPosts_WithToken_ReturnsOk()
     {
+        // Listagem completa (com rascunhos e agendados) é exclusiva do admin
+        await AuthenticateClientAsync();
+
         var response = await Client.GetAsync("/api/blogposts");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
