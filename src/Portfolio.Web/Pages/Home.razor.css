@@ -526,6 +526,55 @@
 }
 
 /* ================================
+   INTRODUÇÕES (TIMELINE E NOW)
+   ================================ */
+
+.intro-header {
+    margin-bottom: 1.5rem;
+}
+
+.intro-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-dark);
+    opacity: 0.75;
+    max-width: 620px;
+    margin: 0 0 2rem;
+    overflow-wrap: anywhere;
+}
+
+/* Fundo escuro: texto claro (contraste alto sobre #0D1C24) */
+.intro-text--light {
+    color: #F4F7F7;
+    opacity: 0.8;
+}
+
+/* O eyebrow --light padrão (#6C9EA3 a 80%) fica abaixo de 4.5:1 sobre #0D1C24; aqui usa a cor cheia (5.8:1) */
+.intro-header .section-eyebrow--light {
+    color: var(--color-primary);
+}
+
+.intro-actions .home-btn {
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* Botão fantasma para fundo escuro (o .home-btn--ghost padrão é escuro) */
+.home-btn--ghost-light {
+    background-color: transparent;
+    color: #F4F7F7;
+    border: 1.5px solid rgba(244, 247, 247, 0.4);
+}
+
+.home-btn--ghost-light:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* ================================
    RESPONSIVIDADE
    ================================ */
 
