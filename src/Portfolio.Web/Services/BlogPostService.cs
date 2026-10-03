@@ -18,7 +18,10 @@ public class BlogPostService
         _httpClient = httpClient;
     }
 
-    public async Task<List<BlogPostCardDto>> GetAllAsync()
+    // ====================================
+    // GET ALL (Admin - inclui Status e ScheduledAt)
+    // ====================================
+    public async Task<List<BlogPostAdminCardDto>> GetAllAsync()
     {
         try
         {
@@ -26,16 +29,16 @@ public class BlogPostService
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"[BlogPostService] GetAllAsync falhou. Status: {(int)response.StatusCode}");
-                return new List<BlogPostCardDto>();
+                return new List<BlogPostAdminCardDto>();
             }
             var json = await response.Content.ReadAsStringAsync();
-            var posts = JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.ListBlogPostCardDto);
-            return posts ?? new List<BlogPostCardDto>();
+            var posts = JsonSerializer.Deserialize(json, BlogPostJsonContext.Default.ListBlogPostAdminCardDto);
+            return posts ?? new List<BlogPostAdminCardDto>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[BlogPostService] GetAllAsync - Erro: {ex.Message}");
-            return new List<BlogPostCardDto>();
+            return new List<BlogPostAdminCardDto>();
         }
     }
 

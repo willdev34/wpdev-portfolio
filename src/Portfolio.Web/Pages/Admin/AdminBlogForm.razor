@@ -8,6 +8,7 @@
 @layout Portfolio.Web.Layout.AdminLayout
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @using Portfolio.Web.DTOs.BlogPosts
+@using Portfolio.Web.Helpers
 @inject BlogPostService BlogPostService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -73,14 +74,59 @@
                 </div>
 
                 <div class="field field--checkbox">
-                    <input type="checkbox" id="published" @bind="_form.IsPublished" />
-                    <label for="published">Publicado</label>
-                </div>
-
-                <div class="field field--checkbox">
                     <input type="checkbox" id="featured" @bind="_form.IsFeatured" />
                     <label for="featured">Post em destaque</label>
                 </div>
+            </div>
+
+            <div class="form-column">
+            <div class="form-section">
+                <h2 class="form-section__title">Publicação</h2>
+
+                @if (_isEdit && !string.IsNullOrEmpty(_originalStatus))
+                {
+                    <p class="publish-current">
+                        Status atual:
+                        <span class="status-badge status-badge--@_originalStatus.ToLower()">@StatusLabel(_originalStatus)</span>
+                    </p>
+                }
+
+                <div class="publish-options">
+                    <label class="publish-option @(_publishMode == PublishMode.Now ? "publish-option--active" : "")">
+                        <input type="radio"
+                               name="publish-mode"
+                               checked="@(_publishMode == PublishMode.Now)"
+                               @onchange="() => SetPublishMode(PublishMode.Now)" />
+                        <span>
+                            <strong>Publicar agora</strong>
+                            <small>O post fica visível em /blog assim que for salvo.</small>
+                        </span>
+                    </label>
+
+                    <label class="publish-option @(_publishMode == PublishMode.Schedule ? "publish-option--active" : "")">
+                        <input type="radio"
+                               name="publish-mode"
+                               checked="@(_publishMode == PublishMode.Schedule)"
+                               @onchange="() => SetPublishMode(PublishMode.Schedule)" />
+                        <span>
+                            <strong>Agendar</strong>
+                            <small>O post é publicado automaticamente na data escolhida.</small>
+                        </span>
+                    </label>
+                </div>
+
+                @if (_publishMode == PublishMode.Schedule)
+                {
+                    <div class="field">
+                        <label class="field__label" for="scheduled-at">Data e hora (horário de Brasília)</label>
+                        <input class="field__input"
+                               id="scheduled-at"
+                               type="datetime-local"
+                               min="@BrasiliaTimeHelper.Now.ToString("yyyy-MM-ddTHH:mm")"
+                               @bind="_scheduledLocal"
+                               @bind:format="yyyy-MM-ddTHH:mm" />
+                    </div>
+                }
             </div>
 
             <div class="form-section">
@@ -112,6 +158,7 @@
                     </div>
                 </div>
             </div>
+            </div>
 
         </div>
 
@@ -126,8 +173,14 @@
             }
             <div class="form-actions">
                 <a class="btn-cancel" href="/admin/blog">Cancelar</a>
-                <button class="btn-save" @onclick="HandleSubmit" disabled="@_isSaving">
-                    @(_isSaving ? "Salvando..." : "Salvar post")
+                @if (!_isPublishedPost)
+                {
+                    <button class="btn-draft" @onclick="SaveDraft" disabled="@_isSaving">
+                        @(_savingStatus == StatusDraft ? "Salvando..." : "Salvar Rascunho")
+                    </button>
+                }
+                <button class="btn-save" @onclick="SavePost" disabled="@_isSaving">
+                    @(_isSaving && _savingStatus != StatusDraft ? "Salvando..." : "Salvar Post")
                 </button>
             </div>
         </div>
@@ -147,6 +200,24 @@
 
     private CreateBlogPostDto _form = new();
 
+    // ====================================
+    // PUBLICAÇÃO (Status e agendamento)
+    // ====================================
+    // Valores do enum BlogPostStatus na API: 0=Draft, 1=Scheduled, 2=Published
+    private const int StatusDraft = 0;
+    private const int StatusScheduled = 1;
+    private const int StatusPublished = 2;
+
+    private enum PublishMode { Now, Schedule }
+
+    private PublishMode _publishMode = PublishMode.Now;
+    private DateTime? _scheduledLocal; // horário de Brasília digitado no input
+    private string _originalStatus = string.Empty; // "Draft", "Scheduled" ou "Published" (vem da API)
+    private int? _savingStatus;
+
+    // Post já publicado não mostra "Salvar Rascunho", para não despublicar sem querer
+    private bool _isPublishedPost => _isEdit && _originalStatus == "Published";
+
     protected override async Task OnInitializedAsync()
     {
         if (_isEdit)
@@ -162,14 +233,23 @@
             _form = new CreateBlogPostDto
             {
                 Title = post.Title,
-                Slug = post.Title.ToLower().Replace(" ", "-"),
+                Slug = post.Slug,
                 Excerpt = post.Excerpt,
                 Content = post.Content,
                 FeaturedImageUrl = post.FeaturedImageUrl,
                 Tags = new List<string>(post.Tags),
+                IsFeatured = post.IsFeatured,
                 IsPublished = post.IsPublished,
                 ReadTimeMinutes = post.ReadTimeMinutes
             };
+
+            _originalStatus = post.Status;
+
+            if (post.Status == "Scheduled" && post.ScheduledAt.HasValue)
+            {
+                _publishMode = PublishMode.Schedule;
+                _scheduledLocal = BrasiliaTimeHelper.FromUtc(post.ScheduledAt.Value);
+            }
         }
 
         _isLoading = false;
@@ -194,7 +274,44 @@
         }
     }
 
-    private async Task HandleSubmit()
+    private void SetPublishMode(PublishMode mode)
+    {
+        _publishMode = mode;
+        _errorMessage = string.Empty;
+    }
+
+    // ====================================
+    // SALVAR RASCUNHO - Status 0, não exige data
+    // ====================================
+    private Task SaveDraft() => HandleSubmit(StatusDraft, null);
+
+    // ====================================
+    // SALVAR POST - Status 2 (agora) ou Status 1 com ScheduledAt (agendar)
+    // ====================================
+    private async Task SavePost()
+    {
+        if (_publishMode == PublishMode.Now)
+        {
+            await HandleSubmit(StatusPublished, null);
+            return;
+        }
+
+        if (!_scheduledLocal.HasValue)
+        {
+            _errorMessage = "Para agendar, informe a data e a hora da publicação.";
+            return;
+        }
+
+        if (_scheduledLocal.Value <= BrasiliaTimeHelper.Now)
+        {
+            _errorMessage = "A data de agendamento precisa estar no futuro (horário de Brasília).";
+            return;
+        }
+
+        await HandleSubmit(StatusScheduled, BrasiliaTimeHelper.ToUtc(_scheduledLocal.Value));
+    }
+
+    private async Task HandleSubmit(int status, DateTime? scheduledAtUtc)
     {
         if (string.IsNullOrWhiteSpace(_form.Title) ||
             string.IsNullOrWhiteSpace(_form.Slug) ||
@@ -205,7 +322,12 @@
         }
 
         _isSaving = true;
+        _savingStatus = status;
         _errorMessage = string.Empty;
+
+        _form.Status = status;
+        _form.ScheduledAt = scheduledAtUtc;
+        _form.IsPublished = status == StatusPublished;
 
         if (_isEdit)
         {
@@ -220,7 +342,9 @@
                 Tags = _form.Tags,
                 IsPublished = _form.IsPublished,
                 IsFeatured = _form.IsFeatured,
-                ReadTimeMinutes = _form.ReadTimeMinutes
+                ReadTimeMinutes = _form.ReadTimeMinutes,
+                Status = _form.Status,
+                ScheduledAt = _form.ScheduledAt
             };
 
             var (success, error) = await BlogPostService.UpdateAsync(updateDto);
@@ -229,6 +353,7 @@
             {
                 _errorMessage = error ?? "Erro ao atualizar post.";
                 _isSaving = false;
+                _savingStatus = null;
                 return;
             }
         }
@@ -240,12 +365,19 @@
             {
                 _errorMessage = error ?? "Erro ao criar post.";
                 _isSaving = false;
+                _savingStatus = null;
                 return;
             }
         }
 
-        _successMessage = _isEdit ? "Post atualizado com sucesso." : "Post criado com sucesso.";
+        _successMessage = status switch
+        {
+            StatusDraft => "Rascunho salvo com sucesso.",
+            StatusScheduled => $"Post agendado para {_scheduledLocal:dd/MM/yyyy 'às' HH:mm} (horário de Brasília).",
+            _ => _isEdit ? "Post atualizado e publicado com sucesso." : "Post publicado com sucesso."
+        };
         _isSaving = false;
+        _savingStatus = null;
         await InvokeAsync(StateHasChanged);
         await Task.Delay(5000);
         await JS.InvokeVoidAsync("eval", "window.location.href='/admin/blog'");
@@ -272,4 +404,12 @@
     }
 
     private void RemoveTag(string tag) => _form.Tags.Remove(tag);
+
+    private static string StatusLabel(string status) => status switch
+    {
+        "Draft" => "Rascunho",
+        "Scheduled" => "Agendado",
+        "Published" => "Publicado",
+        _ => status
+    };
 }
