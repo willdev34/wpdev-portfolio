@@ -1,0 +1,42 @@
+@* ====================================
+   Título: BlogPostCard.razor
+   Descrição: Card de post do blog (data, tempo de leitura, tags), usado no /blog e na Home.
+              Sem elemento envolvente: o DOM é o mesmo do Card, para o grid do pai
+              (ex.: animação .blog-grid > *) continuar valendo.
+              A navegação fica com o pai (OnClick), que usa JS.InvokeVoidAsync("eval").
+   ==================================== *@
+
+@using Portfolio.Web.DTOs.BlogPosts
+
+<Card Title="@Post.Title"
+      Description="@Post.Excerpt"
+      ImageUrl="@Post.FeaturedImageUrl"
+      ImageAlt="@Post.Title"
+      OnClick="OnClick">
+    <HeaderContent>
+        <div class="blog-meta-info">
+            <time class="blog-date">
+                @Post.PublishedAt.ToString("dd MMM yyyy")
+            </time>
+            <span class="blog-reading">
+                @Post.ReadTimeMinutes min de leitura
+            </span>
+        </div>
+    </HeaderContent>
+    <FooterContent>
+        <div class="blog-tags">
+            @foreach (var tag in Post.Tags.Take(3))
+            {
+                <span class="tag-pill">#@tag</span>
+            }
+        </div>
+    </FooterContent>
+</Card>
+
+@code {
+    [Parameter, EditorRequired]
+    public BlogPostCardDto Post { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+}

@@ -507,8 +507,33 @@
 }
 
 /* ================================
+   ÚLTIMOS POSTS
+   ================================ */
+
+/* Segue a seção de projetos (mesmo fundo): sem padding no topo para não dobrar o espaço */
+.home-section--posts {
+    padding-top: 0;
+}
+
+.latest-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.latest-posts-grid > * {
+    min-width: 0;
+}
+
+/* ================================
    RESPONSIVIDADE
    ================================ */
+
+@media (max-width: 900px) {
+    .latest-posts-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
 @media (max-width: 1024px) {
     .skills-grid {
