@@ -122,9 +122,9 @@
                         <input class="field__input"
                                id="scheduled-at"
                                type="datetime-local"
-                               min="@BrasiliaTimeHelper.Now.ToString("yyyy-MM-ddTHH:mm")"
-                               @bind="_scheduledLocal"
-                               @bind:format="yyyy-MM-ddTHH:mm" />
+                               min="@BrasiliaTimeHelper.ToInputValue(BrasiliaTimeHelper.Now)"
+                               value="@_scheduledLocalText"
+                               @onchange="OnScheduledChanged" />
                     </div>
                 }
             </div>
@@ -211,7 +211,9 @@
     private enum PublishMode { Now, Schedule }
 
     private PublishMode _publishMode = PublishMode.Now;
-    private DateTime? _scheduledLocal; // horário de Brasília digitado no input
+    // Texto cru do input datetime-local (horário de Brasília). String em vez de DateTime?
+    // para o valor nunca ser descartado em silêncio pelo binder; a conversão é feita no SavePost
+    private string _scheduledLocalText = string.Empty;
     private string _originalStatus = string.Empty; // "Draft", "Scheduled" ou "Published" (vem da API)
     private int? _savingStatus;
 
@@ -249,7 +251,7 @@
             if (post.Status == "Scheduled" && post.ScheduledAt.HasValue)
             {
                 _publishMode = PublishMode.Schedule;
-                _scheduledLocal = BrasiliaTimeHelper.FromUtc(post.ScheduledAt.Value);
+                _scheduledLocalText = BrasiliaTimeHelper.ToInputValue(BrasiliaTimeHelper.FromUtc(post.ScheduledAt.Value));
             }
         }
 
@@ -275,6 +277,13 @@
         }
     }
 
+    // Ligação manual (value + onchange): o Razor não aceita @bind de string em input datetime-local,
+    // e aqui o texto cru sempre chega, sem conversão no binder
+    private void OnScheduledChanged(ChangeEventArgs e)
+    {
+        _scheduledLocalText = e.Value?.ToString() ?? string.Empty;
+    }
+
     private void SetPublishMode(PublishMode mode)
     {
         _publishMode = mode;
@@ -297,19 +306,26 @@
             return;
         }
 
-        if (!_scheduledLocal.HasValue)
+        if (string.IsNullOrWhiteSpace(_scheduledLocalText))
         {
             _errorMessage = "Para agendar, informe a data e a hora da publicação.";
             return;
         }
 
-        if (_scheduledLocal.Value <= BrasiliaTimeHelper.Now)
+        if (!BrasiliaTimeHelper.TryParseInput(_scheduledLocalText, out var scheduledLocal))
+        {
+            Console.WriteLine($"[AdminBlogForm] Valor de agendamento não reconhecido: '{_scheduledLocalText}'");
+            _errorMessage = "Data e hora inválidas. Use o seletor do campo para escolher a data e a hora.";
+            return;
+        }
+
+        if (scheduledLocal <= BrasiliaTimeHelper.Now)
         {
             _errorMessage = "A data de agendamento precisa estar no futuro (horário de Brasília).";
             return;
         }
 
-        await HandleSubmit(StatusScheduled, BrasiliaTimeHelper.ToUtc(_scheduledLocal.Value));
+        await HandleSubmit(StatusScheduled, BrasiliaTimeHelper.ToUtc(scheduledLocal));
     }
 
     private async Task HandleSubmit(int status, DateTime? scheduledAtUtc)
@@ -374,7 +390,7 @@
         _successMessage = status switch
         {
             StatusDraft => "Rascunho salvo com sucesso.",
-            StatusScheduled => $"Post agendado para {_scheduledLocal:dd/MM/yyyy 'às' HH:mm} (horário de Brasília).",
+            StatusScheduled => $"Post agendado para {BrasiliaTimeHelper.FromUtc(scheduledAtUtc!.Value):dd/MM/yyyy 'às' HH:mm} (horário de Brasília).",
             _ => _isEdit ? "Post atualizado e publicado com sucesso." : "Post publicado com sucesso."
         };
         _isSaving = false;
