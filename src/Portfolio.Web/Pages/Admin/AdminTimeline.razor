@@ -39,22 +39,41 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>Ordem</th>
                         <th>Título</th>
                         <th>Tipo</th>
                         <th>Data</th>
+                        <th>Habilidades</th>
                         <th>Atual</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var evt in _events.OrderBy(e => e.Order))
+                    @* A API já devolve os eventos em ordem cronológica: sem OrderBy no cliente *@
+                    @foreach (var evt in _events)
                     {
                         <tr>
-                            <td>@evt.Order</td>
                             <td class="td-title">@evt.Title</td>
                             <td><span class="tag">@evt.Type</span></td>
                             <td>@evt.Date.ToString("MM/yyyy")</td>
+                            <td>
+                                @if (evt.Skills.Count == 0)
+                                {
+                                    <span class="td-empty">-</span>
+                                }
+                                else
+                                {
+                                    <div class="skill-summary" title="@string.Join(", ", evt.Skills.Select(s => s.Name))">
+                                        @foreach (var skill in evt.Skills.Take(SummaryMax))
+                                        {
+                                            <span class="skill-chip">@skill.Name</span>
+                                        }
+                                        @if (evt.Skills.Count > SummaryMax)
+                                        {
+                                            <span class="skill-chip skill-chip--more">+@(evt.Skills.Count - SummaryMax)</span>
+                                        }
+                                    </div>
+                                }
+                            </td>
                             <td>@(evt.IsCurrent ? "Sim" : "-")</td>
                             <td class="td-actions">
                                 <a class="btn-edit" href="/admin/timeline/edit/@evt.Id">Editar</a>
@@ -83,6 +102,9 @@
 }
 
 @code {
+    // Quantas habilidades aparecem no resumo da listagem (o resto vira "+N")
+    private const int SummaryMax = 3;
+
     private List<TimelineEventDto> _events = new();
     private bool _isLoading = true;
     private bool _showConfirm = false;

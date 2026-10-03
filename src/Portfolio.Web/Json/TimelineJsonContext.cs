@@ -7,6 +7,10 @@ namespace Portfolio.Web.Json;
 [JsonSerializable(typeof(TimelineEventDto))]
 [JsonSerializable(typeof(CreateTimelineEventDto))]
 [JsonSerializable(typeof(UpdateTimelineEventDto))]
+[JsonSerializable(typeof(TimelineEventSkillDto))]
+[JsonSerializable(typeof(TimelineEventSkillInputDto))]
+[JsonSerializable(typeof(List<TimelineEventSkillDto>))]
+[JsonSerializable(typeof(List<TimelineEventSkillInputDto>))]
 [JsonSourceGenerationOptions(
     PropertyNameCaseInsensitive = true,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
