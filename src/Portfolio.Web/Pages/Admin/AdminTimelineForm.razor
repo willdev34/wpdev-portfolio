@@ -6,6 +6,7 @@
 @page "/admin/timeline/new"
 @page "/admin/timeline/edit/{Id:guid}"
 @layout Portfolio.Web.Layout.AdminLayout
+@using Portfolio.Web.Helpers
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @using Portfolio.Web.DTOs.Timeline
 @inject TimelineService TimelineService
@@ -52,20 +53,11 @@
                 <div class="field">
                     <label class="field__label">Tipo *</label>
                     <select class="field__input" @bind="_form.Type">
-                        <option value="0">Educação</option>
-                        <option value="1">Trabalho</option>
-                        <option value="2">Projeto</option>
-                        <option value="3">Conquista</option>
-                        <option value="4">Certificação</option>
+                        @foreach (var option in TimelineTypeHelper.Options)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
                     </select>
-                </div>
-
-                <div class="field">
-                    <label class="field__label">Ordem</label>
-                    <input class="field__input"
-                           type="number"
-                           @bind="_form.Order"
-                           placeholder="0" />
                 </div>
 
                 <div class="field field--checkbox">
@@ -119,6 +111,74 @@
                 </div>
             </div>
 
+            <div class="form-section form-section--wide">
+                <h2 class="form-section__title">
+                    Habilidades
+                    <span class="skills-counter @(_form.Skills.Count >= MaxSkills ? "skills-counter--full" : null)">
+                        @_form.Skills.Count/@MaxSkills
+                    </span>
+                </h2>
+
+                <div class="field">
+                    <label class="field__label">Adicionar habilidade</label>
+                    <div class="skill-input-row">
+                        <input class="field__input skill-input-row__name"
+                               @bind="_newSkillName"
+                               @bind:event="oninput"
+                               @onkeydown="HandleSkillKeyDown"
+                               list="skill-name-suggestions"
+                               maxlength="@MaxSkillNameLength"
+                               disabled="@(_form.Skills.Count >= MaxSkills)"
+                               placeholder="@(_form.Skills.Count >= MaxSkills ? "Limite de 5 habilidades atingido" : "Ex: C#, Comunicação...")" />
+                        <select class="field__input skill-input-row__category"
+                                @bind="_newSkillCategory"
+                                disabled="@(_form.Skills.Count >= MaxSkills)">
+                            @foreach (var option in SkillCategoryOptions)
+                            {
+                                <option value="@option.Value">@option.Label</option>
+                            }
+                        </select>
+                        <button class="btn-add-skill"
+                                type="button"
+                                @onclick="AddSkill"
+                                disabled="@(_form.Skills.Count >= MaxSkills)">+ Adicionar</button>
+                    </div>
+
+                    <datalist id="skill-name-suggestions">
+                        @foreach (var suggestion in AvailableSuggestions)
+                        {
+                            <option value="@suggestion"></option>
+                        }
+                    </datalist>
+
+                    @if (!string.IsNullOrEmpty(_skillError))
+                    {
+                        <span class="field__error">@_skillError</span>
+                    }
+                    else
+                    {
+                        <span class="field__hint">Até @MaxSkills habilidades por evento. Os nomes já usados em outros eventos aparecem como sugestão.</span>
+                    }
+                </div>
+
+                @if (_form.Skills.Count > 0)
+                {
+                    <ul class="skill-list">
+                        @foreach (var skill in _form.Skills)
+                        {
+                            <li class="skill-item skill-item--@skill.Category.ToLowerInvariant()">
+                                <span class="skill-item__name">@skill.Name</span>
+                                <span class="skill-item__category">@CategoryLabel(skill.Category)</span>
+                                <button type="button"
+                                        class="skill-item__remove"
+                                        aria-label="Remover @skill.Name"
+                                        @onclick="() => RemoveSkill(skill)">×</button>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
         </div>
 
         <div class="form-actions-wrapper">
@@ -152,8 +212,47 @@
 
     private CreateTimelineEventDto _form = new();
 
+    // ====================================
+    // HABILIDADES
+    // ====================================
+    private const int MaxSkills = 5;
+    private const int MaxSkillNameLength = 40;
+
+    private record SkillCategoryOption(string Value, string Label);
+
+    private static readonly SkillCategoryOption[] SkillCategoryOptions =
+    {
+        new("HardSkill", "Hard skill"),
+        new("SoftSkill", "Soft skill"),
+        new("Stack", "Stack")
+    };
+
+    private string _newSkillName = string.Empty;
+    private string _newSkillCategory = "HardSkill";
+    private string _skillError = string.Empty;
+
+    // Nomes usados em OUTROS eventos, cada um uma vez (ignorando maiúsculas)
+    private List<string> _suggestions = new();
+
+    // Sugestões que ainda não estão na lista deste evento
+    private IEnumerable<string> AvailableSuggestions =>
+        _suggestions.Where(n => !_form.Skills.Any(s => string.Equals(s.Name, n, StringComparison.OrdinalIgnoreCase)));
+
     protected override async Task OnInitializedAsync()
     {
+        // Sugestões: a lista de eventos já traz as habilidades de cada um.
+        // Falha aqui só deixa o datalist vazio
+        var allEvents = await TimelineService.GetAllAsync();
+        _suggestions = allEvents
+            .Where(e => e.Id != Id)
+            .SelectMany(e => e.Skills)
+            .Select(s => s.Name.Trim())
+            .Where(n => n.Length > 0)
+            .GroupBy(n => n, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.First())
+            .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
         if (_isEdit)
         {
             var evt = await TimelineService.GetByIdAsync(Id!.Value);
@@ -175,8 +274,11 @@
                 IconUrl = evt.IconUrl,
                 LinkUrl = evt.LinkUrl,
                 LinkText = evt.LinkText,
-                Order = evt.Order,
-                IsVisible = evt.IsVisible
+                IsVisible = evt.IsVisible,
+                // Carrega as habilidades do evento (já vêm na ordem certa da API)
+                Skills = evt.Skills
+                    .Select(s => new TimelineEventSkillInputDto { Name = s.Name, Category = s.Category })
+                    .ToList()
             };
         }
 
@@ -215,8 +317,9 @@
                 IconUrl = _form.IconUrl,
                 LinkUrl = _form.LinkUrl,
                 LinkText = _form.LinkText,
-                Order = _form.Order,
-                IsVisible = _form.IsVisible
+                IsVisible = _form.IsVisible,
+                // Sempre envia a lista (nunca nula): o que está na tela é o que fica salvo
+                Skills = CopySkills()
             };
 
             var (success, error) = await TimelineService.UpdateAsync(updateDto);
@@ -241,7 +344,7 @@
                 IconUrl = _form.IconUrl,
                 LinkUrl = _form.LinkUrl,
                 LinkText = _form.LinkText,
-                Order = _form.Order
+                Skills = CopySkills()
             };
 
             var (success, error) = await TimelineService.CreateAsync(createDto);
@@ -261,6 +364,59 @@
         await JS.InvokeVoidAsync("eval", "window.location.href='/admin/timeline'");
     }
 
+    private List<TimelineEventSkillInputDto> CopySkills() =>
+        _form.Skills
+            .Select(s => new TimelineEventSkillInputDto { Name = s.Name.Trim(), Category = s.Category })
+            .ToList();
+
+    private void AddSkill()
+    {
+        _skillError = string.Empty;
+
+        if (_form.Skills.Count >= MaxSkills)
+        {
+            _skillError = $"Limite de {MaxSkills} habilidades por evento.";
+            return;
+        }
+
+        var name = _newSkillName.Trim();
+
+        if (name.Length == 0)
+        {
+            _skillError = "Informe o nome da habilidade.";
+            return;
+        }
+
+        if (name.Length > MaxSkillNameLength)
+        {
+            _skillError = $"O nome deve ter no máximo {MaxSkillNameLength} caracteres.";
+            return;
+        }
+
+        if (_form.Skills.Any(s => string.Equals(s.Name.Trim(), name, StringComparison.OrdinalIgnoreCase)))
+        {
+            _skillError = "Essa habilidade já foi adicionada neste evento.";
+            return;
+        }
+
+        _form.Skills.Add(new TimelineEventSkillInputDto { Name = name, Category = _newSkillCategory });
+        _newSkillName = string.Empty;
+    }
+
+    private void HandleSkillKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddSkill();
+    }
+
+    private void RemoveSkill(TimelineEventSkillInputDto skill)
+    {
+        _form.Skills.Remove(skill);
+        _skillError = string.Empty;
+    }
+
+    private static string CategoryLabel(string category) =>
+        SkillCategoryOptions.FirstOrDefault(o => o.Value == category)?.Label ?? category;
+
     private static int ParseType(string type) => type switch
     {
         "Education" => 0,
@@ -268,6 +424,7 @@
         "Project"   => 2,
         "Achievement" => 3,
         "Certification" => 4,
+        "Other"     => 5,
         _ => int.TryParse(type, out var n) ? n : 1
     };
 }

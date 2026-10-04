@@ -43,7 +43,12 @@ public class TimelineEventDto
     // ORDENAÇÃO E VISIBILIDADE
     // ==========================================
     public int Order { get; set; }
-    public bool IsVisible { get; set; }
+    public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// Habilidades do evento, na ordem do campo Order
+    /// </summary>
+    public List<TimelineEventSkillDto> Skills { get; set; } = new();
     
     // ==========================================
     // AUDITORIA

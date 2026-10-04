@@ -9,9 +9,13 @@ public class UpdateTimelineEventDto
     public DateTime? EndDate { get; set; }
     public bool IsCurrent { get; set; }
     public int Type { get; set; }
-    public string IconUrl { get; set; } = string.Empty;
-    public string LinkUrl { get; set; } = string.Empty;
-    public string LinkText { get; set; } = string.Empty;
+    public string? IconUrl { get; set; }
+    public string? LinkUrl { get; set; }
+    public string? LinkText { get; set; }
     public int Order { get; set; }
     public bool IsVisible { get; set; } = true;
+
+    // Até 5 habilidades. Nulo (omitido no JSON) mantém as atuais; lista vazia limpa;
+    // lista com itens substitui por completo (a posição na lista define a ordem)
+    public List<TimelineEventSkillInputDto>? Skills { get; set; }
 }

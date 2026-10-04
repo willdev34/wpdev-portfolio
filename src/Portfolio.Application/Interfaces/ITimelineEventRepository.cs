@@ -70,6 +70,12 @@ public interface ITimelineEventRepository
     /// </summary>
     /// <param name="timelineEvent">Evento com dados atualizados</param>
     Task UpdateAsync(TimelineEvent timelineEvent);
+
+    /// <summary>
+    /// Substitui por completo as habilidades do evento: remove as atuais e insere as novas.
+    /// Não salva: a persistência acontece no SaveChangesAsync, junto com o evento
+    /// </summary>
+    Task ReplaceSkillsAsync(TimelineEvent timelineEvent, IEnumerable<TimelineEventSkill> skills);
     
     /// <summary>
     /// Deleta um evento (soft delete - apenas marca como invisível)

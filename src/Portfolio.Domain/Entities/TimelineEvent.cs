@@ -12,8 +12,13 @@ public class TimelineEvent
     public string? IconUrl { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
+    // Em desuso: a ordem da timeline agora é automática (data inicial, data final, CreatedAt).
+    // A coluna e o índice continuam no banco; nenhuma consulta usa este campo.
     public int Order { get; set; }
     public bool IsVisible { get; set; } = true;
+
+    // Habilidades do evento (até 5), na ordem de TimelineEventSkill.Order
+    public ICollection<TimelineEventSkill> Skills { get; set; } = new List<TimelineEventSkill>();
 
     // Auditoria
     public DateTime CreatedAt { get; set; }

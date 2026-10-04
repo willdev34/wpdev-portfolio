@@ -156,3 +156,114 @@
 @media (max-width: 900px) {
     .form-grid { grid-template-columns: 1fr; }
 }
+
+
+/* Habilidades do evento */
+.form-section--wide { grid-column: 1 / -1; }
+
+.form-section__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.skills-counter {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #6C9EA3;
+    background: rgba(108,158,163,0.12);
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.skills-counter--full {
+    background: #0D1C24;
+    color: #F4F7F7;
+}
+
+.skill-input-row { display: flex; gap: 8px; }
+.skill-input-row__name { flex: 1; min-width: 0; }
+.skill-input-row__category { width: 150px; flex-shrink: 0; }
+
+.skill-input-row .field__input:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-add-skill {
+    background: #6C9EA3;
+    color: #0D1C24;
+    border: none;
+    border-radius: 6px;
+    padding: 0 18px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.btn-add-skill:hover:not(:disabled) { opacity: 0.85; }
+.btn-add-skill:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.field__error {
+    font-size: 0.78rem;
+    color: #e05555;
+    margin-top: 2px;
+}
+
+.skill-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 6px 5px 12px;
+    border-radius: 20px;
+    background: rgba(108,158,163,0.12);
+    color: #0D1C24;
+    font-size: 0.85rem;
+    max-width: 100%;
+}
+
+.skill-item__name { font-weight: 600; overflow-wrap: anywhere; }
+
+.skill-item__category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #4a8a8f;
+}
+
+.skill-item--softskill { background: rgba(143,181,186,0.22); }
+.skill-item--stack { background: rgba(13,28,36,0.08); }
+
+.skill-item__remove {
+    background: none;
+    border: none;
+    color: #0D1C24;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    opacity: 0.6;
+    transition: opacity 0.15s, background 0.15s;
+}
+
+.skill-item__remove:hover { opacity: 1; background: rgba(224,85,85,0.15); color: #e05555; }
+
+@media (max-width: 600px) {
+    .skill-input-row { flex-direction: column; }
+    .skill-input-row__category { width: 100%; }
+    .btn-add-skill { padding: 11px 18px; }
+}

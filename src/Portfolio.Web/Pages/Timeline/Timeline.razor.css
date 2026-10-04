@@ -178,24 +178,13 @@
     display: inline-block;
     padding: 2px 10px;
     border-radius: 12px;
+    border: 1px solid #6C9EA3;
     font-size: 0.75rem;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
-}
-
-.type-work {
+    /* Texto escuro: #6C9EA3 sobre fundo claro dá cerca de 2,9:1, abaixo dos 4,5:1 do AA */
     background: rgba(108, 158, 163, 0.15);
-    color: #6C9EA3;
-}
-
-.type-education {
-    background: rgba(13, 28, 36, 0.08);
     color: #0D1C24;
-}
-
-.type-project {
-    background: rgba(108, 158, 163, 0.1);
-    color: #6C9EA3;
 }
 
 .card-link {
