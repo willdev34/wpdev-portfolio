@@ -6,6 +6,7 @@
 @page "/admin/timeline/new"
 @page "/admin/timeline/edit/{Id:guid}"
 @layout Portfolio.Web.Layout.AdminLayout
+@using Portfolio.Web.Helpers
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @using Portfolio.Web.DTOs.Timeline
 @inject TimelineService TimelineService
@@ -52,11 +53,10 @@
                 <div class="field">
                     <label class="field__label">Tipo *</label>
                     <select class="field__input" @bind="_form.Type">
-                        <option value="0">Educação</option>
-                        <option value="1">Trabalho</option>
-                        <option value="2">Projeto</option>
-                        <option value="3">Conquista</option>
-                        <option value="4">Certificação</option>
+                        @foreach (var option in TimelineTypeHelper.Options)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
                     </select>
                 </div>
 
@@ -424,6 +424,7 @@
         "Project"   => 2,
         "Achievement" => 3,
         "Certification" => 4,
+        "Other"     => 5,
         _ => int.TryParse(type, out var n) ? n : 1
     };
 }

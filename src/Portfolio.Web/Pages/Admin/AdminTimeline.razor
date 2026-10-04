@@ -5,6 +5,7 @@
 
 @page "/admin/timeline"
 @layout Portfolio.Web.Layout.AdminLayout
+@using Portfolio.Web.Helpers
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject TimelineService TimelineService
 @inject IJSRuntime JS
@@ -53,7 +54,7 @@
                     {
                         <tr>
                             <td class="td-title">@evt.Title</td>
-                            <td><span class="tag">@evt.Type</span></td>
+                            <td><span class="type-badge">@TimelineTypeHelper.Label(evt.Type)</span></td>
                             <td>@evt.Date.ToString("MM/yyyy")</td>
                             <td>
                                 @if (evt.Skills.Count == 0)
