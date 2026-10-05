@@ -3,6 +3,7 @@
 @using Portfolio.Web.DTOs.Timeline
 @using Portfolio.Web.Helpers
 @inject TimelineService TimelineService
+@implements IAsyncDisposable
 @inject IJSRuntime JS
 
 <SeoHead Title="Timeline - WPDev"
@@ -149,9 +150,36 @@
         {
             await JS.InvokeVoidAsync("setupScrollReveal");
         }
+
+        // Só depois de renderizar bolhas novas; o setup é idempotente, mas não precisa rodar a cada render
+        if (needsNetworkSetup)
+        {
+            needsNetworkSetup = false;
+            try
+            {
+                await JS.InvokeVoidAsync("setupSkillNetwork");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao iniciar a rede de habilidades: {ex.Message}");
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("disposeSkillNetwork");
+        }
+        catch (Exception)
+        {
+            // Navegador ou circuito já encerrado: não há loop a limpar
+        }
     }
     private List<TimelineEventDto> events = new();
     private bool isLoading = true;
+    private bool needsNetworkSetup;
 
     // Categoria da API (Stack, HardSkill, SoftSkill) em chave de classe CSS; desconhecida cai em hard
     private static string CategoryKey(string category) => category switch
@@ -185,6 +213,7 @@
         finally
         {
             isLoading = false;
+            needsNetworkSetup = events.Any(e => e.Skills.Count > 0);
             StateHasChanged();
         }
     }

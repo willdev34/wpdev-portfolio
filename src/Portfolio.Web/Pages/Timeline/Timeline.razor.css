@@ -314,6 +314,15 @@
     color: #0D1C24;
 }
 
+/* Hover numa bolha: destaca as de mesmo nome nos eventos visíveis (classe aplicada pelo skillNetwork.js) */
+.skill-bubble--match {
+    box-shadow: 0 0 0 3px rgba(108, 158, 163, 0.45);
+}
+
+.skill-bubble--soft.skill-bubble--match {
+    background: rgba(108, 158, 163, 0.18);
+}
+
 /* Desktop: linha central, cards alternando de lado e rede no lado oposto */
 @media (min-width: 768px) {
     .timeline-section {
@@ -377,7 +386,8 @@
         max-width: 150px;
         width: max-content;
         text-align: center;
-        transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px)));
+        transform: translate(-50%, -50%);
+        transition: box-shadow 0.2s ease, background-color 0.2s ease;
     }
 }
 
