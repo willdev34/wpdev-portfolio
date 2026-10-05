@@ -34,6 +34,7 @@
     <Compile Include="..\..\src\Portfolio.Web\DTOs\BlogPosts\BlogPostDto.cs" Link="Linked\BlogPostDto.cs" />
     <Compile Include="..\..\src\Portfolio.Web\Helpers\BlogStatusHelper.cs" Link="Linked\BlogStatusHelper.cs" />
     <Compile Include="..\..\src\Portfolio.Web\Helpers\TimelineTypeHelper.cs" Link="Linked\TimelineTypeHelper.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\Helpers\SkillNetworkLayout.cs" Link="Linked\SkillNetworkLayout.cs" />
     <Compile Include="..\..\src\Portfolio.Web\DTOs\Timeline\TimelineEventDto.cs" Link="Linked\TimelineEventDto.cs" />
   </ItemGroup>
   <ItemGroup>
