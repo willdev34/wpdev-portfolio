@@ -12,7 +12,7 @@ public enum SkillNetworkSide
 /// <summary>
 /// Posição de uma bolha em relação ao ponto do evento. O ângulo é em graus, com 0 apontando para a
 /// direita e 90 para baixo (eixo Y da tela). X e Y são o mesmo ponto em pixels, já arredondados.
-/// Fase (radianos) e amplitude horizontal (pixels) alimentam a oscilação feita pelo script da rede.
+/// Fase (radianos) e amplitude (pixels) alimentam o movimento feito pelo script da rede.
 /// </summary>
 public readonly record struct SkillBubblePosition(
     double Angle,
@@ -28,13 +28,13 @@ public readonly record struct SkillBubblePosition(
 ///
 /// As bolhas ocupam slots verticais de altura fixa, centrados no ponto do evento, e formam um arco
 /// (as pontas ficam mais perto da linha central). O espaçamento é por altura, não por ângulo, e já
-/// reserva uma bolha de duas linhas mais a oscilação vertical. Como o card do evento vizinho fica do
-/// mesmo lado da rede, a altura mínima do item (<see cref="RequiredHeight"/>) mantém toda a rede,
-/// em repouso e em movimento, dentro do próprio item.
+/// reserva uma bolha de duas linhas. Como o card do evento vizinho fica do mesmo lado da rede, a
+/// altura mínima do item (<see cref="RequiredHeight"/>) e <see cref="VerticalMargin"/> definem a zona
+/// segura vertical, que o script da rede respeita também em movimento.
 /// </summary>
 public static class SkillNetworkLayout
 {
-    /// <summary>Altura reservada por bolha: 44 px de bolha com duas linhas, 14 px de oscilação dos vizinhos e folga.</summary>
+    /// <summary>Altura reservada por bolha: 44 px de bolha com duas linhas e folga entre vizinhas.</summary>
     public const double SlotHeight = 62;
 
     /// <summary>Margem livre em cima e embaixo da rede, dentro do item, para a data e o card do evento vizinho.</summary>
@@ -43,9 +43,9 @@ public static class SkillNetworkLayout
     /// <summary>Menor distância horizontal do centro de uma bolha até a linha central.</summary>
     public const double MinX = 100;
 
-    /// <summary>Amplitude horizontal da oscilação, em pixels. A vertical é metade, para caber no slot.</summary>
-    public const double MinAmplitude = 8;
-    public const double MaxAmplitude = 14;
+    /// <summary>Raio, em pixels, dos sorteios de destino da bolha em movimento. O script limita à zona segura.</summary>
+    public const double MinAmplitude = 40;
+    public const double MaxAmplitude = 70;
 
     private const double BaseDistance = 190;
 
@@ -100,7 +100,7 @@ public static class SkillNetworkLayout
 
             // Razão áurea espalha as fases sem Random; o índice do evento desloca cada evento
             var phase = Math.Round(((i * 0.618034 + eventIndex * 0.37) % 1.0) * 2 * Math.PI, 3);
-            var amplitude = MinAmplitude + (i * 5 + eventIndex * 3) % (MaxAmplitude - MinAmplitude + 1);
+            var amplitude = MinAmplitude + (i * 11 + eventIndex * 7) % (MaxAmplitude - MinAmplitude + 1);
 
             result[i] = new SkillBubblePosition(angle, distance, signedX, y, phase, amplitude);
         }
