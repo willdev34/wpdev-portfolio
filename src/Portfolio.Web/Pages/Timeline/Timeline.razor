@@ -43,56 +43,94 @@
         }
         else
         {
+            <ul class="skill-legend" aria-label="Legenda das habilidades">
+                <li><span class="legend-swatch legend-stack"></span>Stack</li>
+                <li><span class="legend-swatch legend-hard"></span>Hard skill</li>
+                <li><span class="legend-swatch legend-soft"></span>Soft skill</li>
+            </ul>
+
             <div class="timeline-container">
-                @foreach (var evt in events.OrderBy(e => e.Date))
+                @for (int index = 0; index < events.Count; index++)
                 {
-                    <div class="timeline-item">
+                    var evt = events[index];
+                    var cardSide = SkillNetworkLayout.CardSide(index);
+                    var networkSide = SkillNetworkLayout.NetworkSide(index);
+                    var skills = evt.Skills.OrderBy(s => s.Order).ToList();
+                    var positions = SkillNetworkLayout.Compute(index, networkSide, skills.Count);
+
+                    <div class="timeline-item @(cardSide == SkillNetworkSide.Right ? "timeline-item--right" : "timeline-item--left")"
+                         style="--net-min-height: @(Num(SkillNetworkLayout.RequiredHeight(skills.Count)))px;">
 
                         <!-- Marker -->
                         <div class="timeline-marker">
                             <div class="marker-dot @(evt.Type == "Work" ? "marker-current" : "")"></div>
                         </div>
 
-                        <!-- Date -->
-                        <div class="timeline-date">
-                            <span>@evt.Date.ToString("MMM yyyy")</span>
-                            @if (evt.IsCurrent)
-                            {
-                                <span class="date-separator">→</span>
-                                <span class="date-current">Atual</span>
-                            }
-                            else if (evt.EndDate.HasValue)
-                            {
-                                <span class="date-separator">→</span>
-                                <span>@evt.EndDate.Value.ToString("MMM yyyy")</span>
-                            }
-                            <span class="type-badge">@TimelineTypeHelper.Label(evt.Type)</span>
+                        <div class="timeline-body">
+
+                            <!-- Date -->
+                            <div class="timeline-date">
+                                <span>@evt.Date.ToString("MMM yyyy")</span>
+                                @if (evt.IsCurrent)
+                                {
+                                    <span class="date-separator">→</span>
+                                    <span class="date-current">Atual</span>
+                                }
+                                else if (evt.EndDate.HasValue)
+                                {
+                                    <span class="date-separator">→</span>
+                                    <span>@evt.EndDate.Value.ToString("MMM yyyy")</span>
+                                }
+                                <span class="type-badge">@TimelineTypeHelper.Label(evt.Type)</span>
+                            </div>
+
+                            <!-- Card -->
+                            <div class="timeline-card">
+                                @if (!string.IsNullOrEmpty(evt.IconUrl))
+                                {
+                                    <div class="card-icon">
+                                        <img src="@CloudinaryUrlHelper.Optimize(evt.IconUrl, CloudinaryUrlHelper.IconWidth)"
+                                             alt="@evt.Title"
+                                             loading="lazy"
+                                             decoding="async"
+                                             width="80"
+                                             height="80" />
+                                    </div>
+                                }
+                                <div class="card-content">
+                                    <h3 class="card-title">@evt.Title</h3>
+                                    <p class="card-description">@evt.Description</p>
+                                    @if (!string.IsNullOrEmpty(evt.LinkUrl))
+                                    {
+                                        <a href="@evt.LinkUrl" target="_blank" class="card-link">
+                                            @(string.IsNullOrEmpty(evt.LinkText) ? "Ver mais" : evt.LinkText) →
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+
                         </div>
 
-                        <!-- Card -->
-                        <div class="timeline-card">
-                            @if (!string.IsNullOrEmpty(evt.IconUrl))
-                            {
-                                <div class="card-icon">
-                                    <img src="@CloudinaryUrlHelper.Optimize(evt.IconUrl, CloudinaryUrlHelper.IconWidth)" 
-                                         alt="@evt.Title" 
-                                         loading="lazy" 
-                                         decoding="async"
-                                         width="80"
-                                         height="80" />
-                                </div>
-                            }
-                            <div class="card-content">
-                                <h3 class="card-title">@evt.Title</h3>
-                                <p class="card-description">@evt.Description</p>
-                                @if (!string.IsNullOrEmpty(evt.LinkUrl))
+                        <!-- Rede de habilidades: bolhas ao redor do ponto no desktop, chips embaixo do card no mobile -->
+                        @if (skills.Count > 0)
+                        {
+                            <div class="skill-network" data-event-index="@index" data-side="@(networkSide == SkillNetworkSide.Left ? "left" : "right")">
+                                @for (int i = 0; i < skills.Count; i++)
                                 {
-                                    <a href="@evt.LinkUrl" target="_blank" class="card-link">
-                                        @(string.IsNullOrEmpty(evt.LinkText) ? "Ver mais" : evt.LinkText) →
-                                    </a>
+                                    var skill = skills[i];
+                                    var pos = positions[i];
+                                    <span class="skill-bubble skill-bubble--@CategoryKey(skill.Category)"
+                                          title="@skill.Name"
+                                          data-name="@skill.Name"
+                                          data-category="@CategoryKey(skill.Category)"
+                                          data-angle="@Num(pos.Angle)"
+                                          data-distance="@Num(pos.Distance)"
+                                          data-phase="@Num(pos.Phase)"
+                                          data-amplitude="@Num(pos.Amplitude)"
+                                          style="--x: @(Num(pos.X))px; --y: @(Num(pos.Y))px;">@skill.Name</span>
                                 }
                             </div>
-                        </div>
+                        }
 
                     </div>
                 }
@@ -114,6 +152,17 @@
     }
     private List<TimelineEventDto> events = new();
     private bool isLoading = true;
+
+    // Categoria da API (Stack, HardSkill, SoftSkill) em chave de classe CSS; desconhecida cai em hard
+    private static string CategoryKey(string category) => category switch
+    {
+        "Stack" => "stack",
+        "SoftSkill" => "soft",
+        _ => "hard"
+    };
+
+    // Número com ponto decimal, independente da cultura do navegador
+    private static string Num(double value) => value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     protected override async Task OnInitializedAsync()
     {
