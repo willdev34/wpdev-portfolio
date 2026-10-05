@@ -23,4 +23,10 @@ public static class SeoUrlHelper
 
         return path.StartsWith('/') ? $"{BaseUrl}{path}" : $"{BaseUrl}/{path}";
     }
+
+    /// <summary>
+    /// A imagem da página (projeto ou post) tem prioridade; sem ela, usa a imagem padrão de compartilhamento.
+    /// </summary>
+    public static string ResolveImageUrl(string? imageUrl, string fallbackUrl) =>
+        string.IsNullOrWhiteSpace(imageUrl) ? fallbackUrl : imageUrl;
 }

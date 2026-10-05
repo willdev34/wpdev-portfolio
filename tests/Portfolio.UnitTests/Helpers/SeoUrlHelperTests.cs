@@ -29,7 +29,30 @@ public class SeoUrlHelperTests
     }
 
     [Theory]
-    [InlineData("/projects", "https://www.wpdevbr.com/projects")]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void ResolveImageUrl_DeveUsarOFallback_QuandoNaoHaImagemDaPagina(string? imageUrl)
+    {
+        // Act
+        var url = SeoUrlHelper.ResolveImageUrl(imageUrl, "https://exemplo.com/padrao.png");
+
+        // Assert
+        url.Should().Be("https://exemplo.com/padrao.png");
+    }
+
+    [Fact]
+    public void ResolveImageUrl_DevePriorizarAImagemDaPagina_QuandoInformada()
+    {
+        // Act
+        var url = SeoUrlHelper.ResolveImageUrl("https://exemplo.com/projeto.png", "https://exemplo.com/padrao.png");
+
+        // Assert
+        url.Should().Be("https://exemplo.com/projeto.png");
+    }
+
+    [Theory]
+    [InlineData("/projects","https://www.wpdevbr.com/projects")]
     [InlineData("projects", "https://www.wpdevbr.com/projects")]
     [InlineData("/blog/meu-post", "https://www.wpdevbr.com/blog/meu-post")]
     public void BuildFullUrl_DeveJuntarDominioECaminho_ComOuSemBarraInicial(string path, string esperado)

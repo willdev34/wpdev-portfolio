@@ -16,19 +16,13 @@
     <meta property="og:description" content="@Description" />
     <meta property="og:type" content="@OgType" />
     <meta property="og:url" content="@FullUrl" />
-    @if (!string.IsNullOrEmpty(ImageUrl))
-    {
-        <meta property="og:image" content="@ImageUrl" />
-    }
+    <meta property="og:image" content="@ResolvedImageUrl" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="@(string.IsNullOrEmpty(ImageUrl) ? "summary" : "summary_large_image")" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="@Title" />
     <meta name="twitter:description" content="@Description" />
-    @if (!string.IsNullOrEmpty(ImageUrl))
-    {
-        <meta name="twitter:image" content="@ImageUrl" />
-    }
+    <meta name="twitter:image" content="@ResolvedImageUrl" />
 
     <!-- Canonical -->
     <link rel="canonical" href="@FullUrl" />
@@ -42,7 +36,7 @@
     [Parameter] public string Description { get; set; } =
         "Portfólio de William, desenvolvedor Full Stack especializado em .NET, Blazor e arquitetura de software.";
 
-    /// <summary>URL da imagem de capa para compartilhamento (OG image). Opcional.</summary>
+    /// <summary>URL da imagem de capa para compartilhamento (OG image). Opcional: sem ela, usa DefaultImageUrl.</summary>
     [Parameter] public string? ImageUrl { get; set; }
 
     /// <summary>Tipo OG: website, article, profile. Default: website.</summary>
@@ -51,5 +45,10 @@
     /// <summary>Caminho relativo da página atual (ex: "/projects/meu-projeto"). Usado para montar a URL canônica.</summary>
     [Parameter] public string Path { get; set; } = "";
 
+    /// <summary>Imagem padrão de compartilhamento (1200x630), usada quando a página não informa ImageUrl.</summary>
+    private const string DefaultImageUrl = "https://res.cloudinary.com/do0uq7w4n/image/upload/v1791227386/og-image_vhhiy6.png";
+
     private string FullUrl => SeoUrlHelper.BuildFullUrl(Path);
+
+    private string ResolvedImageUrl => SeoUrlHelper.ResolveImageUrl(ImageUrl, DefaultImageUrl);
 }
