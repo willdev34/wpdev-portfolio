@@ -4,6 +4,8 @@
    e OpenGraph tags dinamicamente em cada página
    ==================================== *@
 
+@using Portfolio.Web.Helpers
+
 <PageTitle>@Title</PageTitle>
 
 <HeadContent>
@@ -49,7 +51,5 @@
     /// <summary>Caminho relativo da página atual (ex: "/projects/meu-projeto"). Usado para montar a URL canônica.</summary>
     [Parameter] public string Path { get; set; } = "";
 
-    private const string BaseUrl = "https://wpdev-portfolio.onrender.com";
-
-    private string FullUrl => $"{BaseUrl}{Path}";
+    private string FullUrl => SeoUrlHelper.BuildFullUrl(Path);
 }
