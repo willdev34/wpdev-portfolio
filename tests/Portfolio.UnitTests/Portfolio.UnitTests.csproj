@@ -37,6 +37,7 @@
     <Compile Include="..\..\src\Portfolio.Web\Helpers\SkillNetworkLayout.cs" Link="Linked\SkillNetworkLayout.cs" />
     <Compile Include="..\..\src\Portfolio.Web\Helpers\SeoUrlHelper.cs" Link="Linked\SeoUrlHelper.cs" />
     <Compile Include="..\..\src\Portfolio.Web\Helpers\TechnologyFilterHelper.cs" Link="Linked\TechnologyFilterHelper.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\Helpers\FeaturedSelector.cs" Link="Linked\FeaturedSelector.cs" />
     <Compile Include="..\..\tools\DatabaseSetup\TechnologyCleanupPlanner.cs" Link="Linked\TechnologyCleanupPlanner.cs" />
     <Compile Include="..\..\src\Portfolio.Web\DTOs\Timeline\TimelineEventDto.cs" Link="Linked\TimelineEventDto.cs" />
   </ItemGroup>
