@@ -114,16 +114,16 @@
                 </div>
             </div>
         }
-        else if (projects.Any())
+        else if (featuredPrimary is not null)
         {
             <div class="featured-grid">
 
                 <!-- Projeto principal: maior -->
-                <a href="/projects/@projects[0].Id" class="featured-item featured-item--large">
+                <a href="/projects/@featuredPrimary.Id" class="featured-item featured-item--large">
                     <div class="featured-thumb">
-                        @if (!string.IsNullOrEmpty(projects[0].ImageUrl))
+                        @if (!string.IsNullOrEmpty(featuredPrimary.ImageUrl))
                         {
-                            <img src="@CloudinaryUrlHelper.Optimize(projects[0].ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@projects[0].Title" loading="eager" decoding="async" />
+                            <img src="@CloudinaryUrlHelper.Optimize(featuredPrimary.ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@featuredPrimary.Title" loading="eager" decoding="async" />
                         }
                         else
                         {
@@ -132,19 +132,19 @@
                     </div>
                     <div class="featured-info">
                         <div class="featured-tech-row">
-                            @foreach (var tech in projects[0].Technologies.Take(3))
+                            @foreach (var tech in featuredPrimary.Technologies.Take(3))
                             {
                                 <a href="/projects?tech=@Uri.EscapeDataString(tech)" class="featured-tech" @onclick:stopPropagation="true">@tech</a>
                             }
                         </div>
-                        <h3 class="featured-title">@projects[0].Title</h3>
-                        <p class="featured-desc">@projects[0].ShortDescription</p>
+                        <h3 class="featured-title">@featuredPrimary.Title</h3>
+                        <p class="featured-desc">@featuredPrimary.ShortDescription</p>
                     </div>
                 </a>
 
                 <!-- Projetos secundários: stack vertical -->
                 <div class="featured-stack">
-                    @foreach (var project in projects.Skip(1).Take(2))
+                    @foreach (var project in featuredSecondary)
                     {
                         <a href="/projects/@project.Id" class="featured-item">
                             <div class="featured-thumb featured-thumb--small">
@@ -364,17 +364,66 @@
     private List<ProjectCardDto> projects = new();
     private bool isLoading = true;
 
+    // Destaques: o principal é fixo (CreatedAt mais recente) e os menores são sorteados com a semente da sessão
+    private const string FeaturedSeedKey = "wpdev-featured-seed";
+    private const int FeaturedSecondaryCount = 2;
+    private ProjectCardDto? featuredPrimary;
+    private List<ProjectCardDto> featuredSecondary = new();
+
     protected override async Task OnInitializedAsync()
     {
         // Consome do cache que já começou no boot do WASM (Program.cs).
         // Se os dados já chegaram, retorna na hora. Se não, aguarda
         // o resto do tempo aqui, mas em paralelo com o boot do Blazor.
         projects = await DataCache.GetFeaturedAsync();
+
+        // O sorteio acontece aqui, antes do primeiro render da seção: nada troca depois de aparecer
+        await SelectFeaturedAsync();
         isLoading = false;
 
         // Os últimos posts NÃO entram na espera da splash: carregam em segundo plano
         // e a seção aparece quando chegarem (ou fica oculta se falhar).
         _ = LoadPostsAsync();
+    }
+
+    private async Task SelectFeaturedAsync()
+    {
+        var stored = await ReadFeaturedSeedAsync();
+        var seed = FeaturedSelector.ResolveSeed(stored, Random.Shared.Next(), out var isNew);
+
+        if (isNew)
+        {
+            await WriteFeaturedSeedAsync(seed.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        var selection = FeaturedSelector.Pick(projects, p => p.CreatedAt, FeaturedSecondaryCount, seed);
+        featuredPrimary = selection.Primary;
+        featuredSecondary = selection.Secondary.ToList();
+    }
+
+    // JSInterop só com strings. Qualquer falha do storage vira "sem semente guardada": usa uma por carregamento
+    private async Task<string?> ReadFeaturedSeedAsync()
+    {
+        try
+        {
+            return await JS.InvokeAsync<string?>("wpdevSessionGet", FeaturedSeedKey);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task WriteFeaturedSeedAsync(string seed)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("wpdevSessionSet", FeaturedSeedKey, seed);
+        }
+        catch
+        {
+            // Sem storage: segue com a semente só desta página
+        }
     }
 
     private List<BlogPostCardDto> latestPosts = new();
