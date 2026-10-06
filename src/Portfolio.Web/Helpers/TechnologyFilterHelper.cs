@@ -12,15 +12,20 @@ namespace Portfolio.Web.Helpers;
 public static class TechnologyFilterHelper
 {
     /// <summary>
-    /// Lista única de tecnologias para os chips: nomes canônicos, sem duplicados e em ordem alfabética.
+    /// Lista única de tecnologias para os chips: nomes canônicos, sem duplicados, da mais usada para a menos usada.
+    /// A frequência é a quantidade de projetos que usam a tecnologia, contada pela chave canônica (CSS, CSS3 e
+    /// CSS 3 são uma só, e um projeto que lista mais de uma grafia conta uma vez). O desempate é alfabético,
+    /// sem diferenciar maiúsculas. Quem chama passa só os projetos ativos (a API já devolve só esses).
     /// </summary>
     public static List<string> BuildAvailable(IEnumerable<IEnumerable<string>> technologiesByProject)
     {
         return technologiesByProject
             .SelectMany(TechnologyNormalizer.NormalizeAll)
             .GroupBy(TechnologyNormalizer.Key)
-            .Select(group => group.First())
-            .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
+            .Select(group => new { Name = group.First(), Projects = group.Count() })
+            .OrderByDescending(item => item.Projects)
+            .ThenBy(item => item.Name, StringComparer.InvariantCultureIgnoreCase)
+            .Select(item => item.Name)
             .ToList();
     }
 

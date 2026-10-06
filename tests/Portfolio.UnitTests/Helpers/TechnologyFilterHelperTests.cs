@@ -24,6 +24,70 @@ public class TechnologyFilterHelperTests
     }
 
     [Fact]
+    public void BuildAvailable_DeveOrdenarPorQuantidadeDeProjetos_DaMaiorParaAMenor()
+    {
+        // Em ordem alfabética seria CSS, Docker, React: a contagem inverte
+        var porProjeto = new[]
+        {
+            new[] { "React", "Docker", "CSS" },
+            new[] { "React", "Docker" },
+            new[] { "React" }
+        };
+
+        var disponiveis = TechnologyFilterHelper.BuildAvailable(porProjeto);
+
+        disponiveis.Should().Equal("React", "Docker", "CSS");
+    }
+
+    [Fact]
+    public void BuildAvailable_DeveDesempatarEmOrdemAlfabetica_SemDiferenciarMaiusculas()
+    {
+        var porProjeto = new[] { new[] { "zebra", "Alfa", "beta", "Gama" } };
+
+        var disponiveis = TechnologyFilterHelper.BuildAvailable(porProjeto);
+
+        disponiveis.Should().Equal("Alfa", "beta", "Gama", "zebra");
+    }
+
+    [Fact]
+    public void BuildAvailable_DeveContarGrafiasDiferentesComoUmaSoTecnologia()
+    {
+        // CSS aparece como CSS3, "CSS 3" e css em 3 projetos: junta 3, mais que AWS com 2
+        // (alfabeticamente AWS viria antes, então só a contagem unificada coloca CSS na frente)
+        var porProjeto = new[]
+        {
+            new[] { "CSS3", "AWS" },
+            new[] { "CSS 3", "AWS" },
+            new[] { "css" }
+        };
+
+        var disponiveis = TechnologyFilterHelper.BuildAvailable(porProjeto);
+
+        disponiveis.Should().Equal("CSS", "AWS");
+    }
+
+    [Fact]
+    public void BuildAvailable_DeveContarUmaVezPorProjeto_MesmoComVariasGrafiasNoMesmoProjeto()
+    {
+        var porProjeto = new[]
+        {
+            new[] { "CSS", "CSS3", "CSS 3" },
+            new[] { "Docker" },
+            new[] { "Docker" }
+        };
+
+        var disponiveis = TechnologyFilterHelper.BuildAvailable(porProjeto);
+
+        disponiveis.Should().Equal("Docker", "CSS");
+    }
+
+    [Fact]
+    public void BuildAvailable_DeveDevolverVazio_QuandoOsProjetosNaoTemTecnologias()
+    {
+        TechnologyFilterHelper.BuildAvailable(new[] { Array.Empty<string>(), new[] { " ", "" } }).Should().BeEmpty();
+    }
+
+    [Fact]
     public void BuildAvailable_DeveManterVersoesComoTecnologiasSeparadas()
     {
         var disponiveis = TechnologyFilterHelper.BuildAvailable(new[] { new[] { "Next.js", "Next.js 16", "Django 4.2" } });
