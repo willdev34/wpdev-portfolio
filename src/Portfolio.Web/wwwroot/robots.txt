@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://wpdev-portfolio-web.onrender.com/sitemap.xml
+Sitemap: https://www.wpdevbr.com/sitemap.xml

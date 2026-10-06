@@ -6,8 +6,8 @@
 #            so as paginas fixas em vez de quebrar o build.
 # ====================================
 
-API_URL="${1:-https://wpdev-portfolio-api.onrender.com}"
-SITE_URL="${2:-https://wpdev-portfolio-web.onrender.com}"
+API_URL="${1:-https://www.wpdevbr.com}"
+SITE_URL="${2:-https://www.wpdevbr.com}"
 OUTPUT="${3:-/app/publish/wwwroot/sitemap.xml}"
 TODAY=$(date -u +"%Y-%m-%d")
 

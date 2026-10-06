@@ -22,7 +22,7 @@ RUN dotnet publish src/Portfolio.Web/Portfolio.Web.csproj -c Release -o /app/pub
 RUN apt-get update && apt-get install -y --no-install-recommends curl jq && rm -rf /var/lib/apt/lists/*
 COPY src/Portfolio.Web/generate-sitemap.sh /tmp/generate-sitemap.sh
 RUN chmod +x /tmp/generate-sitemap.sh && \
-    /tmp/generate-sitemap.sh "https://wpdev-portfolio-api.vercel.app" "https://wpdev-portfolio-api.vercel.app"
+    /tmp/generate-sitemap.sh "https://www.wpdevbr.com" "https://www.wpdevbr.com"
 
 FROM nginx:alpine AS runtime
 
