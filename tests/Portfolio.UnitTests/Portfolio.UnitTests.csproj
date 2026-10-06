@@ -39,6 +39,11 @@
     <Compile Include="..\..\src\Portfolio.Web\Helpers\TechnologyFilterHelper.cs" Link="Linked\TechnologyFilterHelper.cs" />
     <Compile Include="..\..\src\Portfolio.Web\Helpers\FeaturedSelector.cs" Link="Linked\FeaturedSelector.cs" />
     <Compile Include="..\..\src\Portfolio.Web\Helpers\CloudinaryUrlHelper.cs" Link="Linked\CloudinaryUrlHelper.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\Helpers\ProjectStatusHelper.cs" Link="Linked\ProjectStatusHelper.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\Helpers\ProjectFormMapper.cs" Link="Linked\ProjectFormMapper.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\DTOs\Projects\ProjectDto.cs" Link="Linked\WebProjectDto.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\DTOs\Projects\CreateProjectDto.cs" Link="Linked\WebCreateProjectDto.cs" />
+    <Compile Include="..\..\src\Portfolio.Web\DTOs\Projects\UpdateProjectDto.cs" Link="Linked\WebUpdateProjectDto.cs" />
     <Compile Include="..\..\tools\DatabaseSetup\TechnologyCleanupPlanner.cs" Link="Linked\TechnologyCleanupPlanner.cs" />
     <Compile Include="..\..\src\Portfolio.Web\DTOs\Timeline\TimelineEventDto.cs" Link="Linked\TimelineEventDto.cs" />
   </ItemGroup>
