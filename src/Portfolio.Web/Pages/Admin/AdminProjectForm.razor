@@ -7,6 +7,7 @@
 @page "/admin/projects/edit/{Id:guid}"
 @layout Portfolio.Web.Layout.AdminLayout
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Portfolio.Application.Helpers
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -232,9 +233,11 @@
 
     private void AddTech()
     {
-        var tech = _newTech.Trim();
-        if (!string.IsNullOrWhiteSpace(tech) && !_form.Technologies.Contains(tech))
-            _form.Technologies.Add(tech);
+        foreach (var tech in TechnologyNormalizer.NormalizeAll(new[] { _newTech }))
+        {
+            if (!_form.Technologies.Any(t => TechnologyNormalizer.AreEquivalent(t, tech)))
+                _form.Technologies.Add(tech);
+        }
         _newTech = string.Empty;
     }
 

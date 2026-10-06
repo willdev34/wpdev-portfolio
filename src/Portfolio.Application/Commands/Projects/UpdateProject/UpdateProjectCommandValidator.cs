@@ -4,6 +4,7 @@
 // ====================================
 
 using FluentValidation;
+using Portfolio.Application.Helpers;
 using Portfolio.Domain.Entities;
 
 namespace Portfolio.Application.Commands.Projects.UpdateProject;
@@ -72,7 +73,11 @@ public class UpdateProjectCommandValidator : AbstractValidator<UpdateProjectComm
         // ====================================
         RuleFor(x => x.ProjectData.Technologies)
             .NotEmpty().WithMessage("Informe pelo menos uma tecnologia utilizada")
-            .Must(x => x.Count <= 10).WithMessage("Informe no máximo 10 tecnologias");
+            .Must(x => TechnologyNormalizer.NormalizeAll(x).Count > 0).WithMessage("Informe pelo menos uma tecnologia válida")
+            .Must(x => TechnologyNormalizer.NormalizeAll(x).Count <= 10).WithMessage("Informe no máximo 10 tecnologias");
+
+        RuleForEach(x => x.ProjectData.Technologies)
+            .MaximumLength(TechnologyNormalizer.MaxLength).WithMessage($"Cada tecnologia deve ter no máximo {TechnologyNormalizer.MaxLength} caracteres");
 
         // ====================================
         // VALIDAÇÃO DO ANO
