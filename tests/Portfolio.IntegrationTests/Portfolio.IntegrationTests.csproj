@@ -31,6 +31,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Portfolio.Api\Portfolio.Api.csproj" />
+    <!-- Mesmo helper do admin (Web): prova que o nome devolvido pela API vira o número que ela espera receber -->
+    <Compile Include="..\..\src\Portfolio.Web\Helpers\ProjectStatusHelper.cs" Link="Linked\ProjectStatusHelper.cs" />
   </ItemGroup>
 
 </Project>

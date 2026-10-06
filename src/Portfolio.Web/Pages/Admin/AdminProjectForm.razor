@@ -8,6 +8,8 @@
 @layout Portfolio.Web.Layout.AdminLayout
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @using Portfolio.Application.Helpers
+@using Portfolio.Web.DTOs.Projects
+@using Portfolio.Web.Helpers
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -55,12 +57,23 @@
                     </div>
                     <div class="field">
                         <label class="field__label">Status</label>
-                        <select class="field__select" @bind="_form.Status">
-                            <option value="0">Planejamento</option>
-                            <option value="1">Em andamento</option>
-                            <option value="2">Concluído</option>
-                            <option value="3">Arquivado</option>
+                        <select class="field__select" @bind="_form.Status" @bind:after="OnStatusChanged">
+                            @if (_unknownStatus is not null)
+                            {
+                                <option value="@ProjectStatusHelper.Unknown" disabled>Selecione um status</option>
+                            }
+                            @foreach (var option in ProjectStatusHelper.Options)
+                            {
+                                <option value="@option.Value">@option.Label</option>
+                            }
                         </select>
+                        @if (_unknownStatus is not null)
+                        {
+                            <div class="form-error" role="alert">
+                                O status atual deste projeto ("@_unknownStatus") não é reconhecido pelo formulário.
+                                Escolha um status para poder salvar.
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -133,11 +146,18 @@
     private bool _isEdit => Id.HasValue;
     private bool _isLoading = true;
     private bool _isSaving = false;
+    private const string StatusRequiredMessage = "Escolha um status para salvar o projeto.";
     private string _errorMessage = string.Empty;
     private string _successMessage = string.Empty;
     private string _newTech = string.Empty;
 
     private CreateProjectDto _form = new();
+
+    // Projeto como veio da API (só na edição): base do salvamento, para não alterar o que o formulário não edita
+    private ProjectDto? _original;
+
+    // Texto do status que a API devolveu e o formulário não reconhece; enquanto houver, o salvamento fica bloqueado
+    private string? _unknownStatus;
 
     protected override async Task OnInitializedAsync()
     {
@@ -152,18 +172,10 @@
                 return;
             }
 
-            _form = new CreateProjectDto
-            {
-                Title = project.Title,
-                Description = project.Description,
-                ShortDescription = project.ShortDescription,
-                ImageUrl = project.ImageUrl,
-                DemoUrl = project.DemoUrl,
-                RepositoryUrl = project.RepositoryUrl,
-                Technologies = new List<string>(project.Technologies),
-                Year = project.Year,
-                IsFeatured = project.IsFeatured
-            };
+            _original = project;
+            var loaded = ProjectFormMapper.ToForm(project);
+            _form = loaded.Form;
+            _unknownStatus = loaded.UnknownStatus;
         }
 
         _isLoading = false;
@@ -179,26 +191,19 @@
             return;
         }
 
+        // Nunca grava um status que o usuário não escolheu (por exemplo, um nome desconhecido vindo da API)
+        if (!ProjectStatusHelper.IsValid(_form.Status))
+        {
+            _errorMessage = StatusRequiredMessage;
+            return;
+        }
+
         _isSaving = true;
         _errorMessage = string.Empty;
 
         if (_isEdit)
         {
-            var updateDto = new UpdateProjectDto
-            {
-                Id = Id!.Value,
-                Title = _form.Title,
-                Description = _form.Description,
-                ShortDescription = _form.ShortDescription,
-                ImageUrl = _form.ImageUrl,
-                DemoUrl = _form.DemoUrl,
-                RepositoryUrl = _form.RepositoryUrl,
-                Technologies = _form.Technologies,
-                Year = _form.Year,
-                IsFeatured = _form.IsFeatured,
-                Status = _form.Status,
-                IsActive = true
-            };
+            var updateDto = ProjectFormMapper.ToUpdate(_original!, _form);
 
             var (success, error) = await ProjectService.UpdateAsync(updateDto);
 
@@ -229,6 +234,21 @@
        await InvokeAsync(StateHasChanged);
        await Task.Delay(5000);
        await JS.InvokeVoidAsync("eval", "window.location.href='/admin/projects'");
+    }
+
+    private void OnStatusChanged()
+    {
+        // Escolher um status válido resolve o aviso e libera o salvamento
+        if (ProjectStatusHelper.IsValid(_form.Status))
+        {
+            _unknownStatus = null;
+
+            // A mensagem do bloqueio anterior não faz mais sentido; outros erros continuam até o próximo envio
+            if (_errorMessage == StatusRequiredMessage)
+            {
+                _errorMessage = string.Empty;
+            }
+        }
     }
 
     private void AddTech()
