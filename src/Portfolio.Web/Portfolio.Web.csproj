@@ -15,4 +15,9 @@
     <PackageReference Include="System.Net.Http.Json" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Mesma regra de nomes do Application, compilada por link: o Web não referencia o Application -->
+    <Compile Include="..\Portfolio.Application\Helpers\TechnologyNormalizer.cs" Link="Helpers\TechnologyNormalizer.cs" />
+  </ItemGroup>
+
 </Project>

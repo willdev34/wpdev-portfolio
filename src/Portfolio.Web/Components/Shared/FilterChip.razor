@@ -10,6 +10,7 @@
 <button 
     type="button"
     class="filter-chip @VariantClass @SizeClass @ActiveClass @Class"
+    aria-pressed="@(IsActive ? "true" : "false")"
     @onclick="HandleClick"
     disabled="@Disabled"
     @attributes="AdditionalAttributes">

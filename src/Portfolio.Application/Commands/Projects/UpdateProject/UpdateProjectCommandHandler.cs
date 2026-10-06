@@ -5,6 +5,7 @@
 
 using AutoMapper;
 using MediatR;
+using Portfolio.Application.Helpers;
 using Portfolio.Application.Interfaces;
 
 namespace Portfolio.Application.Commands.Projects.UpdateProject;
@@ -54,6 +55,9 @@ public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand,
         // ====================================
         // 2. CONVERTER DTO → ENTITY
         // ====================================
+        // Nomes de tecnologia sempre canônicos e sem duplicados antes de gravar
+        request.ProjectData.Technologies = TechnologyNormalizer.NormalizeAll(request.ProjectData.Technologies);
+
         var updatedProject = _mapper.Map(request.ProjectData, existingProject);
 
         // ====================================

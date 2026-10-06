@@ -1,5 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Portfolio.Infrastructure.Data;
+
+// Subcomando de dados: dotnet run --project tools/DatabaseSetup -- normalize-technologies [--apply]
+// Sem argumentos, mantém o comportamento original (criar o banco local).
+if (args.Length > 0 && args[0] == "normalize-technologies")
+{
+    return await DatabaseSetup.TechnologyCleanupRunner.RunAsync(args.Contains("--apply"));
+}
 
 Console.WriteLine("🚀 Iniciando criação do banco de dados...");
 
@@ -13,3 +20,5 @@ await context.Database.EnsureCreatedAsync();
 
 Console.WriteLine("✅ Banco de dados criado com sucesso!");
 Console.WriteLine("✅ Todas as tabelas foram criadas!");
+
+return 0;

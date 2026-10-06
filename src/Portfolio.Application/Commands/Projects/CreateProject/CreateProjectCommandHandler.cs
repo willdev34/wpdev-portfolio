@@ -6,6 +6,7 @@
 using AutoMapper;
 using MediatR;
 using Portfolio.Application.DTOs.Projects;
+using Portfolio.Application.Helpers;
 using Portfolio.Application.Interfaces;
 using Portfolio.Domain.Entities;
 
@@ -48,6 +49,9 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
         // 1. CONVERTER DTO → ENTITY
         // ====================================
         // O AutoMapper usa o Profile que criamos para fazer a conversão
+        // Nomes de tecnologia sempre canônicos e sem duplicados antes de gravar
+        request.ProjectData.Technologies = TechnologyNormalizer.NormalizeAll(request.ProjectData.Technologies);
+
         var project = _mapper.Map<Project>(request.ProjectData);
 
         // ====================================

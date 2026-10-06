@@ -67,7 +67,7 @@
 /* Filters Container */
 .filters-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
     flex-wrap: wrap;
 }
@@ -79,13 +79,108 @@
     color: #0D1C24;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    /* Alinha o rótulo com a primeira linha de chips */
+    line-height: 36px;
+}
+
+/*
+   Filtro resumido em 2 linhas. Para a medida ser estável de 360 a 1280 px, todo chip tem altura fixa
+   (--chip-h) e o espaçamento é fixo (--chip-gap): o limite recolhido é 2 chips mais 1 espaço, nunca
+   depende de line-height nem da fonte. O padding de 3px (com margem negativa) só dá folga para o
+   outline de foco não ser cortado pelo overflow: hidden.
+*/
+.filters-area {
+    --chip-h: 36px;
+    --chip-gap: 12px;
+    --chip-bleed: 3px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
 }
 
 .filters-chips {
+    position: relative;
     display: flex;
-    gap: 12px;
     flex-wrap: wrap;
+    gap: var(--chip-gap);
     flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: var(--chip-bleed);
+    margin: calc(var(--chip-bleed) * -1);
+    max-height: calc(var(--chip-h) * 2 + var(--chip-gap) + var(--chip-bleed) * 2);
+    overflow: hidden;
+}
+
+.filters-chips--expanded {
+    max-height: none;
+    overflow: visible;
+}
+
+.filters-chips ::deep .filter-chip {
+    box-sizing: border-box;
+    height: var(--chip-h);
+    min-height: var(--chip-h);
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1;
+}
+
+/* Sem subir 1px no hover: o overflow: hidden cortaria a primeira linha */
+.filters-chips ::deep .filter-chip:hover:not(:disabled) {
+    transform: none;
+}
+
+.filters-toggle {
+    display: none;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--chip-h);
+    height: var(--chip-h);
+    padding: 0;
+    border: 2px solid rgba(13, 28, 36, 0.2);
+    border-radius: 50%;
+    background: transparent;
+    color: #0D1C24;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+/* Com tecnologias selecionadas e o filtro recolhido, vira uma pílula com a quantidade ao lado do glifo */
+.filters-toggle--count {
+    width: auto;
+    min-width: var(--chip-h);
+    padding: 0 12px;
+    gap: 6px;
+    border-radius: calc(var(--chip-h) / 2);
+    border-color: #6C9EA3;
+}
+
+.filters-toggle__count {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6C9EA3;
+}
+
+.filters-area[data-overflow="true"] .filters-toggle {
+    display: inline-flex;
+}
+
+.filters-toggle:hover {
+    background: rgba(13, 28, 36, 0.05);
+    border-color: rgba(13, 28, 36, 0.3);
+}
+
+.filters-toggle:focus-visible {
+    outline: 2px solid #6C9EA3;
+    outline-offset: 2px;
 }
 
 /* ====================================
@@ -177,9 +272,10 @@
 
     .filters-label {
         width: 100%;
+        line-height: 1.4;
     }
 
-    .filters-chips {
+    .filters-area {
         width: 100%;
     }
 }
