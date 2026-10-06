@@ -40,6 +40,20 @@ public static class TechnologyFilterHelper
         return projectTechnologies.Any(tech => selectedKeys.Contains(TechnologyNormalizer.Key(TechnologyNormalizer.Normalize(tech))));
     }
 
+    public const string ToggleBaseLabel = "Todas as tecnologias";
+
+    /// <summary>
+    /// A quantidade só aparece com o filtro recolhido e ao menos uma tecnologia selecionada: expandido,
+    /// os chips selecionados já estão visíveis.
+    /// </summary>
+    public static bool ShowsSelectedCount(int selectedCount, bool expanded) => !expanded && selectedCount > 0;
+
+    /// <summary>
+    /// Rótulo acessível do botão de expandir: "Todas as tecnologias" ou "Todas as tecnologias (N)".
+    /// </summary>
+    public static string BuildToggleLabel(int selectedCount, bool expanded) =>
+        ShowsSelectedCount(selectedCount, expanded) ? $"{ToggleBaseLabel} ({selectedCount})" : ToggleBaseLabel;
+
     /// <summary>
     /// Resolve o valor de ?tech= para o nome exibido no chip, normalizando antes: links antigos como
     /// ?tech=CSS 3 ou ?tech=html5 continuam funcionando. Devolve null se não houver tecnologia equivalente.

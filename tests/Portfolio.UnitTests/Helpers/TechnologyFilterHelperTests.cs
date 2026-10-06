@@ -67,6 +67,28 @@ public class TechnologyFilterHelperTests
     }
 
     [Theory]
+    [InlineData(0, false, "Todas as tecnologias")]
+    [InlineData(0, true, "Todas as tecnologias")]
+    [InlineData(1, false, "Todas as tecnologias (1)")]
+    [InlineData(3, false, "Todas as tecnologias (3)")]
+    [InlineData(12, false, "Todas as tecnologias (12)")]
+    [InlineData(3, true, "Todas as tecnologias")]
+    public void BuildToggleLabel_DeveMostrarAQuantidade_SoRecolhidoEComSelecao(int selecionadas, bool expandido, string esperado)
+    {
+        TechnologyFilterHelper.BuildToggleLabel(selecionadas, expandido).Should().Be(esperado);
+    }
+
+    [Theory]
+    [InlineData(0, false, false)]
+    [InlineData(2, false, true)]
+    [InlineData(2, true, false)]
+    [InlineData(0, true, false)]
+    public void ShowsSelectedCount_DeveSerVerdadeiro_SoRecolhidoEComSelecao(int selecionadas, bool expandido, bool esperado)
+    {
+        TechnologyFilterHelper.ShowsSelectedCount(selecionadas, expandido).Should().Be(esperado);
+    }
+
+    [Theory]
     [InlineData("CSS 3", "CSS")]
     [InlineData("css3", "CSS")]
     [InlineData("html 5", "HTML")]

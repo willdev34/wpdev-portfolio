@@ -50,12 +50,17 @@
                     @* Botão "+" / "−": só aparece (CSS via data-overflow) quando os chips passam de 2 linhas.
                        O rótulo é constante e o estado vai em aria-expanded; o glifo é decorativo. *@
                     <button type="button"
-                            class="filters-toggle"
-                            aria-label="Todas as tecnologias"
+                            class="filters-toggle @(TechnologyFilterHelper.ShowsSelectedCount(selectedTechnologies.Count, filtersExpanded) ? "filters-toggle--count" : "")"
+                            aria-label="@TechnologyFilterHelper.BuildToggleLabel(selectedTechnologies.Count, filtersExpanded)"
                             aria-expanded="@(filtersExpanded ? "true" : "false")"
                             aria-controls="@TechFilterId"
                             @onclick="ToggleFiltersExpanded">
                         <span aria-hidden="true">@(filtersExpanded ? "−" : "+")</span>
+                        @* A quantidade visível é decorativa: o aria-label já anuncia "Todas as tecnologias (N)" *@
+                        @if (TechnologyFilterHelper.ShowsSelectedCount(selectedTechnologies.Count, filtersExpanded))
+                        {
+                            <span class="filters-toggle__count" aria-hidden="true">@selectedTechnologies.Count</span>
+                        }
                     </button>
                 </div>
             </div>

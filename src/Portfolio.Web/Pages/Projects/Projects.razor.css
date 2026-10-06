@@ -153,6 +153,22 @@
     transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+/* Com tecnologias selecionadas e o filtro recolhido, vira uma pílula com a quantidade ao lado do glifo */
+.filters-toggle--count {
+    width: auto;
+    min-width: var(--chip-h);
+    padding: 0 12px;
+    gap: 6px;
+    border-radius: calc(var(--chip-h) / 2);
+    border-color: #6C9EA3;
+}
+
+.filters-toggle__count {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6C9EA3;
+}
+
 .filters-area[data-overflow="true"] .filters-toggle {
     display: inline-flex;
 }
