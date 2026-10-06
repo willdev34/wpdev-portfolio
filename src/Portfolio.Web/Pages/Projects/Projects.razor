@@ -89,12 +89,12 @@
                         ImageUrl="@project.ImageUrl"
                         Badge="@FormatBadge(project)"
                         OnClick="() => NavigateToProject(project.Id)">
-                        <HeaderContent>
+                        <BodyContent>
                             @foreach (var tech in project.Technologies)
                             {
                                 <span class="tech-tag">@tech</span>
                             }
-                        </HeaderContent>
+                        </BodyContent>
                     </Card>
                 }
             </div>
