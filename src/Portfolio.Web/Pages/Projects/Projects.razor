@@ -1,6 +1,8 @@
 @page "/projects"
 @using Portfolio.Web.DTOs.Projects
 @using Portfolio.Web.Services
+@using Portfolio.Web.Helpers
+@using Portfolio.Application.Helpers
 @inject ProjectService ProjectService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -35,14 +37,26 @@
             <!-- Filter Chips -->
             <div class="filters-container">
                 <span class="filters-label">Tecnologias:</span>
-                <div class="filters-chips">
-                    @foreach (var tech in availableTechnologies)
-                    {
-                        <FilterChip 
-                            Label="@tech"
-                            IsActive="selectedTechnologies.Contains(tech)"
-                            OnClick="() => ToggleTechnology(tech)" />
-                    }
+                <div class="filters-area">
+                    <div id="@TechFilterId" class="filters-chips @(filtersExpanded ? "filters-chips--expanded" : "")">
+                        @foreach (var tech in availableTechnologies)
+                        {
+                            <FilterChip 
+                                Label="@tech"
+                                IsActive="selectedTechnologies.Contains(tech)"
+                                OnClick="() => ToggleTechnology(tech)" />
+                        }
+                    </div>
+                    @* Botão "+" / "−": só aparece (CSS via data-overflow) quando os chips passam de 2 linhas.
+                       O rótulo é constante e o estado vai em aria-expanded; o glifo é decorativo. *@
+                    <button type="button"
+                            class="filters-toggle"
+                            aria-label="Todas as tecnologias"
+                            aria-expanded="@(filtersExpanded ? "true" : "false")"
+                            aria-controls="@TechFilterId"
+                            @onclick="ToggleFiltersExpanded">
+                        <span aria-hidden="true">@(filtersExpanded ? "−" : "+")</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -90,7 +104,7 @@
                         Badge="@FormatBadge(project)"
                         OnClick="() => NavigateToProject(project.Id)">
                         <BodyContent>
-                            @foreach (var tech in project.Technologies)
+                            @foreach (var tech in TechnologyNormalizer.NormalizeAll(project.Technologies))
                             {
                                 <span class="tech-tag">@tech</span>
                             }
@@ -130,6 +144,8 @@
     private string searchQuery = string.Empty;
     private HashSet<string> selectedTechnologies = new();
     private List<string> availableTechnologies = new();
+    private bool filtersExpanded;
+    private const string TechFilterId = "tech-filter-chips";
     
     // Pagination
     private int currentPage = 1;
@@ -163,21 +179,20 @@
             allProjects = await ProjectService.GetAllAsync();
 
             // Tecnologias disponiveis, calculadas a partir dos projetos reais
-            availableTechnologies = allProjects
-                .SelectMany(p => p.Technologies)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(t => t)
-                .ToList();
+            // (nomes canônicos e sem variações como CSS3 e CSS 3)
+            availableTechnologies = TechnologyFilterHelper.BuildAvailable(allProjects.Select(p => p.Technologies));
 
             // Pre-seleciona a tecnologia vinda pela URL, se houver (ex: /projects?tech=Blazor)
             if (!string.IsNullOrWhiteSpace(TechFilter))
             {
-                var match = availableTechnologies
-                    .FirstOrDefault(t => t.Equals(TechFilter, StringComparison.OrdinalIgnoreCase));
+                // O valor da URL passa pelo normalizador, então links antigos (?tech=CSS 3) continuam valendo
+                var match = TechnologyFilterHelper.ResolveFromQuery(TechFilter, availableTechnologies);
 
                 if (match is not null)
                 {
                     selectedTechnologies.Add(match);
+                    // O chip selecionado pode estar além da 2ª linha: começa expandido para ele ficar visível
+                    filtersExpanded = true;
                 }
             }
 
@@ -216,16 +231,10 @@
             );
         }
 
-        // Aplicar filtro por tecnologias (busca parcial, case-insensitive)
+        // Aplicar filtro por tecnologias (casamento exato pela chave canônica, sem diferenciar maiúsculas)
         if (selectedTechnologies.Any())
         {
-            query = query.Where(p => 
-                p.Technologies.Any(tech => 
-                    selectedTechnologies.Any(selected => 
-                        tech.Contains(selected, StringComparison.OrdinalIgnoreCase)
-                    )
-                )
-            );
+            query = query.Where(p => TechnologyFilterHelper.MatchesAny(p.Technologies, selectedTechnologies));
         }
 
         // Mais recentes primeiro (pelo ano real do projeto, nao pela data de cadastro)
@@ -274,6 +283,11 @@
         ApplyFilters();
     }
 
+    private void ToggleFiltersExpanded()
+    {
+        filtersExpanded = !filtersExpanded;
+    }
+
     private void HandlePageChange(int newPage)
     {
         currentPage = newPage;
@@ -311,6 +325,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!isLoading && availableTechnologies.Count > 0)
+        {
+            // Só uma string: o JS mede as linhas dos chips e marca data-overflow
+            await JS.InvokeVoidAsync("wpdevSetupTechFilter", TechFilterId);
+        }
+
         if (paginatedProjects.Count > 0)
         {
             await JS.InvokeVoidAsync("setupScrollReveal");
