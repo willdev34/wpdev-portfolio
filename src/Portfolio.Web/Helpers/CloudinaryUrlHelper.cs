@@ -44,6 +44,20 @@ public static class CloudinaryUrlHelper
     /// <summary>
     /// Largura recomendada para thumbnails em grids de cards (Projects, Blog)
     /// </summary>
+    /// <summary>
+    /// Monta o valor do atributo srcset ("url 480w, url 800w, ...") com uma versão otimizada por largura.
+    /// Devolve null quando a URL não é do Cloudinary, para o atributo nem ser renderizado.
+    /// </summary>
+    public static string? BuildSrcSet(string? url, IEnumerable<int> widths)
+    {
+        if (string.IsNullOrWhiteSpace(url) || !url.Contains("/upload/", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return string.Join(", ", widths.Select(width => $"{Optimize(url, width)} {width}w"));
+    }
+
     public const int ThumbnailWidth = 480;
 
     /// <summary>

@@ -7,6 +7,7 @@
 
 @page "/"
 @using Portfolio.Web.Services
+@using Portfolio.Application.Helpers
 @using Portfolio.Web.DTOs.Projects
 @using Portfolio.Web.DTOs.BlogPosts
 @using Portfolio.Web.Components
@@ -88,42 +89,48 @@
 
         @if (isLoading)
         {
-            <div class="featured-grid">
-                <div class="featured-item featured-item--large">
-                    <LoadingSkeleton Lines="1" Height="320px" />
-                    <div style="margin-top:1.5rem">
-                        <LoadingSkeleton Lines="1" Width="60%" Height="28px" />
-                        <LoadingSkeleton Lines="2" />
+            @* Esqueleto com a mesma geometria do layout final (principal + menores): a proporção 3:2 já reserva o espaço *@
+            <div class="featured-grid" aria-hidden="true">
+                <div class="featured-item featured-item--primary">
+                    <div class="featured-thumb featured-skeleton"></div>
+                    <div class="featured-info">
+                        <div class="featured-skeleton featured-skeleton--tags"></div>
+                        <div class="featured-skeleton featured-skeleton--title"></div>
+                        <div class="featured-skeleton featured-skeleton--line"></div>
+                        <div class="featured-skeleton featured-skeleton--line featured-skeleton--short"></div>
                     </div>
                 </div>
                 <div class="featured-stack">
-                    <div class="featured-item">
-                        <LoadingSkeleton Lines="1" Height="180px" />
-                        <div style="margin-top:1rem">
-                            <LoadingSkeleton Lines="1" Width="70%" Height="22px" />
-                            <LoadingSkeleton Lines="1" />
+                    @for (var i = 0; i < FeaturedSecondaryCount; i++)
+                    {
+                        <div class="featured-item featured-item--compact">
+                            <div class="featured-thumb featured-skeleton"></div>
+                            <div class="featured-info">
+                                <div class="featured-skeleton featured-skeleton--tags"></div>
+                                <div class="featured-skeleton featured-skeleton--title featured-skeleton--title-small"></div>
+                                <div class="featured-skeleton featured-skeleton--line"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="featured-item">
-                        <LoadingSkeleton Lines="1" Height="180px" />
-                        <div style="margin-top:1rem">
-                            <LoadingSkeleton Lines="1" Width="70%" Height="22px" />
-                            <LoadingSkeleton Lines="1" />
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         }
-        else if (projects.Any())
+        else if (featuredPrimary is not null)
         {
+            @* Cada card tem UM link (o título); a área clicável do card inteiro é estendida por CSS (::after).
+               As tags são texto, não links: nada de <a> dentro de <a>. As imagens são decorativas (alt vazio),
+               porque o título já nomeia o card. *@
             <div class="featured-grid">
 
-                <!-- Projeto principal: maior -->
-                <a href="/projects/@projects[0].Id" class="featured-item featured-item--large">
+                <!-- Projeto principal: fixo, o mais recente entre os destaques -->
+                <article class="featured-item featured-item--primary">
                     <div class="featured-thumb">
-                        @if (!string.IsNullOrEmpty(projects[0].ImageUrl))
+                        @if (!string.IsNullOrEmpty(featuredPrimary.ImageUrl))
                         {
-                            <img src="@CloudinaryUrlHelper.Optimize(projects[0].ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@projects[0].Title" loading="eager" decoding="async" />
+                            <img src="@CloudinaryUrlHelper.Optimize(featuredPrimary.ImageUrl, CloudinaryUrlHelper.HeroWidth)"
+                                 srcset="@CloudinaryUrlHelper.BuildSrcSet(featuredPrimary.ImageUrl, PrimaryImageWidths)"
+                                 sizes="@PrimaryImageSizes"
+                                 alt="" width="1200" height="800" loading="lazy" decoding="async" />
                         }
                         else
                         {
@@ -132,25 +139,26 @@
                     </div>
                     <div class="featured-info">
                         <div class="featured-tech-row">
-                            @foreach (var tech in projects[0].Technologies.Take(3))
+                            @foreach (var tech in TechnologyNormalizer.NormalizeAll(featuredPrimary.Technologies).Take(3))
                             {
-                                <a href="/projects?tech=@Uri.EscapeDataString(tech)" class="featured-tech" @onclick:stopPropagation="true">@tech</a>
+                                <span class="featured-tech">@tech</span>
                             }
                         </div>
-                        <h3 class="featured-title">@projects[0].Title</h3>
-                        <p class="featured-desc">@projects[0].ShortDescription</p>
+                        <h3 class="featured-title"><a class="featured-link" href="/projects/@featuredPrimary.Id">@featuredPrimary.Title</a></h3>
+                        <p class="featured-desc">@featuredPrimary.ShortDescription</p>
                     </div>
-                </a>
+                </article>
 
-                <!-- Projetos secundários: stack vertical -->
+                <!-- Projetos sorteados: cards horizontais -->
                 <div class="featured-stack">
-                    @foreach (var project in projects.Skip(1).Take(2))
+                    @foreach (var project in featuredSecondary)
                     {
-                        <a href="/projects/@project.Id" class="featured-item">
-                            <div class="featured-thumb featured-thumb--small">
+                        <article class="featured-item featured-item--compact">
+                            <div class="featured-thumb">
                                 @if (!string.IsNullOrEmpty(project.ImageUrl))
                                 {
-                                    <img src="@CloudinaryUrlHelper.Optimize(project.ImageUrl, CloudinaryUrlHelper.HeroWidth)" alt="@project.Title" loading="lazy" decoding="async" />
+                                    <img src="@CloudinaryUrlHelper.Optimize(project.ImageUrl, CloudinaryUrlHelper.ThumbnailWidth)"
+                                         alt="" width="480" height="320" loading="lazy" decoding="async" />
                                 }
                                 else
                                 {
@@ -159,15 +167,15 @@
                             </div>
                             <div class="featured-info">
                                 <div class="featured-tech-row">
-                                    @foreach (var tech in project.Technologies.Take(2))
+                                    @foreach (var tech in TechnologyNormalizer.NormalizeAll(project.Technologies).Take(2))
                                     {
-                                        <a href="/projects?tech=@Uri.EscapeDataString(tech)" class="featured-tech" @onclick:stopPropagation="true">@tech</a>
+                                        <span class="featured-tech">@tech</span>
                                     }
                                 </div>
-                                <h3 class="featured-title featured-title--small">@project.Title</h3>
+                                <h3 class="featured-title featured-title--small"><a class="featured-link" href="/projects/@project.Id">@project.Title</a></h3>
                                 <p class="featured-desc featured-desc--small">@project.ShortDescription</p>
                             </div>
-                        </a>
+                        </article>
                     }
                 </div>
 
@@ -178,8 +186,7 @@
                     Ver todos os projetos →
                 </a>
             </div>
-        }
-        else
+        }        else
         {
             <div class="home-empty">
                 <p>Nenhum projeto em destaque ainda.</p>
@@ -364,17 +371,70 @@
     private List<ProjectCardDto> projects = new();
     private bool isLoading = true;
 
+    // Destaques: o principal é fixo (CreatedAt mais recente) e os menores são sorteados com a semente da sessão
+    private const string FeaturedSeedKey = "wpdev-featured-seed";
+    private const int FeaturedSecondaryCount = 3;
+
+    // Imagem do principal: três larguras e o espaço que ela ocupa (a coluna maior no desktop, a largura toda abaixo de 900px)
+    private static readonly int[] PrimaryImageWidths = { 480, 800, 1200 };
+    private const string PrimaryImageSizes = "(max-width: 900px) calc(100vw - 3rem), 780px";
+    private ProjectCardDto? featuredPrimary;
+    private List<ProjectCardDto> featuredSecondary = new();
+
     protected override async Task OnInitializedAsync()
     {
         // Consome do cache que já começou no boot do WASM (Program.cs).
         // Se os dados já chegaram, retorna na hora. Se não, aguarda
         // o resto do tempo aqui, mas em paralelo com o boot do Blazor.
         projects = await DataCache.GetFeaturedAsync();
+
+        // O sorteio acontece aqui, antes do primeiro render da seção: nada troca depois de aparecer
+        await SelectFeaturedAsync();
         isLoading = false;
 
         // Os últimos posts NÃO entram na espera da splash: carregam em segundo plano
         // e a seção aparece quando chegarem (ou fica oculta se falhar).
         _ = LoadPostsAsync();
+    }
+
+    private async Task SelectFeaturedAsync()
+    {
+        var stored = await ReadFeaturedSeedAsync();
+        var seed = FeaturedSelector.ResolveSeed(stored, Random.Shared.Next(), out var isNew);
+
+        if (isNew)
+        {
+            await WriteFeaturedSeedAsync(seed.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        var selection = FeaturedSelector.Pick(projects, p => p.CreatedAt, FeaturedSecondaryCount, seed);
+        featuredPrimary = selection.Primary;
+        featuredSecondary = selection.Secondary.ToList();
+    }
+
+    // JSInterop só com strings. Qualquer falha do storage vira "sem semente guardada": usa uma por carregamento
+    private async Task<string?> ReadFeaturedSeedAsync()
+    {
+        try
+        {
+            return await JS.InvokeAsync<string?>("wpdevSessionGet", FeaturedSeedKey);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task WriteFeaturedSeedAsync(string seed)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("wpdevSessionSet", FeaturedSeedKey, seed);
+        }
+        catch
+        {
+            // Sem storage: segue com a semente só desta página
+        }
     }
 
     private List<BlogPostCardDto> latestPosts = new();
